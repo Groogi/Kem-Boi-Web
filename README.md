@@ -1,3 +1,7 @@
+<p align="center">
+  <img width="217" height="205" alt="image" src="https://github.com/user-attachments/assets/07726160-1a50-4886-86fd-7df22a0ad3aa" />
+</p>
+
 <h1 align="center" style="margin-top"> Kem Boi </h1>
 
 
