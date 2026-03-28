@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  email: MyString
+  bonus_definition: one
+  points_amount: 1
+  status: MyString
+  expires_at: 2026-03-28 23:02:53
+  assigned_by_admin_id: 1
+  claimed_by_user_id: 1
+  claimed_at: 2026-03-28 23:02:53
+
+two:
+  email: MyString
+  bonus_definition: two
+  points_amount: 1
+  status: MyString
+  expires_at: 2026-03-28 23:02:53
+  assigned_by_admin_id: 1
+  claimed_by_user_id: 1
+  claimed_at: 2026-03-28 23:02:53

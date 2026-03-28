@@ -1,0 +1,2 @@
+class BonusDefinition < ApplicationRecord
+end
