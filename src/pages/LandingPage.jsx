@@ -18,7 +18,6 @@ function LandingPage() {
       <InstagramGrid/>
       </main>
       <Footer/>
-      {/* Footer */}
     </>
   );
 }
