@@ -10,7 +10,7 @@ function App(){
     <Routes>
       <Route path= '/' element={<LandingPage/>}/>
       <Route path= 'admin' element={<AdminPanel/>}/>
-      <Route path= 'Family' element={<FamilyBonusDashboard/>}/>
+      <Route path= 'family' element={<FamilyBonusDashboard/>}/>
     </Routes>
     </BrowserRouter>
   )
