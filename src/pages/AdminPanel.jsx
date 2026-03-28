@@ -1,8 +1,8 @@
-import SideNavbar from "../components/SideNavBar";
-import SubNav from "../components/SubNav";
-import UserList from "../components/UserList";
-import BonusEntryForm from "../components/BonusEntryForm";
-import FooterAdmin from "../components/FooterAdmin";
+import SideNavbar from "../components/Admin/SideNavBar";
+import SubNav from "../components/Admin/SubNav";
+import UserList from "../components/Admin/UserList";
+import BonusEntryForm from "../components/Admin/BonusEntryForm";
+import FooterAdmin from "../components/Admin/FooterAdmin";
 
 function AdminPanel(){
     return (
