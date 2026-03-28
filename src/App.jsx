@@ -1,25 +1,16 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React from "react";
+import { BrowserRouter,  Routes, Route} from "react-router-dom";
+import Test from "./pages/test";
+import LandingPage from "./pages/LandingPage";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+function App(){
   return (
-    <>
-      <div style={{ padding: '20px' }}>
-      <h1>Join the Kem Boi Family</h1>
-      <p>Enter your details to register</p>
-      
-      <input type="email" placeholder="Email Address" />
-      <br /><br />
-      <input type="password" placeholder="Password" />
-      <br /><br />
-      <button>Sign Up</button>
-    </div>
-    </>
+    <BrowserRouter>
+    <Routes>
+      <Route path= '/' element={<LandingPage/>}/>
+      <Route path= '/test' element={<Test/>}/>
+    </Routes>
+    </BrowserRouter>
   )
 }
 
