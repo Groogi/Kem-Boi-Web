@@ -1,4 +1,4 @@
-function VisaulLayers(){
+function VisualLayers(){
     return (
         <section className="py-24 bg-surface-container-low" id="menu">
           <div className="max-w-7xl mx-auto px-6">
@@ -37,4 +37,4 @@ function VisaulLayers(){
     )
 }
 
-export default VisaulLayers
+export default VisualLayers
