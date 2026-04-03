@@ -9,7 +9,7 @@ function AdminPanel(){
         <>
             <div className="bg-background text-on-surface min-h-screen">
                 <SideNavbar/>
-                <main className="ml-64 p-8 min-h-screen">
+                <div className="ml-64 p-8 min-h-screen">
                     <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <SubNav/>                        
                     </header>
@@ -17,7 +17,7 @@ function AdminPanel(){
                         <UserList/>
                         <BonusEntryForm/>
                     </div>
-                </main>
+                </div>
                 <FooterAdmin/>
             </div>
         </>

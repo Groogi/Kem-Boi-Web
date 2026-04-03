@@ -10,13 +10,13 @@ function LandingPage() {
   return (
     <>
       <Navbar/>
-      <main className="pt-20">
+      <div className="pt-20">
         <Hero/>
         <VisualLayers/>
         <Registration/>
         <Locations/>
         <InstagramGrid/>
-      </main>
+      </div>
       <Footer/>
     </>
   );
