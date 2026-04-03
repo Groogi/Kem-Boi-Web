@@ -1,0 +1,38 @@
+<p align="center">
+  <img width="217" height="205" alt="image" src="https://github.com/user-attachments/assets/07726160-1a50-4886-86fd-7df22a0ad3aa" />
+</p>
+
+<h1 align="center" style="margin-top"> Kem Boi </h1>
+
+### __Description__
+
+Kem Boi is a dessert brand launching on the Gold Coast, Australia. The company specializes in a Vietnamese-style avocado dessert combining avocado mousse, ice cream, and customizable toppings. The goal of the brand is not only to sell a product, but to build a modern, technology-driven ecosystem focused on customer engagement, community building, and long-term scalability.
+
+<img width="500" height="400" alt="image" src="https://github.com/user-attachments/assets/8d561338-7ae1-478a-aac8-24340fe93013" />
+
+
+### Frontend Dependencies
+
+#### NodeJS
+```https://nodejs.org/en```
+
+#### React-router-dom
+```npm install react-router-dom```
+
+#### Tailwind, Postcss, Autoprefixer
+```npm install -D tailwindcss@^3.4.0 postcss autoprefixer```
+
+### Backend Dependencies
+
+#### Ruby & Rails
+```https://rubyonrails.org/```
+
+#### PostgreSQL
+```https://www.postgresql.org/download/```
+
+#### Ruby Gems (Authentication, CORS, Database)
+The backend uses **BCrypt** for password hashing, **JWT** for secure user sessions, and **Rack-Cors** for CORS configuration. Make sure to download and start PostgreSQL before installing the Ruby gems.
+```bash
+cd backend
+bundle install
+```
