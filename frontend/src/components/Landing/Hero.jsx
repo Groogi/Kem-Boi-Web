@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 function Hero() {
   return (
     <section className="relative min-h-[921px] flex items-center px-6 overflow-hidden">
@@ -11,9 +13,9 @@ function Hero() {
             A silky symphony of fresh avocado mousse, artisanal coconut ice cream, and a crunch of toasted toppings. Experience the creamy heart of Dalat in every spoonful.
           </p>
           <div className="flex flex-wrap gap-4">
-            <button className="bg-primary text-on-primary px-8 py-4 rounded-full font-bold text-lg editorial-shadow hover:bg-primary-dim transition-all active:scale-95">
+            <Link to="/login" className="inline-block bg-primary text-on-primary px-8 py-4 rounded-full font-bold text-lg editorial-shadow hover:bg-primary-dim transition-all active:scale-95">
               Join the Kem Bơ Family
-            </button>
+            </Link>
             <button className="bg-surface-container-lowest border border-outline-variant/20 text-on-surface px-8 py-4 rounded-full font-bold text-lg hover:bg-surface-container-low transition-all active:scale-95">
               Our Story
             </button>

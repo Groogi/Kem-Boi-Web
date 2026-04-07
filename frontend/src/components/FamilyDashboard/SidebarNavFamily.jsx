@@ -1,7 +1,7 @@
 import { useAuth } from "../../context/AuthContext";
 
 function SidebarNavFamily(){
-    const { user } = useAuth();
+    const { } = useAuth(); // Removed unused 'user' destructuring
 
     return (
         <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-64 flex-col p-4 bg-[#f1f1ec] dark:bg-[#1e201d] pt-24">

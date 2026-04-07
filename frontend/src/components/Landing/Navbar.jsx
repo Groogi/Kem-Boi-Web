@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 function Navbar() {
     return (
         <nav className="fixed top-0 w-full z-50 bg-[#f7f7f2]/70 dark:bg-[#2d2f2c]/70 backdrop-blur-xl">
@@ -12,7 +14,7 @@ function Navbar() {
                     <a className="text-[#5a5c58] dark:text-[#adada9] hover:text-[#426500] font-['Plus_Jakarta_Sans'] text-sm transition-opacity" href="#story">Story</a>
                 </div>
                 <div className="flex items-center gap-4">
-                    <button className="material-symbols-outlined text-[#5a5c58] hover:text-[#426500] transition-colors">account_circle</button>
+                    <Link to="/login" className="material-symbols-outlined text-[#5a5c58] hover:text-[#426500] transition-colors">account_circle</Link>
                     <button className="bg-[#426500] text-[#dbffa4] px-6 py-2.5 rounded-full font-bold text-sm hover:opacity-90 active:scale-95 duration-200">
                         Order Now
                     </button>

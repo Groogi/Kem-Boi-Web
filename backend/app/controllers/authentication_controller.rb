@@ -8,7 +8,7 @@ class AuthenticationController < ApplicationController
       render json: { token: token, exp: time.strftime("%m-%d-%Y %H:%M"),
                      email: @user.email, name: @user.name }, status: :ok
     else
-      render json: { error: 'invalid credentials' }, status: :unauthorized
+      render json: { error: "invalid credentials" }, status: :unauthorized
     end
   end
 end
