@@ -25,8 +25,11 @@ dist-ssr
 
 # Backend specific
 backend/tmp/
+backend/tmp/cache/
 backend/log/*.log
 backend/storage/
+backend/storage/*.sqlite3
 backend/public/assets
 backend/node_modules/
+backend/config/master.key
 .byebug_history
