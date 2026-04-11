@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PendingBonuTest < ActiveSupport::TestCase
+class PendingBonusTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
