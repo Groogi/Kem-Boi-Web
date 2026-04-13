@@ -11,7 +11,7 @@ Kem Boi is a dessert brand launching on the Gold Coast, Australia. The company s
 <img width="500" height="400" alt="image" src="https://github.com/user-attachments/assets/8d561338-7ae1-478a-aac8-24340fe93013" />
 
 
-### Frontend Dependencies
+### Dependencies
 
 #### NodeJS
 ```https://nodejs.org/en```
@@ -22,17 +22,3 @@ Kem Boi is a dessert brand launching on the Gold Coast, Australia. The company s
 #### Tailwind, Postcss, Autoprefixer
 ```npm install -D tailwindcss@^3.4.0 postcss autoprefixer```
 
-### Backend Dependencies
-
-#### Ruby & Rails
-```https://rubyonrails.org/```
-
-#### PostgreSQL
-```https://www.postgresql.org/download/```
-
-#### Ruby Gems (Authentication, CORS, Database)
-The backend uses **BCrypt** for password hashing, **JWT** for secure user sessions, and **Rack-Cors** for CORS configuration. Make sure to download and start PostgreSQL before installing the Ruby gems.
-```bash
-cd backend
-bundle install
-```
