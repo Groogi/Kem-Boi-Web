@@ -11,7 +11,7 @@ function SideNavbar() {
     };
 
     return (
-        <aside className="fixed left-0 top-0 h-screen flex flex-col p-4 bg-[#f1f1ec] dark:bg-[#1e201d] h-full w-64 border-r-0 z-40">
+        <aside className="fixed left-0 top-0 h-screen flex flex-col p-4 bg-[#f7f7f2] dark:bg-[#1e201d] h-full w-64 border-r-0 z-40">
             <div className="mb-10 px-4">
                 <h1 className="text-xl font-bold text-[#426500] tracking-tight">
                     Kem Bơ Admin
@@ -74,3 +74,5 @@ function SideNavbar() {
 }
 
 export default SideNavbar
+
+

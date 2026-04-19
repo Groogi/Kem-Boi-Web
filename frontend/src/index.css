@@ -1,11 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Be+Vietnam+Pro:ital,wght@0,100..900;1,100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background-color: rgba(66, 101, 0, 0.15);
+  color: #1a2a00;
+}
+
 body {
   font-family: 'Be Vietnam Pro', sans-serif;
   background-color: #f7f7f2;
+  background-image: radial-gradient(circle at top right, #fdfdfc, #f7f7f2);
   color: #2d2f2c;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
 }
 
 .material-symbols-outlined {
@@ -19,3 +33,15 @@ body {
 }
 
 .glass-nav { background: rgba(247, 247, 242, 0.7); backdrop-filter: blur(20px); }
+
+/* Hide native date picker indicator */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  cursor: pointer;
+  position: absolute;
+  right: 1rem;
+  z-index: 10;
+}
+
+
+

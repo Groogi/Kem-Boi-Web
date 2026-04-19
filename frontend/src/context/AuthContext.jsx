@@ -14,7 +14,11 @@ export function AuthProvider({ children }) {
     localStorage.setItem('token', data.token);
     const userData = {
       email: data.email,
-      name: data.name,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      account_id: data.account_id,
+      role: data.role,
+      points_balance: data.points_balance,
       exp: data.exp,
     };
     localStorage.setItem('user', JSON.stringify(userData));
@@ -43,13 +47,23 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  const updateUser = (newData) => {
+    const updatedUser = { ...user, ...newData };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setUser(updatedUser);
+  };
+
   return (
-    <AuthContext.Provider value={{ token, user, isAuthenticated: !!token, login, register, logout }}>
+    <AuthContext.Provider value={{ token, user, isAuthenticated: !!token, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   return useContext(AuthContext);
 }
+
+
+

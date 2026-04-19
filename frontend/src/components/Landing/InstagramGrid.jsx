@@ -1,34 +1,74 @@
-function InstagramGrid(){
-    return (
-        <section className="py-24">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex justify-between items-end mb-12">
-              <div>
-                <h2 className="text-4xl font-bold font-headline mb-2">Social Feed</h2>
-                <p className="text-on-surface-variant">Tag us @KemBoAtelier to be featured.</p>
-              </div>
-              <button className="bg-primary text-on-primary px-8 py-3 rounded-full font-bold flex items-center gap-2 editorial-shadow">
-                <span className="material-symbols-outlined">photo_camera</span>
-                Follow
-              </button>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="aspect-square bg-surface-container rounded-lg overflow-hidden relative group">
-                <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQBlpR8qwaziFQhftN0Nf4frRJ7OgsfM2k2EEmxqVJ2wFXoyuwzVt8OTC0fzoHZbzoJQadRt-9LgVKwEQtIfzYK9O8rgXAloJEOQ3Kdq3XqIrSq0qkAMhvNKfWR7R_tQXzlSd2KiyV87o9-512UL5qMcgtJohkAE5T4qQVPFQtvKq8MjgWg0VcIAbLzE0zrmH2j_fpDvUkanSXXqyBZm_k_uvj-rK5h6v1FmsvtkIohE0rwdqOcmMGTlPeyZzFop7sBrlXsiFGf2Rr" alt="Close up of avocado dessert with coconut flakes" />
-              </div>
-              <div className="aspect-square bg-surface-container rounded-lg overflow-hidden relative group translate-y-8">
-                <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9j1RXnVXGbSbmB3QlEHXm0lznLc69clQ6HIx_9lkz9w17groA8zoPAvDkgOPwdcskApF9aL3mz1lSA2w62TY3h-J1JchN5IqQzV4HClm7vTLjiz-9v03iW7CAEww_wCCg-Ms_NeG1Z2c2hEE7pjEyQlkp7VRBlD4vmH0RbVSZmtm7qbSJGoLLK7zZ3eLeryzuW4dk4I795mP0iKWLE_aVrN770wneawEsFFYSMaSRVwm4nWPpXvoEQd8Y9tZSdlcxCd0vqBoJoJyA" alt="Minimalist shop interior with light wood and green accents" />
-              </div>
-              <div className="aspect-square bg-surface-container rounded-lg overflow-hidden relative group">
-                <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8GDZ64lBefApIE3akluo9o5uESCOTs36QNpGZ6RfrLyQD-Rjl_Z6K1RIGakRwYYQ-c7otcJcDynu3Kl0GOj3IXwqjLCpq71yzzLrt82Fp7eOX1cYNx90H4cRnMDjl2oVE2AleTeXTZ9Shyf-jCvp4cYO_DHpHRJzu4zuHazjf8rh8XnllTzqfZjkJhI1hxar4rvsAyFDceb6BbRTUn0IvBVu9jOGcHUB0JbmsJVNTGZilEe3FR3KZgl-1w9UjUSmprfzfFXPBQtc-" alt="Hands holding a cup of avocado dessert against a white wall" />
-              </div>
-              <div className="aspect-square bg-surface-container rounded-lg overflow-hidden relative group translate-y-8">
-                <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7wZqOxBPf5MhrAogVX7NvW0EQA0ldCwdVqR3wljiTzHgt9-wPUCCC2fyBH_N8pnDL1Ac2y1f6-gv5wz_8D6oNtmUHB9TYwIVpfdl-prZy5w3XBnNyQmOP8fys86M1v0sWq5z7hZrr--myUwMLIR8x4-RrhKeIkLO42KZ-AMg6snN_mSm0yi77l0j-P31SSub8kP1vY0Cn9rQmIbwAfb-fiep4a2ob8jjTtuErokLgWkt6Qxo2vUtcsJas47Sic8HVN99WaTTlnVjJ" alt="Artistic macro shot of creamy avocado mousse texture" />
-              </div>
+import React from 'react';
+
+function InstagramGrid() {
+  return (
+    <section className="pt-24 pb-20 md:pt-32 md:pb-24 bg-[#f7f7f2]">
+      <div className="max-w-[1440px] px-6 md:px-12 mx-auto">
+        {/* Header Section */}
+        <div className="mb-10 md:mb-14 relative">
+          <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 mb-4">
+            <h2 className="text-[36px] md:text-[60px] font-bold font-headline text-[#426500] tracking-[-1px] md:tracking-[-1.5px] leading-tight">
+              Tag Us On Socials
+            </h2>
+            <div className="flex gap-4 items-center opacity-80">
+              <svg width="36" height="36" className="md:w-[45px] md:h-[45px]" viewBox="0 0 24 24" fill="#5B5C59" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z"/></svg>
+              <svg width="36" height="36" className="md:w-[45px] md:h-[45px]" viewBox="0 0 24 24" fill="none" stroke="#5B5C59" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="20" height="20" rx="6" ry="6"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
             </div>
           </div>
-        </section>        
-    )
+          <p className="text-[#5B5C59] font-bold text-[22px] md:text-[35px] tracking-tight opacity-60">For Your Chance to be Featured</p>
+        </div>
+
+        {/* Masonry Scatter Grid (Images with shadows, no white border padding) */}
+        <div className="relative w-full h-[750px] lg:h-[709px] hidden lg:block">
+          <div className="absolute left-0 top-0 w-[342px] h-[278px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
+            <img src="/socials-holding.png" className="w-full h-full object-cover scale-[1.2]" alt="Social 1" />
+          </div>
+          <div className="absolute left-0 top-[298px] w-[203px] h-[411px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
+            <img src="/socials-dessert.png" className="w-full h-full object-cover scale-[1.2]" alt="Social 2" />
+          </div>
+          <div className="absolute left-[223px] top-[298px] w-[119px] h-[106px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
+            <img src="/socials-dessert.png" className="w-full h-full object-cover scale-[1.2]" alt="Social 3" />
+          </div>
+          <div className="absolute left-[223px] top-[424px] w-[258px] h-[285px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
+            <img src="/socials-swirl-1.png" className="w-full h-full object-cover scale-[1.2]" alt="Social 4" />
+          </div>
+          <div className="absolute left-[362px] top-[3px] w-[512px] h-[387px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
+            <img src="/socials-store-front.png" className="w-full h-full object-cover scale-[1.1]" alt="Social 5" />
+          </div>
+          <div className="absolute left-[501px] top-[424px] w-[373px] h-[285px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
+            <img src="/socials-holding.png" className="w-full h-full object-cover scale-[1.2]" alt="Social 6" />
+          </div>
+          <div className="absolute left-[894px] top-[3px] w-[435px] h-[301px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
+            <img src="/socials-dessert.png" className="w-full h-full object-cover scale-[1.2]" alt="Social 7" />
+          </div>
+          <div className="absolute left-[897px] top-[324px] w-[432px] h-[385px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
+            <img src="/socials-swirl-2.png" className="w-full h-full object-cover scale-[1.2]" alt="Social 8" />
+          </div>
+        </div>
+
+        {/* Mobile Grid */}
+        <div className="grid grid-cols-2 gap-4 lg:hidden px-2">
+            <div className="rounded-[20px] shadow-lg overflow-hidden h-[240px]">
+              <img src="/socials-holding.png" className="w-full h-full object-cover scale-[1.1]" alt="Social 1" />
+            </div>
+            <div className="rounded-[20px] shadow-lg overflow-hidden h-[280px] -mt-4">
+              <img src="/socials-dessert.png" className="w-full h-full object-cover scale-[1.1]" alt="Social 2" />
+            </div>
+            <div className="rounded-[20px] shadow-lg overflow-hidden h-[180px]">
+              <img src="/socials-swirl-1.png" className="w-full h-full object-cover scale-[1.1]" alt="Social 3" />
+            </div>
+            <div className="rounded-[20px] shadow-lg overflow-hidden h-[220px]">
+              <img src="/socials-store-front.png" className="w-full h-full object-cover scale-[1.1]" alt="Social 4" />
+            </div>
+            <div className="rounded-[20px] shadow-lg overflow-hidden h-[200px] col-span-2 -mt-4">
+              <img src="/socials-swirl-2.png" className="w-full h-full object-cover scale-[1.1]" alt="Social 5" />
+            </div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
-export default InstagramGrid
+export default InstagramGrid;
+
+

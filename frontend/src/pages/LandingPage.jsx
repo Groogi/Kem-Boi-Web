@@ -10,7 +10,7 @@ function LandingPage() {
   return (
     <>
       <Navbar/>
-      <div className="pt-20">
+      <div>
         <Hero/>
         <VisualLayers/>
         <Registration/>
@@ -23,3 +23,6 @@ function LandingPage() {
 }
 
 export default LandingPage;
+
+
+

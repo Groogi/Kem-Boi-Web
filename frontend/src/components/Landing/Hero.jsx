@@ -1,37 +1,40 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 function Hero() {
   return (
-    <section className="relative min-h-[921px] flex items-center px-6 overflow-hidden">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
-        <div className="order-2 lg:order-1">
-          <span className="inline-block px-4 py-1 bg-primary-container text-on-primary-container rounded-full text-xs font-bold tracking-widest uppercase mb-6">Traditional Reimagined</span>
-          <h1 className="text-5xl lg:text-7xl font-extrabold text-on-surface tracking-tight leading-[1.1] mb-6 font-headline">
-            Vietnamese <br /> <span className="text-primary italic">Avocado</span> Dessert
+    <section className="relative pt-32 pb-16 lg:pt-48 lg:pb-32 flex items-center px-6 overflow-hidden bg-[#f7f7f2]">
+      <div className="max-w-[1440px] px-4 md:px-12 mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
+        <div className="order-2 lg:order-1 flex flex-col items-center text-center lg:items-start lg:text-left lg:px-10">
+          <h1 className="text-[44px] md:text-5xl lg:text-[80px] font-extrabold text-[#426500] tracking-[-1.2px] md:tracking-[-1.6px] leading-[1.1] md:leading-[80px] mb-6 font-headline">
+            Vietnamese <br className="hidden md:block" /> <span className="whitespace-nowrap">Avocado Dessert</span>
           </h1>
-          <p className="text-lg text-on-surface-variant max-w-lg mb-10 leading-relaxed font-body">
-            A silky symphony of fresh avocado mousse, artisanal coconut ice cream, and a crunch of toasted toppings. Experience the creamy heart of Dalat in every spoonful.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link to="/login" className="inline-block bg-primary text-on-primary px-8 py-4 rounded-full font-bold text-lg editorial-shadow hover:bg-primary-dim transition-all active:scale-95">
-              Join the Kem Bơ Family
+          <div className="text-[#426500] text-[22px] md:text-[30px] font-bold tracking-tight mb-10 font-body opacity-80">
+            Traditional Reimagined
+          </div>
+          <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-5 w-full sm:w-auto">
+            <Link to="/login" className="inline-block bg-[#426500] text-[#f7f7f2] px-8 py-3.5 rounded-full font-bold text-[18px] shadow-[10px_10px_25px_rgba(66,101,0,0.1)] hover:bg-[#395800] transition-all hover:-translate-y-0.5 active:scale-95 font-headline text-center">
+              Join the Kem Boi Family
             </Link>
-            <button className="bg-surface-container-lowest border border-outline-variant/20 text-on-surface px-8 py-4 rounded-full font-bold text-lg hover:bg-surface-container-low transition-all active:scale-95">
+            <a href="#story" className="bg-[#EAF5D6] text-[#426500] px-14 py-3.5 rounded-full font-bold text-[18px] hover:bg-[#dcedb9] transition-all active:scale-95 font-headline flex items-center justify-center text-center">
               Our Story
-            </button>
+            </a>
           </div>
         </div>
-        <div className="order-1 lg:order-2 relative">
-          <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-primary-container/40 to-transparent rounded-full blur-3xl"></div>
-          <img
-            className="w-full h-auto object-cover rounded-lg rotate-3 hover:rotate-0 transition-transform duration-700 editorial-shadow"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoA4r_KYan9Js5V99ZoTaQC-iTbBA0jJ7cZTspjRzGW4x92aAuLuNzY5iQrYyoF_o2nEzohEajOL-tFxlJQ64_xID5glze8HNdrm2uDywetG4V5JYnWGuqrqGEHX8EPexxZcKk--D3Lk3TZAxgVQx58o6dQE-CFRqIhqawyfueyKysjBXFeAPcRqfS9eFpIaWZ9RpFf_a3aDzhpFSl-5SoFE4nchhUD6FVDj6CrZWWLGaUCJsebHpWR-qEzxtnRGhBtj0a4PYiI1dL"
-            alt="Premium close-up of a layered avocado dessert in a crystal glass"
-          />
+        <div className="order-1 lg:order-2 flex justify-center lg:justify-end mb-8 lg:mb-0 px-4 md:px-0">
+          <div className="relative w-full max-w-[462px] aspect-square md:aspect-[462/468] rounded-[30px] md:rounded-[45px] overflow-hidden shadow-[20px_20px_50px_rgba(0,0,0,0.12)]">
+            <img
+              className="w-full h-full object-cover scale-[1.15] md:scale-[1.25]"
+              src="/intro-product-pic.png"
+              alt="Vietnamese Avocado Dessert"
+            />
+          </div>
         </div>
       </div>
     </section>
-  )
+  );
 }
 
-export default Hero
+export default Hero;
+
+

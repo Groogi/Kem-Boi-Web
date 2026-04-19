@@ -12,3 +12,5 @@ function ImageBleed(){
 }
 
 export default ImageBleed
+
+

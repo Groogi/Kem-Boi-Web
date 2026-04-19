@@ -18,19 +18,19 @@ function TopAppBar() {
                 </div>
                 <div className="hidden md:flex items-center gap-8">
                     <a
-                        className="text-[#426500] dark:text-[#c7fc79] font-bold border-b-2 border-[#426500] font-['Plus_Jakarta_Sans'] tracking-tight"
+                        className="text-[#426500] dark:text-[#c7fc79] font-bold border-b-2 border-[#426500] font-headline tracking-tight"
                         href="#"
                     >
                         Dashboard
                     </a>
                     <a
-                        className="text-[#5a5c58] dark:text-[#adada9] hover:text-[#426500] transition-opacity font-['Plus_Jakarta_Sans'] font-bold tracking-tight"
+                        className="text-[#5a5c58] dark:text-[#adada9] hover:text-[#426500] transition-opacity font-headline font-bold tracking-tight"
                         href="#"
                     >
                         History
                     </a>
                     <a
-                        className="text-[#5a5c58] dark:text-[#adada9] hover:text-[#426500] transition-opacity font-['Plus_Jakarta_Sans'] font-bold tracking-tight"
+                        className="text-[#5a5c58] dark:text-[#adada9] hover:text-[#426500] transition-opacity font-headline font-bold tracking-tight"
                         href="#"
                     >
                         Profile
@@ -59,3 +59,5 @@ function TopAppBar() {
 
 
 export default TopAppBar
+
+

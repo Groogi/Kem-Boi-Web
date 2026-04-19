@@ -21,3 +21,17 @@ export async function login({ email, password }) {
   if (!res.ok) throw new Error(data.error || 'Login failed');
   return data;
 }
+
+export async function updateProfile(userData, token) {
+  const res = await fetch(`${API_BASE}/update_profile`, {
+    method: 'PUT',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(userData),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.errors?.join(', ') || 'Update failed');
+  return data;
+}
