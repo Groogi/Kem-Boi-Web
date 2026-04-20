@@ -1,6 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
+import { CustomDatePicker } from "../Common/SharedUI";
 
 function GiveawayEditor({ giveaway, onSave, onCancel, onDelete, loading }) {
+  const { token } = useAuth();
+  const { showToast } = useToast();
   const [data, setData] = useState(giveaway || {
     title: "",
     participation_conditions: "",
@@ -8,11 +13,34 @@ function GiveawayEditor({ giveaway, onSave, onCancel, onDelete, loading }) {
     end_date: "",
     active: false
   });
+  
+  const [entries, setEntries] = useState([]);
+  const [loadingEntries, setLoadingEntries] = useState(false);
+
+  useEffect(() => {
+    const fetchEntries = async () => {
+      if (!data.id) return;
+      setLoadingEntries(true);
+      try {
+        const res = await fetch(`/api/giveaways/${data.id}/entries`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const entriesData = await res.json();
+          setEntries(entriesData);
+        }
+      } catch (err) {
+        console.error("Failed to fetch entries", err);
+      } finally {
+        setLoadingEntries(false);
+      }
+    };
+    fetchEntries();
+  }, [data.id, token]);
+
 
   return (
     <div className="animate-fade-in space-y-8">
-      <h2 className="text-4xl font-headline font-bold text-primary capitalize mb-2">Dashboard</h2>
-      
       <div className="bg-[#EEF4E4] rounded-[2.5rem] p-10 md:p-12 shadow-sm border border-white/40">
         <div className="flex justify-between items-center mb-8">
            <h3 className="text-3xl font-bold font-headline text-[#4A6B10]">{data.id ? 'Edit Giveaway' : 'New Giveaway'}</h3>
@@ -53,50 +81,57 @@ function GiveawayEditor({ giveaway, onSave, onCancel, onDelete, loading }) {
            
            <div className="flex flex-col gap-8 lg:pt-0">
               <div className="w-full md:w-3/4">
-                 <label className="block text-sm font-bold text-[#4A6B10] mb-2 px-1">Start Date</label>
-                 <div className="relative group">
-                    <input type="date" value={data.start_date} onChange={(e) => setData({...data, start_date: e.target.value})} className="w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none" />
-                    <div className="absolute right-5 top-[10px] flex flex-col items-center leading-none text-on-surface-variant/40 pointer-events-none select-none">
-                      <span className="material-symbols-outlined text-[18px]">calendar_month</span>
-                      <span className="text-[9px] font-bold uppercase mt-0.5 tracking-wider">Edit</span>
-                    </div>
-                 </div>
+                 <CustomDatePicker 
+                    label="Start Date"
+                    value={data.start_date}
+                    onChange={(val) => setData({...data, start_date: val})}
+                    placeholder="Set start date"
+                 />
               </div>
               <div className="w-full md:w-3/4">
-                 <label className="block text-sm font-bold text-[#4A6B10] mb-2 px-1">End Date</label>
-                 <div className="relative group">
-                    <input type="date" value={data.end_date} onChange={(e) => setData({...data, end_date: e.target.value})} className="w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none" />
-                    <div className="absolute right-5 top-[10px] flex flex-col items-center leading-none text-on-surface-variant/40 pointer-events-none select-none">
-                       <span className="material-symbols-outlined text-[18px]">calendar_month</span>
-                       <span className="text-[9px] font-bold uppercase mt-0.5 tracking-wider">Edit</span>
-                    </div>
-                 </div>
+                 <CustomDatePicker 
+                    label="End Date"
+                    value={data.end_date}
+                    onChange={(val) => setData({...data, end_date: val})}
+                    placeholder="Set end date"
+                 />
               </div>
            </div>
         </div>
 
         {/* Entries Table Section */}
         <div className="mb-12">
-           <h4 className="text-xl font-bold font-headline text-[#4A6B10] mb-4 pl-1">Entries</h4>
+           <div className="flex justify-between items-center mb-6 pl-1">
+              <h4 className="text-xl font-bold font-headline text-[#4A6B10]">Participation List ({entries.length})</h4>
+           </div>
+
            <div className="bg-white rounded-[2rem] overflow-hidden border border-primary/5 shadow-sm">
               <table className="w-full text-left">
                  <thead className="bg-[#F2F3EB]/30 border-b border-primary/5">
                     <tr>
-                       <th className="px-8 py-5 text-[11px] font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-center">Name</th>
-                       <th className="px-8 py-5 text-[11px] font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-center">Email</th>
-                       <th className="px-8 py-5 text-[11px] font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-center">Date of Entry</th>
-                       <th className="px-8 py-5 text-[11px] font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-center"># Of Entries</th>
+                       <th className="px-8 py-5 text-[11px] font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest">ID</th>
+                       <th className="px-8 py-5 text-[11px] font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest">Name</th>
+                       <th className="px-8 py-5 text-[11px] font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest">Email</th>
+                       <th className="px-8 py-5 text-[11px] font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-center">Date Joined</th>
                     </tr>
                  </thead>
                  <tbody className="divide-y divide-[#426500]/5">
-                    {[1, 2, 3, 4].map(i => (
-                       <tr key={i}>
-                          <td className="px-8 py-5 bg-[#FBFBF5]/20"></td>
-                          <td className="px-8 py-5 bg-[#FBFBF5]/20"></td>
-                          <td className="px-8 py-5 bg-[#FBFBF5]/20"></td>
-                          <td className="px-8 py-5 bg-[#FBFBF5]/20"></td>
-                       </tr>
-                    ))}
+                    {loadingEntries ? (
+                       <tr><td colSpan="4" className="px-8 py-10 text-center text-sm font-medium text-on-surface-variant/40 italic">Loading entries...</td></tr>
+                    ) : entries.length === 0 ? (
+                       <tr><td colSpan="4" className="px-8 py-10 text-center text-sm font-medium text-on-surface-variant/40 italic">No entries yet.</td></tr>
+                    ) : (
+                       entries.map((entry, idx) => (
+                          <tr key={idx}>
+                             <td className="px-8 py-5 text-[10px] font-black text-on-surface-variant/40">#{entry.user?.account_id || entry.user?.id}</td>
+                             <td className="px-8 py-5 text-sm font-bold text-on-surface">{entry.user?.first_name} {entry.user?.last_name}</td>
+                             <td className="px-8 py-5 text-sm font-medium text-on-surface-variant/80 italic">{entry.user?.email}</td>
+                             <td className="px-8 py-5 text-sm font-medium text-on-surface-variant/60 text-center">
+                                {entry.created_at ? new Date(entry.created_at).toLocaleDateString('en-AU', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A'}
+                             </td>
+                          </tr>
+                       ))
+                    )}
                  </tbody>
               </table>
            </div>

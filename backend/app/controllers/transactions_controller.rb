@@ -1,5 +1,6 @@
 class TransactionsController < ApplicationController
   before_action :authorize_request
+  before_action :authorize_admin, only: [ :quick_add, :user_transactions ]
 
   def index
     render json: @current_user.transactions.order(created_at: :desc)
@@ -7,15 +8,15 @@ class TransactionsController < ApplicationController
 
   def create
     @transaction = @current_user.transactions.build(transaction_params)
-    
+
     if @transaction.save
-      render json: { 
-        message: "Transaction successful", 
+      render json: {
+        message: "Transaction successful",
         transaction: @transaction,
-        new_balance: @current_user.points_balance 
+        new_balance: @current_user.points_balance
       }, status: :created
     else
-      render json: { errors: @transaction.errors.full_messages }, 
+      render json: { errors: @transaction.errors.full_messages },
              status: :unprocessable_entity
     end
   end
@@ -23,7 +24,7 @@ class TransactionsController < ApplicationController
   def quick_add
     user = User.where("LOWER(email) = ?", params[:email].to_s.downcase).first
     if user
-      transaction = user.transactions.new(points: params[:points].to_i, transaction_type: 'manual', notes: "Quick Admin Entry")
+      transaction = user.transactions.new(points: params[:points].to_i, transaction_type: "manual", notes: "Quick Admin Entry")
       if transaction.save
         render json: { message: "Points added to existing user", new_balance: user.points_balance }
       else
@@ -37,12 +38,8 @@ class TransactionsController < ApplicationController
   end
 
   def user_transactions
-    if @current_user.admin?
-      user = User.find(params[:id])
-      render json: user.transactions.order(created_at: :desc)
-    else
-      render json: { error: "Not authorized" }, status: :unauthorized
-    end
+    user = User.find(params[:id])
+    render json: user.transactions.order(created_at: :desc)
   end
 
   private

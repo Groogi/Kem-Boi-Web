@@ -11,12 +11,12 @@ class Transaction < ApplicationRecord
   private
 
   def redemption?
-    transaction_type == 'redemption' || (points.present? && points < 0)
+    transaction_type == "redemption" || (points.present? && points < 0)
   end
 
   def sufficient_points_for_redemption
     return if user.nil?
-    
+
     # We use abs because points are stored as negative for redemptions
     required_points = points.abs
     if user.points_balance < required_points

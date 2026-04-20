@@ -4,7 +4,7 @@ class UpdateSchemaForLedgerAndUsers < ActiveRecord::Migration[8.1]
     add_column :users, :first_name, :string
     add_column :users, :last_name, :string
     add_column :users, :phone, :string
-    
+
     # 2. Update Giveaways table default
     change_column_default :giveaways, :active, from: nil, to: false
     # Clean up existing nulls if any (safety measure)

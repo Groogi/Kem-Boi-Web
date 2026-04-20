@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_19_063729) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_20_093019) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -37,6 +37,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_19_063729) do
     t.index ["assigned_by_admin_id"], name: "index_bonus_transactions_on_assigned_by_admin_id"
     t.index ["bonus_definition_id"], name: "index_bonus_transactions_on_bonus_definition_id"
     t.index ["user_id"], name: "index_bonus_transactions_on_user_id"
+  end
+
+  create_table "giveaway_entries", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "giveaway_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["giveaway_id"], name: "index_giveaway_entries_on_giveaway_id"
+    t.index ["user_id"], name: "index_giveaway_entries_on_user_id"
   end
 
   create_table "giveaways", force: :cascade do |t|
@@ -89,6 +98,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_19_063729) do
     t.index ["claimed_by_user_id"], name: "index_pending_bonus_on_claimed_by_user_id"
   end
 
+  create_table "redemptions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "reward_id", null: false
+    t.string "status"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.string "voucher_code"
+    t.index ["reward_id"], name: "index_redemptions_on_reward_id"
+    t.index ["user_id"], name: "index_redemptions_on_user_id"
+  end
+
+  create_table "rewards", force: :cascade do |t|
+    t.boolean "active"
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "images"
+    t.string "name"
+    t.integer "point_cost"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "transactions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "notes"
@@ -118,7 +148,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_19_063729) do
 
   add_foreign_key "bonus_transactions", "bonus_definitions"
   add_foreign_key "bonus_transactions", "users"
+  add_foreign_key "giveaway_entries", "giveaways"
+  add_foreign_key "giveaway_entries", "users"
   add_foreign_key "links", "locations"
   add_foreign_key "pending_bonus", "bonus_definitions"
+  add_foreign_key "redemptions", "rewards"
+  add_foreign_key "redemptions", "users"
   add_foreign_key "transactions", "users"
 end

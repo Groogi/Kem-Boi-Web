@@ -1,11 +1,30 @@
 class GiveawaysController < ApplicationController
-  before_action :authorize_request
-  before_action :set_giveaway, only: [:show, :update, :destroy]
-  before_action :authorize_admin, only: [:create, :update, :destroy]
+  before_action :authorize_request, except: [ :index, :show ]
+  before_action :authorize_admin, except: [ :index, :show ]
+  before_action :set_giveaway, only: [ :show, :update, :destroy ]
 
   def index
     @giveaways = Giveaway.all
-    render json: @giveaways
+    
+    # Try to identify user if token is present, but don't fail if not
+    header = request.headers["Authorization"]
+    token = header.split(" ").last if header
+    begin
+      decoded = JsonWebToken.decode(token)
+      user = User.find_by(id: decoded[:user_id])
+      Rails.logger.info "Giveaways index called for user_id: #{user&.id}"
+    rescue => e
+      Rails.logger.error "Token decode failed in Giveaways index: #{e.message}"
+      user = nil
+    end
+
+    if user
+      render json: @giveaways.map { |giveaway| 
+        giveaway.attributes.merge("isJoined" => user.giveaway_entries.exists?(giveaway_id: giveaway.id))
+      }
+    else
+      render json: @giveaways
+    end
   end
 
   def show
@@ -31,18 +50,13 @@ class GiveawaysController < ApplicationController
 
   def destroy
     @giveaway.destroy
+    head :no_content
   end
 
   private
 
   def set_giveaway
     @giveaway = Giveaway.find(params[:id])
-  end
-
-  def authorize_admin
-    unless @current_user.admin?
-      render json: { error: "Not authorized" }, status: :unauthorized
-    end
   end
 
   def giveaway_params

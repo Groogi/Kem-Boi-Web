@@ -5,8 +5,8 @@ class AuthenticationController < ApplicationController
     if @user&.authenticate(params[:password])
       token = JsonWebToken.encode(user_id: @user.id)
       time = Time.now + 24.hours.to_i
-      render json: { 
-        token: token, 
+      render json: {
+        token: token,
         exp: time.strftime("%m-%d-%Y %H:%M"),
         email: @user.email,
         first_name: @user.first_name,

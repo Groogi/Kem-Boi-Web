@@ -32,4 +32,8 @@ backend/storage/*.sqlite3
 backend/public/assets
 backend/node_modules/
 backend/config/master.key
+backend/.kamal/secrets
 .byebug_history
+
+# Temp / Backup
+frontend/new_files_backup/

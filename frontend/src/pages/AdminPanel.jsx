@@ -1,13 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import BonusEntryForm from "../components/Admin/BonusEntryForm";
 import WebsiteLinksForm from "../components/Admin/WebsiteLinksForm";
 import GiveawayEditor from "../components/Admin/GiveawayEditor";
 import LocationEditor from "../components/Admin/LocationEditor";
+import RewardsManager from "../components/Admin/RewardsManager";
+import { ModernAlert, ModernConfirm } from "../components/Common/SharedUI";
 
 function AdminPanel() {
    const { user, token, logout } = useAuth();
+   const { showToast } = useToast();
    const navigate = useNavigate();
    const [activeTab, setActiveTab] = useState("dashboard"); // dashboard, bonus-entry, giveaways, locations
    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -27,8 +31,11 @@ function AdminPanel() {
    const [editingLocation, setEditingLocation] = useState(null);
 
    const [users, setUsers] = useState([]);
+   const [redemptions, setRedemptions] = useState([]);
    const [searchQuery, setSearchQuery] = useState("");
    const [loading, setLoading] = useState(false);
+   const [redemptionSearch, setRedemptionSearch] = useState("");
+   const [redemptionToDelete, setRedemptionToDelete] = useState(null);
 
    const filteredUsers = users.filter(u => {
       const fullName = `${u.first_name || ''} ${u.last_name || ''}`.toLowerCase();
@@ -69,6 +76,19 @@ function AdminPanel() {
       }
    }, [token]);
 
+   const fetchRedemptions = useCallback(async () => {
+      try {
+         const res = await fetch("/api/redemptions", {
+            headers: { "Authorization": `Bearer ${token}` }
+         });
+         const data = await res.json();
+         setRedemptions(Array.isArray(data) ? data : []);
+      } catch (err) {
+         console.error("Failed to fetch redemptions", err);
+         setRedemptions([]);
+      }
+   }, [token]);
+
    const fetchLocations = useCallback(async () => {
       try {
          const res = await fetch("/api/locations", {
@@ -83,10 +103,57 @@ function AdminPanel() {
    }, [token]);
 
    useEffect(() => {
-      fetchUsers();
-      fetchGiveaways();
-      fetchLocations();
-   }, [fetchUsers, fetchGiveaways, fetchLocations]);
+      if (token && user && user.role !== 'admin') {
+         navigate("/");
+      }
+   }, [user, token, navigate]);
+
+   useEffect(() => {
+      if (token) {
+         fetchUsers();
+         fetchGiveaways();
+         fetchLocations();
+         fetchRedemptions();
+      }
+   }, [token, fetchUsers, fetchGiveaways, fetchLocations, fetchRedemptions]);
+
+   const handleUpdateRedemptionStatus = async (redId, newStatus) => {
+      try {
+         const res = await fetch(`/api/redemptions/${redId}`, {
+            method: 'PUT',
+            headers: { 
+               'Content-Type': 'application/json',
+               'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({ status: newStatus })
+         });
+         if (res.ok) {
+            showToast(`Redemption marked as ${newStatus}`);
+            fetchRedemptions();
+         }
+      } catch (err) {
+         showToast("Failed to update status", "error");
+      }
+   };
+
+   const handleDeleteRedemption = async (redId) => {
+      const id = redId || (redemptionToDelete && redemptionToDelete.id);
+      if (!id) return;
+      
+      try {
+         const res = await fetch(`/api/redemptions/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+         });
+         if (res.ok) {
+            showToast("Redemption record deleted");
+            setRedemptionToDelete(null);
+            fetchRedemptions();
+         }
+      } catch (err) {
+         showToast("Failed to delete redemption", "error");
+      }
+   };
 
    useEffect(() => {
       if (selectedUser) {
@@ -112,9 +179,12 @@ function AdminPanel() {
          if (res.ok) {
             setQuickEmail(""); setQuickPoints("");
             fetchUsers();
-            alert("Points added successfully!");
+            showToast("Points added successfully!");
          }
-      } catch (err) { console.error(err); }
+      } catch (err) { 
+         console.error(err); 
+         showToast("Failed to add points.", "error");
+      }
       finally { setLoading(false); }
    };
 
@@ -131,14 +201,15 @@ function AdminPanel() {
             const data = await res.json();
             setSelectedUser({ ...selectedUser, points_balance: data.new_balance });
             setManualPointsAmount("");
+            showToast("Points updated successfully!");
             fetchUsers();
          } else {
             const errData = await res.json();
-            alert(`Failed to add points: ${errData.error || errData.errors || "Access denied"}`);
+            showToast(`Failed to add points: ${errData.error || errData.errors || "Access denied"}`, "error");
          }
       } catch (err) { 
          console.error(err); 
-         alert("Network error occurred while adding points.");
+         showToast("Network error occurred while adding points.", "error");
       }
       finally { setLoading(false); }
    };
@@ -176,20 +247,34 @@ function AdminPanel() {
             })
          });
          if (res.ok) {
+            const userData = await res.json();
             // If points were specified, add them now
-            if (addUserForm.points) {
-               const userData = await res.json();
-               await fetch(`/api/users/${userData.user.id}/add_points`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                  body: JSON.stringify({ points: addUserForm.points })
-               });
+            if (addUserForm.points && Number(addUserForm.points) !== 0) {
+               const userId = userData.id || userData.user?.id;
+               if (userId) {
+                  try {
+                     await fetch(`/api/users/${userId}/add_points`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                        body: JSON.stringify({ points: addUserForm.points, notes: "Initial Sign-up Bonus" })
+                     });
+                  } catch (pointErr) {
+                     console.error("Failed to add initial points:", pointErr);
+                  }
+               }
             }
+            showToast(`Invitation sent to ${addUserForm.email}!`, "success");
             setAddUserForm({ full_name: "", email: "", points: "" });
             setViewMode("list");
             fetchUsers();
+         } else {
+            const errorData = await res.json();
+            showToast(errorData.error || errorData.errors?.join(", ") || "Failed to create user", "error");
          }
-      } catch (err) { console.error(err); }
+      } catch (err) { 
+         console.error(err); 
+         showToast("Network error occurred while creating user.", "error");
+      }
       finally { setLoading(false); }
    };
 
@@ -259,7 +344,7 @@ function AdminPanel() {
       const upcoming = giveaways.filter(g => !g.active);
 
       return (
-         <div className="animate-fade-in space-y-12 relative pb-20">
+         <div className="animate-fade-in space-y-12 relative pb-48">
             <section>
                <h3 className="text-2xl font-bold font-headline text-[#4A6B10] mb-8">Current Giveaways</h3>
                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -310,7 +395,7 @@ function AdminPanel() {
                </div>
             </section>
 
-            {/* Floating Action Button */}
+            {/* Floating Action Button - Positioned to not overlap content area */}
             <button 
                onClick={() => { setEditingGiveaway(null); setGiveawayMode("editor"); }}
                className="fixed bottom-10 right-10 bg-[#426500] text-white font-bold py-4 px-10 rounded-full shadow-2xl hover:bg-[#395800] transition-all flex items-center gap-3 z-50 animate-scale-in"
@@ -336,6 +421,8 @@ function AdminPanel() {
       { id: "bonus-entry", label: "Bonus Entry", icon: "wb_sunny" },
       { id: "giveaways", label: "Giveaways", icon: "redeem" },
       { id: "locations", label: "Locations", icon: "task_alt" },
+      { id: "rewards", label: "Rewards", icon: "workspace_premium" },
+      { id: "redemptions", label: "Redemptions", icon: "confirmation_number" },
       { id: "links", label: "Website Links", icon: "ads_click" },
    ];
 
@@ -364,7 +451,13 @@ function AdminPanel() {
             {navItems.map((item) => (
                <div
                   key={item.id}
-                  onClick={() => { setActiveTab(item.id); setViewMode("list"); setIsSidebarOpen(false); }}
+                  onClick={() => { 
+                     setActiveTab(item.id); 
+                     setViewMode("list"); 
+                     if (item.id === 'giveaways') setGiveawayMode("grid");
+                     if (item.id === 'locations') setLocationMode("grid");
+                     setIsSidebarOpen(false); 
+                  }}
                   className={`flex items-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 group ${activeTab === item.id
                         ? "bg-white border-2 border-[#E5E7E1] text-primary shadow-sm shadow-black/5"
                         : "text-on-surface-variant hover:bg-surface-container-highest/30"
@@ -393,7 +486,7 @@ function AdminPanel() {
 
    const renderHeader = () => (
       <div className="flex justify-between items-center mb-10">
-         <h2 className="text-4xl font-headline font-bold text-primary capitalize">
+         <h2 className="text-4xl font-headline font-bold text-primary capitalize tracking-[-0.02em]">
             {activeTab === 'dashboard' ? 'Dashboard' : activeTab.replace("-", " ")}
          </h2>
 
@@ -425,11 +518,12 @@ function AdminPanel() {
             <span className="material-symbols-outlined absolute left-4 top-3.5 text-on-surface-variant/40">search</span>
          </div>
 
-         <div className="bg-[#EEF4E4]/40 rounded-[2.5rem] p-8 shadow-sm border border-outline-variant/20">
-            <div className="bg-white rounded-[2rem] overflow-hidden border border-primary/5 shadow-sm">
+         <div className="bg-[#EEF4E4]/40 rounded-[2.5rem] p-10 md:p-14 relative">
+            <div className="bg-white/40 backdrop-blur-sm rounded-[2rem] overflow-hidden">
                <table className="w-full text-left">
-                  <thead className="bg-[#F2F3EB]/30 border-b border-primary/5">
+                  <thead className="bg-[#F2F3EB]/30">
                      <tr>
+                        <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80">ID</th>
                         <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80">User Name</th>
                         <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80">Email Address</th>
                         <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 text-center">Points Balance</th>
@@ -437,11 +531,12 @@ function AdminPanel() {
                         <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 text-right">Actions</th>
                      </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#426500]/5">
+                  <tbody>
                      {filteredUsers.length > 0 ? filteredUsers.map((u, idx) => {
                         const status = getStatusBadge(u.points_balance);
                         return (
                            <tr key={idx} onClick={() => { setSelectedUser(u); setViewMode("user-details"); }} className="hover:bg-surface-container-highest/10 cursor-pointer transition-colors">
+                              <td className="px-8 py-5 text-[11px] font-black text-on-surface-variant opacity-60">#{u.account_id || u.id}</td>
                               <td className="px-8 py-5 text-sm font-bold text-on-surface">{u.first_name} {u.last_name}</td>
                               <td className="px-8 py-5 text-sm font-medium text-on-surface-variant/80 italic">{u.email}</td>
                               <td className="px-8 py-5 text-sm font-bold text-[#4A6B10] text-center font-headline">{u.points_balance} pts</td>
@@ -450,8 +545,8 @@ function AdminPanel() {
                                     {status.label}
                                  </span>
                               </td>
-                              <td className="px-8 py-5 text-right">
-                                 <span className="bg-[#426500]/10 text-[#426500] font-bold text-[10px] tracking-widest px-4 py-1.5 rounded-full border border-[#426500]/20 hover:bg-[#426500] hover:text-white transition-all uppercase">
+                              <td className="px-8 py-6 text-right">
+                                 <span className="bg-[#426500]/5 text-[#426500] font-bold text-[10px] tracking-widest px-6 py-2.5 rounded-full hover:bg-[#426500] hover:text-white transition-all uppercase">
                                     View
                                  </span>
                               </td>
@@ -459,12 +554,16 @@ function AdminPanel() {
                         );
                      }) : (
                         [1, 2, 3, 4, 5].map((idx) => (
-                           <tr key={idx}>
-                              <td className="px-8 py-5 text-sm font-bold text-on-surface opacity-10">Person {idx}</td>
-                              <td className="px-8 py-5 text-sm font-medium text-on-surface-variant/10 italic">person@example.com</td>
-                              <td className="px-8 py-5 text-sm font-bold text-center text-on-surface opacity-10">0 pts</td>
+                           <tr key={idx} className="opacity-10">
+                              <td className="px-8 py-5 text-[10px] font-black">#000</td>
+                              <td className="px-8 py-5 text-sm font-bold text-on-surface">Member Name</td>
+                              <td className="px-8 py-5 text-sm font-medium italic">member@email.com</td>
+                              <td className="px-8 py-5 text-sm font-bold text-center">0 pts</td>
                               <td className="px-8 py-5 text-center">
-                                 <span className="inline-block px-4 py-1 rounded-full text-[9px] font-bold bg-[#D1D3C8] text-white opacity-20">BRONZE</span>
+                                 <span className="inline-block px-4 py-1 rounded-full text-[9px] font-bold bg-[#D1D3C8] text-white">BRONZE</span>
+                              </td>
+                              <td className="px-8 py-5 text-right">
+                                 <span className="bg-[#426500]/5 text-[#426500] font-bold text-[10px] px-4 py-1.5 rounded-full uppercase">View</span>
                               </td>
                            </tr>
                         ))
@@ -482,12 +581,8 @@ function AdminPanel() {
    );
 
    const renderAddUserView = () => (
-      <div className="animate-fade-in space-y-8">
-         <h3 className="text-3xl font-bold font-headline text-[#4A6B10]">New User</h3>
-         
-         <div className="bg-[#EEF4E4]/60 rounded-[2.5rem] p-10 md:p-14 shadow-sm border border-outline-variant/30 max-w-4xl relative">
-            
-            <div className="space-y-8 max-w-2xl">
+         <div className="bg-[#EEF4E4]/40 rounded-[2.5rem] p-10 md:p-14 max-w-4xl relative">
+            <div className="bg-white/40 backdrop-blur-sm rounded-[2.5rem] p-12">
                <div>
                   <label className="block text-sm font-bold text-[#4A6B10] mb-3 px-1">Full Name</label>
                   <div className="relative group">
@@ -555,7 +650,6 @@ function AdminPanel() {
                </button>
             </div>
          </div>
-      </div>
    );
 
    const handleUpdateUser = async () => {
@@ -582,7 +676,7 @@ function AdminPanel() {
                // Note: AuthContext might need a refresh logic, but this is a start
             }
 
-            alert("User updated successfully!");
+            showToast("User profile updated successfully.", "success");
          }
       } catch (err) { console.error(err); }
       finally { setLoading(false); }
@@ -692,6 +786,78 @@ function AdminPanel() {
       </div>
    );
 
+    const renderRedemptionLogs = () => (
+      <div className="animate-fade-in space-y-8">
+          <div className="flex justify-between items-center mb-12">
+             <div>
+                <h2 className="text-5xl font-headline font-bold text-primary capitalize tracking-[-0.03em]">Redemption Log</h2>
+                <p className="text-on-surface-variant font-medium opacity-60 text-lg mt-2">Track and verify customer reward claims.</p>
+             </div>
+          </div>
+
+         <div className="flex flex-col md:flex-row gap-4 items-center mb-8">
+            <div className="relative flex-1">
+               <input
+                  type="text"
+                  placeholder="Search by customer name or ID..."
+                  value={redemptionSearch}
+                  onChange={(e) => setRedemptionSearch(e.target.value)}
+                  className="w-full bg-[#fcfdf2] border-none rounded-full px-12 py-4 shadow-inner focus:ring-4 focus:ring-[#426500]/10 transition-all font-medium text-on-surface-variant outline-none"
+               />
+               <span className="material-symbols-outlined absolute left-4 top-[18px] text-on-surface-variant/40">search</span>
+            </div>
+            <button 
+               onClick={fetchRedemptions}
+               className="bg-[#426500] text-white font-bold py-4 px-10 rounded-full shadow-lg shadow-[#426500]/10 hover:bg-[#395800] transition-all flex items-center gap-2 whitespace-nowrap active:scale-95"
+            >
+               <span className="material-symbols-outlined text-[20px]">refresh</span>
+               <span className="text-sm tracking-widest">REFRESH</span>
+            </button>
+         </div>
+
+         <div className="bg-[#fcfdf9] rounded-[2.5rem] p-10 shadow-sm border border-outline-variant/30">
+            <div className="bg-white rounded-[2rem] overflow-hidden border border-primary/5 shadow-sm">
+               <table className="w-full text-left">
+                  <thead className="bg-[#F2F3EB]/30 border-b border-primary/5">
+                     <tr>
+                        <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-[11px]">Date</th>
+                        <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-[11px]">Customer</th>
+                        <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-[11px]">Reward</th>
+                        <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-[11px]">Voucher Code</th>
+                        <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-center text-[11px]">Status</th>
+                        <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-right text-[11px]">Actions</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     {redemptions.filter(red => {
+                        const name = `${red.user?.first_name || ''} ${red.user?.last_name || ''}`.toLowerCase();
+                        const accId = String(red.user?.account_id || '').toLowerCase();
+                        const query = redemptionSearch.toLowerCase();
+                        return name.includes(query) || accId.includes(query);
+                     }).length > 0 ? redemptions.filter(red => {
+                        const name = `${red.user?.first_name || ''} ${red.user?.last_name || ''}`.toLowerCase();
+                        const accId = String(red.user?.account_id || '').toLowerCase();
+                        const query = redemptionSearch.toLowerCase();
+                        return name.includes(query) || accId.includes(query);
+                     }).map((red, idx) => (
+                        <RedemptionRow 
+                           key={idx} 
+                           red={red} 
+                           onUpdate={handleUpdateRedemptionStatus} 
+                           onDelete={() => setRedemptionToDelete(red)}
+                        />
+                     )) : (
+                        <tr>
+                           <td colSpan="6" className="px-8 py-16 text-center text-sm font-medium text-on-surface-variant/40 italic">No redemptions found.</td>
+                        </tr>
+                     )}
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+   );
+
    return (
       <div className="min-h-screen bg-[#FBFBF5] font-body text-on-surface selection:bg-[#c7fc79] selection:text-[#304c00]">
          {renderSidebar()}
@@ -768,16 +934,93 @@ function AdminPanel() {
                   />
                )}
 
+               {activeTab === 'rewards' && <RewardsManager />}
+               {activeTab === 'redemptions' && renderRedemptionLogs()}
                {activeTab === 'links' && <WebsiteLinksForm />}
             </div>
          </main>
 
-         {showDeleteModal && renderDeleteModal()}
+         {activeTab === 'redemptions' && (
+            <ModernConfirm 
+               isOpen={!!redemptionToDelete}
+               onConfirm={() => handleDeleteRedemption()}
+               onCancel={() => setRedemptionToDelete(null)}
+               title="Delete Redemption?"
+               message="This will permanently remove the record from the log. This action is irreversible."
+               confirmText="Delete Permanently"
+            />
+         )}
       </div>
    );
 }
 
 export default AdminPanel;
+
+const RedemptionRow = ({ red, onUpdate, onDelete }) => {
+   const [loading, setLoading] = useState(false);
+   
+   return (
+      <tr className="hover:bg-white/60 transition-all group">
+         <td className="px-8 py-8">
+            <span className="text-[11px] font-bold text-on-surface-variant font-mono">
+               {new Date(red.created_at).toLocaleDateString('en-AU')}
+            </span>
+         </td>
+         <td className="px-8 py-6">
+            <div className="flex flex-col">
+               <span className="text-sm font-bold text-on-surface">{red.user?.first_name} {red.user?.last_name}</span>
+               <span className="text-[10px] font-bold text-[#4A6B10] opacity-40 uppercase tracking-widest leading-none mt-1">#{red.user?.account_id}</span>
+            </div>
+         </td>
+         <td className="px-8 py-6">
+            <span className="text-sm font-medium text-on-surface-variant font-headline">{red.reward?.name}</span>
+         </td>
+         <td className="px-8 py-6">
+            <div className="flex justify-center">
+               <span className="inline-block font-mono whitespace-nowrap bg-[#F2F3EB] px-6 py-4 rounded-[1.5rem] text-[#4A6B10] font-bold tracking-[0.2em] border border-primary/10 text-[14px]">
+                  {red.voucher_code}
+               </span>
+            </div>
+         </td>
+         <td className="px-8 py-6 text-center">
+            <span className={`text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border ${
+               red.status === 'used' ? 'bg-red-50 text-red-500 border-red-200' : 'bg-green-50 text-green-600 border-green-200'
+            }`}>
+               {red.status}
+            </span>
+         </td>
+         <td className="px-8 py-8 text-right">
+            <div className="flex justify-end gap-3">
+               {red.status === 'pending' ? (
+                  <button 
+                     onClick={async () => {
+                        setLoading(true);
+                        await onUpdate(red.id, 'used');
+                        setLoading(false);
+                     }}
+                     disabled={loading}
+                     className="bg-[#426500] text-white font-bold text-[10px] tracking-widest px-6 h-[38px] rounded-full hover:bg-[#4a6b10] transition-all uppercase disabled:opacity-50 flex items-center justify-center whitespace-nowrap"
+                  >
+                     {loading ? "Processing..." : "Confirm Redeem"}
+                  </button>
+               ) : (
+                  <button 
+                     onClick={async () => {
+                        setLoading(true);
+                        await onDelete(red.id);
+                        setLoading(false);
+                     }}
+                     disabled={loading}
+                     className="bg-red-50 text-red-600 font-bold text-[10px] tracking-widest px-6 h-[38px] rounded-full border-none hover:bg-red-600 hover:text-white transition-all uppercase disabled:opacity-50 flex items-center justify-center whitespace-nowrap"
+                  >
+                     {loading ? "Deleting..." : "Delete Record"}
+                  </button>
+               )}
+            </div>
+         </td>
+      </tr>
+   );
+};
 
 const UserDetailsView = ({ selectedUser, status, manualPointsAmount, setManualPointsAmount, handleManualAddPoints, editUserForm, setEditUserForm, handleUpdateUser, setShowDeleteModal, setViewMode, loading }) => {
    const [detailTab, setDetailTab] = useState("details"); // details, points

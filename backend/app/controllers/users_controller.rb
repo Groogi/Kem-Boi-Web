@@ -1,17 +1,26 @@
 class UsersController < ApplicationController
+  before_action :authorize_request, except: [ :create ]
+  before_action :authorize_admin, only: [ :index, :admin_update, :destroy, :add_points ]
+
   def index
-    authorize_request
-    @users = User.all
-    render json: @users.as_json(methods: :points_balance)
+    render json: User.all.as_json(methods: :points_balance)
   end
 
   def create
-    @user = User.new(user_params.merge(role: "customer"))
+    props = user_params.to_h
+    if props[:name].present? && props[:first_name].blank?
+      parts = props[:name].split(" ")
+      props[:first_name] = parts.first
+      props[:last_name] = parts[1..-1].join(" ") if parts.size > 1
+    end
+
+    @user = User.new(props.merge(role: "customer"))
     if @user.save
       token = JsonWebToken.encode(user_id: @user.id)
       time = Time.now + 24.hours.to_i
-      render json: { 
-        token: token, 
+      render json: {
+        id: @user.id,
+        token: token,
         exp: time.strftime("%m-%d-%Y %H:%M"),
         email: @user.email,
         first_name: @user.first_name,
@@ -26,7 +35,6 @@ class UsersController < ApplicationController
   end
 
   def update
-    authorize_request
     if @current_user.update(user_params)
       render json: {
         email: @current_user.email,
@@ -44,7 +52,6 @@ class UsersController < ApplicationController
   end
 
   def admin_update
-    authorize_request
     if @current_user.admin?
       @user = User.find(params[:id])
       if @user.update(user_params)
@@ -58,7 +65,6 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    authorize_request
     if @current_user.admin?
       @user = User.find(params[:id])
       @user.destroy
@@ -69,15 +75,14 @@ class UsersController < ApplicationController
   end
 
   def add_points
-    authorize_request
     if @current_user.admin?
       @user = User.find(params[:id])
       @transaction = @user.transactions.new(
         points: params[:points].to_i,
-        transaction_type: 'manual',
+        transaction_type: "manual",
         notes: params[:notes] || "Admin adjustment"
       )
-      
+
       if @transaction.save
         render json: { message: "Points added", new_balance: @user.points_balance }
       else
@@ -91,7 +96,7 @@ class UsersController < ApplicationController
   private
   def user_params
     params.permit(
-      :email, :password, :password_confirmation, :first_name, :last_name, :phone, :date_of_birth
+      :email, :password, :password_confirmation, :first_name, :last_name, :phone, :date_of_birth, :name
     )
   end
 end

@@ -1,10 +1,15 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useToast } from "../../context/ToastContext";
 
 function BonusEntryForm({ users, onQuickAdd, loading, token }) {
   const [bonusUser, setBonusUser] = useState(null);
   const [quickEmail, setQuickEmail] = useState("");
   const [quickPoints, setQuickPoints] = useState("");
   const [history, setHistory] = useState([]);
+  const [searchEmail, setSearchEmail] = useState("");
+  const { showToast } = useToast();
+
+  const searchInputRef = useRef(null);
 
   useEffect(() => {
     if (bonusUser && !bonusUser.is_new) {
@@ -13,8 +18,6 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
          setBonusUser(updated);
       }
     }
-    // We intentionally omit bonusUser to avoid an infinite update loop;
-    // this effect only needs to sync when the users list refreshes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [users]);
 
@@ -38,37 +41,54 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
     }
   }, [bonusUser, fetchTransactions]);
 
-  const handleSearch = (e) => {
-    if (e.key === 'Enter') {
-      const query = e.target.value.trim();
-      if (!query) return;
+  const triggerSearch = (query) => {
+    const q = query || searchEmail.trim();
+    if (!q) return;
 
-      const found = users.find(u => u.email.toLowerCase() === query.toLowerCase());
-      if (found) {
-        setBonusUser(found);
-      } else if (query.includes('@')) {
-        // Only allow prospective user state if it looks like an email
-        setBonusUser({ email: query, is_new: true });
-      } else {
-        alert("No user found with that email address.");
-      }
+    const found = users.find(u => u.email.toLowerCase() === q.toLowerCase());
+    if (found) {
+      setBonusUser(found);
+      setSearchEmail("");
+      showToast(`Member Found: ${found.first_name || found.email}`, "success");
+    } else if (q.includes('@')) {
+      setBonusUser({ email: q, is_new: true });
+      setSearchEmail("");
+      showToast("Ready to register prospective member", "success");
+    } else {
+      showToast("No user found with that email address.", "error");
     }
   };
 
-
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      triggerSearch(e.target.value.trim());
+    }
+  };
 
   return (
     <div className="animate-fade-in space-y-10">
       <div className="flex flex-col gap-6">
         <h3 className="text-3xl font-bold font-headline text-[#4A6B10]">Manual Bonus Entry</h3>
-        <div className="relative max-w-xl">
-          <input 
-            type="text" 
-            placeholder="Search Email" 
-            className="w-full bg-[#F2F3EB]/50 border-none rounded-full px-12 py-3.5 shadow-inner font-medium text-on-surface-variant focus:ring-2 focus:ring-primary/20 transition-all outline-none" 
-            onKeyDown={handleSearch}
-          />
-          <span className="material-symbols-outlined absolute left-4 top-3.5 text-on-surface-variant/40">search</span>
+        <div className="relative max-w-xl flex gap-3">
+          <div className="relative flex-grow">
+            <input 
+              type="text" 
+              placeholder="Search Email" 
+              value={searchEmail}
+              onChange={(e) => setSearchEmail(e.target.value)}
+              className="w-full bg-[#F2F3EB]/50 border-none rounded-full px-12 py-3.5 shadow-inner font-medium text-on-surface-variant focus:ring-2 focus:ring-primary/20 transition-all outline-none" 
+              onKeyDown={handleSearch}
+              ref={searchInputRef}
+            />
+            <span className="material-symbols-outlined absolute left-4 top-3.5 text-on-surface-variant/40">search</span>
+          </div>
+          <button 
+            onClick={() => triggerSearch()}
+            className="bg-primary text-white font-bold px-8 rounded-full shadow-lg shadow-primary/10 hover:bg-primary-dark transition-all active:scale-95 flex items-center gap-2 group whitespace-nowrap"
+          >
+            <span className="text-xs tracking-widest uppercase">Enter</span>
+            <span className="material-symbols-outlined text-sm group-hover:translate-x-0.5 transition-transform">east</span>
+          </button>
         </div>
       </div>
 
@@ -102,7 +122,7 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                 >
                    {loading ? "..." : "Points"}
                 </button>
-             </div>
+          </div>
           </div>
         </div>
       ) : (
@@ -190,52 +210,47 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                               </td>
                            </tr>
                         ) : history.length > 0 ? (
-                          history.map((t, i) => {
-                             const isPositive = t.points > 0;
-                             const date = new Date(t.created_at).toLocaleDateString();
-                             
-                             // Calculate running balance for this row
-                             // history is desc, so the first item (index 0) is the latest.
-                             // The balance at row i is: total_balance - (sum of all points from index 0 to i-1)
-                             let runningBalance = bonusUser.points_balance;
-                             for (let j = 0; j < i; j++) {
-                               runningBalance -= history[j].points;
-                             }
+                           history.map((t, i) => {
+                              const isPositive = t.points > 0;
+                              const date = new Date(t.created_at).toLocaleDateString('en-AU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                              
+                              let runningBalance = bonusUser.points_balance;
+                              for (let j = 0; j < i; j++) {
+                                runningBalance -= history[j].points;
+                              }
 
-                             return (
-                              <tr key={i}>
-                                 <td className={`px-8 py-5 text-sm font-bold ${isPositive ? 'text-primary' : 'text-red-500'}`}>
-                                    {isPositive ? `+${t.points}` : t.points}
-                                 </td>
-                                 <td className="px-8 py-5 text-sm font-medium text-on-surface-variant/70 italic">{date}</td>
-                                 <td className="px-8 py-5 text-sm font-bold text-center text-[#4A6B10] font-headline">{runningBalance} pts</td>
-                                 <td className="px-8 py-5 text-center">
-                                    <span className={`inline-block px-5 py-1 rounded-full text-[9px] font-bold tracking-widest ${isPositive ? "bg-[#BFE9A2] text-[#304c00]" : "bg-red-100 text-red-800"}`}>
-                                       {t.transaction_type.toUpperCase()}
-                                    </span>
-                                 </td>
-                              </tr>
-                             );
-                          })
+                              return (
+                               <tr key={i}>
+                                  <td className={`px-8 py-5 text-sm font-bold ${isPositive ? 'text-primary' : 'text-red-500'}`}>
+                                     {isPositive ? `+${t.points}` : t.points}
+                                  </td>
+                                  <td className="px-8 py-5 text-sm font-medium text-on-surface-variant/70 italic">{date}</td>
+                                  <td className="px-8 py-5 text-sm font-bold text-center text-[#4A6B10] font-headline">{runningBalance} pts</td>
+                                  <td className="px-8 py-5 text-center">
+                                     <span className={`inline-block px-5 py-1 rounded-full text-[9px] font-bold tracking-widest ${isPositive ? "bg-[#BFE9A2] text-[#304c00]" : "bg-red-100 text-red-800"}`}>
+                                        {t.transaction_type.toUpperCase()}
+                                     </span>
+                                  </td>
+                               </tr>
+                              );
+                           })
                         ) : (
                            <tr>
                               <td colSpan="4" className="px-8 py-10 text-center text-sm font-medium text-on-surface-variant/40 italic">No transactions found</td>
                            </tr>
                         )}
                      </tbody>
-                 </table>
-              </div>
-              <button onClick={() => setBonusUser(null)} className="flex items-center gap-2 mt-6 text-[#4A6B10] font-bold text-xs group hover:text-[#395800] transition-colors">
-                 <span className="material-symbols-outlined text-sm transition-transform group-hover:-translate-x-1">west</span>
-                 Back to Search
-              </button>
-           </div>
-        </div>
+                  </table>
+               </div>
+               <button onClick={() => setBonusUser(null)} className="flex items-center gap-2 mt-6 text-[#4A6B10] font-bold text-xs group hover:text-[#395800] transition-colors">
+                  <span className="material-symbols-outlined text-sm transition-transform group-hover:-translate-x-1">west</span>
+                  Back to Search
+               </button>
+            </div>
+         </div>
       )}
     </div>
   );
 }
 
 export default BonusEntryForm;
-
-

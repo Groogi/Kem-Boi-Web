@@ -1,8 +1,7 @@
 Rails.application.routes.draw do
-  get "links/index"
-  get "links/create"
-  get "links/update"
-  get "links/destroy"
+  post "/giveaways/:giveaway_id/enter", to: "giveaway_entries#create"
+  get "/giveaways/:giveaway_id/entries", to: "giveaway_entries#index"
+  get "/my_giveaway_entries", to: "giveaway_entries#my_entries"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -20,8 +19,12 @@ Rails.application.routes.draw do
   delete "/users/:id", to: "users#destroy"
   post "/users/:id/add_points", to: "users#add_points"
   post "/transactions/quick_add", to: "transactions#quick_add"
-  resources :transactions, only: [:index, :create]
+  resources :transactions, only: [ :index, :create ]
   get "/users/:id/transactions", to: "transactions#user_transactions"
   resources :giveaways
   resources :locations
+  resources :rewards
+  resources :redemptions, only: [ :index, :update, :destroy ]
+  post "/rewards/:id/claim", to: "redemptions#create"
+  get "/my_redemptions", to: "redemptions#my_redemptions"
 end

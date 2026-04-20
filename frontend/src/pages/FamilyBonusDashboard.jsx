@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { updateProfile } from "../api/auth";
+import { CustomDatePicker, ModernConfirm } from "../components/Common/SharedUI";
 
 function FamilyBonusDashboard() {
   const { user, token, updateUser, logout } = useAuth();
+  const { showToast } = useToast();
   const navigate = useNavigate();
   
   // View state: 'dashboard', 'rewards', 'giveaways', 'reward-details', 'edit-account'
@@ -12,21 +15,116 @@ function FamilyBonusDashboard() {
   const [loading, setLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
   const [giveaways, setGiveaways] = useState([]);
+  const [rewards, setRewards] = useState([]);
+  const [myRedemptions, setMyRedemptions] = useState([]);
+  const [localParticipation, setLocalParticipation] = useState([]);
+  const [lastUpdate, setLastUpdate] = useState(Date.now());
+  const [confirmData, setConfirmData] = useState({ isOpen: false, reward: null });
+
+  const refreshAllData = async () => {
+    setLoading(true);
+    await Promise.all([fetchGiveawaysData(), fetchRewardsData(), fetchMyRedemptionsData()]);
+    setLoading(false);
+  };
+
+  const fetchRewardsData = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('/api/rewards', {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setRewards(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to fetch rewards", err);
+    }
+  };
+
+  const fetchMyRedemptionsData = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('/api/my_redemptions', {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setMyRedemptions(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to fetch my redemptions", err);
+    }
+  };
+
+  const handleClaimReward = async (reward) => {
+    if ((user?.points_balance || 0) < reward.point_cost) {
+      showToast(`You need ${reward.point_cost} points to claim this!`, "error");
+      return;
+    }
+
+    setConfirmData({
+      isOpen: true,
+      reward,
+      message: `Redeem ${reward.point_cost} points for ${reward.name}?`
+    });
+    return;
+  };
+
+  const executeClaimReward = async (reward) => {
+    setConfirmData({ isOpen: false, reward: null });
+    try {
+      const res = await fetch(`/api/rewards/${reward.id}/claim`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(`Success! Your code is: ${data.redemption.voucher_code}`, "success");
+        updateUser({ ...user, points_balance: data.point_balance });
+        setActiveTab('vouchers');
+        fetchMyRedemptionsData();
+      } else {
+        showToast(data.error || "Failed to claim reward", "error");
+      }
+    } catch (err) {
+      showToast("Network error", "error");
+    }
+  };
+
+  const fetchGiveawaysData = async () => {
+    if (!token) return;
+    try {
+      const timestamp = new Date().getTime();
+      const res = await fetch(`/api/giveaways?t=${timestamp}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await res.json();
+      const syncedData = Array.isArray(data) ? data : [];
+      
+      setGiveaways(prev => {
+        return syncedData.map(newG => {
+          const localG = prev.find(p => Number(p.id) === Number(newG.id));
+          if (localG?.isJoined && !newG.isJoined) {
+            return { ...newG, isJoined: true };
+          }
+          return newG;
+        });
+      });
+      setLastUpdate(Date.now());
+    } catch (err) {
+      console.error("Failed to fetch giveaways", err);
+    }
+  };
 
   useEffect(() => {
-    const fetchGiveaways = async () => {
-      try {
-        const res = await fetch("/api/giveaways", {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        const data = await res.json();
-        setGiveaways(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error("Failed to fetch giveaways", err);
-      }
-    };
-    if (token) fetchGiveaways();
+    if (token) {
+      fetchGiveawaysData();
+      fetchRewardsData();
+      fetchMyRedemptionsData();
+    }
   }, [token]);
+
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+    refreshAllData();
+  };
 
   const getStatusBadge = (points) => {
     if (points >= 1500) return { label: 'PLATINUM', class: 'bg-[#4A6B10] text-white shadow-md' };
@@ -59,10 +157,12 @@ function FamilyBonusDashboard() {
       const updatedUser = await updateProfile(formData, token);
       updateUser(updatedUser);
       setSaveStatus("success");
+      showToast("Profile updated successfully!", "success");
       setTimeout(() => setSaveStatus(""), 3000);
     } catch (err) {
       console.error(err);
       setSaveStatus("error");
+      showToast("Update failed. Please check your network.", "error");
     } finally {
       setLoading(false);
     }
@@ -78,25 +178,32 @@ function FamilyBonusDashboard() {
       {activeTab !== 'edit-account' && (
         <>
           <div className="hidden md:flex gap-10 text-[15px] font-semibold mt-2">
-            <div className="relative group cursor-pointer" onClick={() => setActiveTab("dashboard")}>
+            <div className="relative group cursor-pointer" onClick={() => handleTabClick("dashboard")}>
               <span className={`transition-colors ${activeTab === 'dashboard' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>
                 Dashboard
               </span>
               {activeTab === 'dashboard' && <div className="absolute left-0 bottom-[-4px] w-full h-[3px] bg-primary"></div>}
             </div>
             
-            <div className="relative group cursor-pointer" onClick={() => setActiveTab("rewards")}>
+            <div className="relative group cursor-pointer" onClick={() => handleTabClick("rewards")}>
               <span className={`transition-colors ${activeTab === 'rewards' || activeTab === 'reward-details' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>
                 Rewards
               </span>
               {activeTab === 'rewards' || activeTab === 'reward-details' ? <div className="absolute left-0 bottom-[-4px] w-full h-[3px] bg-primary"></div> : null}
             </div>
 
-            <div className="relative group cursor-pointer" onClick={() => setActiveTab("giveaways")}>
+            <div className="relative group cursor-pointer" onClick={() => handleTabClick("giveaways")}>
               <span className={`transition-colors ${activeTab === 'giveaways' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>
                 Giveaways
               </span>
               {activeTab === 'giveaways' && <div className="absolute left-0 bottom-[-4px] w-full h-[3px] bg-primary"></div>}
+            </div>
+
+            <div className="relative group cursor-pointer" onClick={() => handleTabClick("vouchers")}>
+              <span className={`transition-colors ${activeTab === 'vouchers' ? 'text-primary font-bold' : 'text-on-surface-variant hover:text-primary'}`}>
+                Vouchers
+              </span>
+              {activeTab === 'vouchers' && <div className="absolute left-0 bottom-[-4px] w-full h-[3px] bg-primary"></div>}
             </div>
           </div>
 
@@ -132,7 +239,7 @@ function FamilyBonusDashboard() {
   const renderBottomNav = () => (
     <div className="fixed bottom-0 left-0 w-full bg-[#fcfdf9]/90 backdrop-blur-md border-t border-outline-variant/10 px-6 py-3 flex justify-around items-center md:hidden z-50">
       <button 
-        onClick={() => setActiveTab('dashboard')}
+        onClick={() => handleTabClick('dashboard')}
         className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'dashboard' ? 'text-primary' : 'text-on-surface-variant/60'}`}
       >
         <span className="material-symbols-outlined text-[24px]">home</span>
@@ -140,7 +247,7 @@ function FamilyBonusDashboard() {
       </button>
       
       <button 
-        onClick={() => setActiveTab('rewards')}
+        onClick={() => handleTabClick('rewards')}
         className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'rewards' || activeTab === 'reward-details' ? 'text-primary' : 'text-on-surface-variant/60'}`}
       >
         <span className="material-symbols-outlined text-[24px]">emoji_events</span>
@@ -148,11 +255,19 @@ function FamilyBonusDashboard() {
       </button>
 
       <button 
-        onClick={() => setActiveTab('giveaways')}
+        onClick={() => handleTabClick('giveaways')}
         className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'giveaways' ? 'text-primary' : 'text-on-surface-variant/60'}`}
       >
         <span className="material-symbols-outlined text-[24px]">redeem</span>
         <span className="text-[10px] font-bold uppercase tracking-widest">WINS</span>
+      </button>
+
+      <button 
+        onClick={() => handleTabClick('vouchers')}
+        className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'vouchers' ? 'text-primary' : 'text-on-surface-variant/60'}`}
+      >
+        <span className="material-symbols-outlined text-[24px]">confirmation_number</span>
+        <span className="text-[10px] font-bold uppercase tracking-widest">Codes</span>
       </button>
 
       <button 
@@ -238,7 +353,7 @@ function FamilyBonusDashboard() {
 
         <div onClick={() => setActiveTab('giveaways')} className="bg-transparent border border-outline-variant/30 rounded-[1.5rem] p-8 shadow-sm flex justify-between items-start cursor-pointer hover:bg-[#e0e2d6]/50 transition-colors group">
            <div className="pr-4">
-             <h3 className="text-primary font-bold font-headline text-2xl mb-3 group-hover:underline">Win a Free Kem Boi Tote Bag</h3>
+             <h3 className="text-primary font-bold font-headline text-2xl mb-3 group-hover:underline">Exclusive Giveaways</h3>
              <p className="text-base text-on-surface-variant/80 font-medium">Keep up to date with current and upcoming giveaways here.</p>
            </div>
            <span className="material-symbols-outlined text-[2rem] text-primary">redeem</span>
@@ -247,6 +362,50 @@ function FamilyBonusDashboard() {
 
     </div>
   );
+
+  const handleEnterGiveaway = async (giveawayId) => {
+    try {
+      const res = await fetch(`/api/giveaways/${giveawayId}/enter`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        showToast('Successfully entered giveaway!', 'success');
+        setLocalParticipation(prev => [...prev, Number(giveawayId)]);
+        setGiveaways(prev => {
+          return prev.map(g => Number(g.id) === Number(giveawayId) ? { ...g, isJoined: true } : g);
+        });
+      } else if (res.status === 422) {
+        showToast('You are already participating!', 'success');
+        setLocalParticipation(prev => [...prev, Number(giveawayId)]);
+      } else {
+        const data = await res.json();
+        showToast(data.error || 'Failed to enter giveaway', 'error');
+      }
+    } catch (err) {
+      showToast('Network error', 'error');
+    }
+  };
+
+  const ParticipationButton = ({ giveaway }) => {
+    const isJoined = giveaway.isJoined || localParticipation.includes(Number(giveaway.id));
+    if (isJoined) {
+      return (
+        <div className="flex items-center gap-2 bg-[#EEF4E4] text-[#4A6B10] font-bold py-2 px-5 text-[11px] tracking-widest rounded-full border border-[#4A6B10]/20 shadow-inner min-w-[100px] justify-center">
+          <span className="material-symbols-outlined text-[14px]">check_circle</span>
+          JOINED
+        </div>
+      );
+    }
+    return (
+      <button
+        onClick={(e) => { e.stopPropagation(); handleEnterGiveaway(giveaway.id); }}
+        className="bg-primary text-white font-bold py-2 px-8 text-[11px] tracking-widest rounded-full hover:bg-[#395800] transition-colors shadow-sm active:scale-95 min-w-[100px]"
+      >
+        ENTER
+      </button>
+    );
+  };
 
   const renderGiveaways = () => {
     const activeGiveaways = giveaways.filter(g => g.active);
@@ -261,7 +420,7 @@ function FamilyBonusDashboard() {
                  <p className="text-on-surface-variant/60 font-medium col-span-full">No active giveaways at the moment. Check back soon!</p>
               ) : (
                  activeGiveaways.map((g, idx) => (
-                    <div key={idx} className="bg-[#E4ECD5] rounded-2xl p-6 shadow-sm flex flex-col border border-white/20 min-h-[180px]">
+                    <div key={g.id} className="bg-[#E4ECD5] rounded-2xl p-6 shadow-sm flex flex-col border border-white/20 min-h-[180px]">
                        <div className="flex justify-between items-start mb-3">
                           <h3 className="font-bold text-primary text-lg font-headline">{g.title}</h3>
                           <span className="material-symbols-outlined text-primary text-xl">redeem</span>
@@ -271,9 +430,7 @@ function FamilyBonusDashboard() {
                        </p>
                        <div className="flex justify-between items-end">
                           <span className="text-[10px] font-bold text-primary/60 tracking-widest uppercase">Ends {g.end_date}</span>
-                          <button className="bg-primary text-white font-bold py-1.5 px-6 text-xs tracking-wider rounded-md hover:bg-[#395800] transition-colors shadow-sm">
-                             ENTER
-                          </button>
+                          <ParticipationButton giveaway={g} />
                        </div>
                     </div>
                  ))
@@ -310,62 +467,119 @@ function FamilyBonusDashboard() {
     );
   };
 
-  const renderRewards = () => (
-    <div className="space-y-10 animate-fade-in pb-12">
-       <div>
-          <h2 className="text-xl font-bold font-headline text-on-surface mb-6">Redeemable Offers:</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-             <div onClick={() => setActiveTab('reward-details')} className="bg-[#E4ECD5] rounded-[1.5rem] p-6 shadow-sm flex flex-col cursor-pointer border border-primary/10 hover:border-[#426500]/40 transition-colors">
-                <div className="flex justify-between items-start mb-2">
-                   <h3 className="font-bold text-on-surface text-lg font-headline">Refer A Friend</h3>
-                   <span className="material-symbols-outlined text-on-surface-variant/70 text-[26px]">sell</span>
-                </div>
-                <p className="text-sm text-on-surface-variant font-medium opacity-80 mb-8 flex-grow pr-4">
-                   Sweet Treats are better with a friend.
-                </p>
-                <div className="flex justify-end pt-2">
-                   <button className="bg-primary text-white font-bold py-2 px-8 text-[11px] tracking-wider rounded-full hover:bg-[#395800] transition-colors shadow-sm">
-                      CLAIM
-                   </button>
-                </div>
-             </div>
+  const renderRewards = () => {
+    const redeemable = rewards.filter(r => r.active);
+    const upcoming = rewards.filter(r => !r.active);
 
-             <div className="bg-[#E4ECD5] rounded-[1.5rem] p-6 shadow-sm flex flex-col border border-primary/10">
-                <div className="flex justify-between items-start mb-2">
-                   <h3 className="font-bold text-on-surface text-lg font-headline">Loyalty Level Up</h3>
-                   <span className="material-symbols-outlined text-on-surface-variant/70 text-[26px]">sell</span>
-                </div>
-                <p className="text-sm text-on-surface-variant font-medium opacity-80 mb-8 flex-grow pr-4">
-                   Loyalty hits different when its sweet.
-                </p>
-                <div className="flex justify-end pt-2">
-                   <button className="bg-primary text-white font-bold py-2 px-8 text-[11px] tracking-wider rounded-full hover:bg-[#395800] transition-colors shadow-sm">
-                      CLAIM
-                   </button>
-                </div>
-             </div>
-          </div>
-       </div>
+    return (
+      <div className="space-y-10 animate-fade-in pb-12">
+         <div>
+            <h2 className="text-xl font-bold font-headline text-on-surface mb-6">Redeemable Offers:</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+               {redeemable.length === 0 ? (
+                  <p className="text-on-surface-variant/60 font-medium">No rewards available to redeem right now.</p>
+               ) : (
+                  redeemable.map(r => (
+                    <div key={r.id} className="bg-[#E4ECD5] rounded-[1.5rem] p-6 shadow-sm flex flex-col border border-primary/10 hover:border-[#426500]/40 transition-colors">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-bold text-on-surface text-lg font-headline">{r.name}</h3>
+                          <span className="material-symbols-outlined text-on-surface-variant/70 text-[26px]">sell</span>
+                        </div>
+                        <p className="text-sm text-on-surface-variant font-medium opacity-80 mb-8 flex-grow pr-4">
+                          {r.description}
+                        </p>
+                        <div className="flex justify-between items-center pt-2">
+                          <span className="text-[11px] font-bold text-primary/80">{r.point_cost} PTS</span>
+                          <button 
+                              onClick={(e) => { e.stopPropagation(); handleClaimReward(r); }}
+                              className="bg-primary text-white font-bold py-2 px-8 text-[11px] tracking-wider rounded-full hover:bg-[#395800] transition-colors shadow-sm"
+                          >
+                              CLAIM
+                          </button>
+                        </div>
+                    </div>
+                  ))
+               )}
+            </div>
+         </div>
 
-       <div>
-          <h2 className="text-xl font-bold font-headline text-on-surface mb-6">Upcoming Offers:</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-             <div className="bg-surface-container-highest/20 rounded-[1.5rem] p-6 shadow-sm flex flex-col border border-outline-variant/10">
-                <div className="flex justify-between items-start mb-2">
-                   <h3 className="font-bold text-on-surface-variant text-lg font-headline">Birthday Surprise</h3>
-                   <span className="material-symbols-outlined text-on-surface-variant opacity-60 text-[26px]">cake</span>
-                </div>
-                <p className="text-sm text-on-surface-variant font-medium opacity-70 mb-8 flex-grow pr-4">
-                   A special treat for your special day.
-                </p>
-                <div className="flex justify-end pt-2">
-                   <button disabled className="bg-transparent border-2 border-outline-variant/30 text-on-surface-variant/60 font-bold py-1.5 px-6 text-[11px] tracking-wider rounded-full">
-                      LOCKED
-                   </button>
-                </div>
-             </div>
+         <div>
+            <h2 className="text-xl font-bold font-headline text-on-surface mb-6">Upcoming Offers:</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+               {upcoming.length === 0 ? (
+                  <p className="text-on-surface-variant/60 font-medium">No upcoming offers at this time.</p>
+               ) : (
+                  upcoming.map(r => (
+                    <div key={r.id} className="bg-surface-container-highest/30 rounded-2xl p-6 shadow-sm flex flex-col border border-outline-variant/10 opacity-70">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-bold text-on-surface-variant text-lg font-headline">{r.name}</h3>
+                          <span className="material-symbols-outlined text-on-surface-variant/40 text-[26px]">cake</span>
+                        </div>
+                        <p className="text-sm text-on-surface-variant font-medium opacity-80 mb-8 flex-grow pr-4">
+                          {r.description}
+                        </p>
+                        <div className="flex justify-end pt-2">
+                          <button disabled className="bg-[#D1D3C8] text-white font-bold py-1.5 px-8 text-xs tracking-wider rounded-full uppercase">
+                              LOCKED
+                          </button>
+                        </div>
+                    </div>
+                  ))
+               )}
+            </div>
+         </div>
+      </div>
+    );
+  };
+
+  const renderMyVouchers = () => (
+    <div className="space-y-8 animate-fade-in pb-20">
+      <div className="flex justify-between items-center bg-white/40 p-6 rounded-[2rem] border border-white/60">
+        <div>
+          <h2 className="text-2xl font-bold font-headline text-primary">My Claimed Rewards</h2>
+          <p className="text-sm font-medium text-on-surface-variant opacity-70">Show these codes to our staff in-store to redeem.</p>
+        </div>
+        <span className="material-symbols-outlined text-primary text-3xl">confirmation_number</span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {myRedemptions.length === 0 ? (
+          <div className="col-span-full py-20 text-center bg-white/20 rounded-[2rem] border-2 border-dashed border-white/40">
+            <span className="material-symbols-outlined text-5xl text-on-surface-variant/20 mb-4">redeem</span>
+            <p className="text-on-surface-variant/40 font-bold tracking-widest uppercase text-sm">No vouchers claimed yet</p>
           </div>
-       </div>
+        ) : (
+          myRedemptions.map((red) => (
+            <div key={red.id} className="bg-white rounded-[2rem] p-8 shadow-sm border border-outline-variant/10 flex flex-col relative group overflow-hidden">
+              {/* Status Badge */}
+              <div className="absolute top-6 right-6">
+                <span className={`text-[9px] font-black tracking-[0.15em] uppercase px-3 py-1 rounded-full border ${
+                  red.status === 'used' ? 'bg-red-50 text-red-500 border-red-100' : 'bg-green-50 text-green-600 border-green-100'
+                }`}>
+                  {red.status}
+                </span>
+              </div>
+
+              <h4 className="text-xl font-bold font-headline text-on-surface mb-1">{red.reward?.name}</h4>
+              <p className="text-xs font-bold text-on-surface-variant/40 uppercase tracking-widest mb-8">
+                Claimed {new Date(red.created_at).toLocaleDateString('en-AU')}
+              </p>
+
+              <div className="bg-[#FBFCF6] border-2 border-dashed border-[#E5E7D9] rounded-2xl p-5 flex flex-col items-center justify-center group-hover:border-primary/30 transition-colors">
+                <span className="text-[10px] font-black text-on-surface-variant/30 uppercase tracking-[0.2em] mb-2">Voucher Code</span>
+                <span className="text-2xl font-black font-headline text-primary tracking-widest selection:bg-primary selection:text-white uppercase">
+                  {red.voucher_code}
+                </span>
+              </div>
+              
+              <div className="mt-6 flex items-center gap-2 text-[#426500]/40">
+                <span className="material-symbols-outlined text-sm">info</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest leading-none">Show this in-store</span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 
@@ -401,9 +615,9 @@ function FamilyBonusDashboard() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in pb-12 pt-2">
        {/* Left Panel */}
        <div className="col-span-1 flex flex-col h-full">
-           <div className="bg-[#fcfdf9] rounded-[1.5rem] p-6 shadow-sm border border-outline-variant/30 flex-grow">
-              {/* Profile Box */}
-              <div className="flex items-center gap-4 mb-8">
+            <div className="bg-[#fcfdf9] rounded-[1.5rem] p-6 shadow-sm border border-outline-variant/30 flex-grow">
+               {/* Profile Box */}
+               <div className="flex items-center gap-4 mb-8">
                   <div className="w-16 h-16 rounded-full bg-[#426500] flex flex-col justify-center items-center text-white text-3xl font-bold border-4 border-white shadow-sm">
                      <span className="material-symbols-outlined text-[2.5rem]">person</span>
                   </div>
@@ -413,20 +627,20 @@ function FamilyBonusDashboard() {
                      </h3>
                      <p className="text-[13px] font-bold text-on-surface-variant opacity-80">{user?.account_id ? `#${user.account_id}` : '#account_ID'}</p>
                   </div>
-              </div>
+               </div>
 
-              {/* Nav selector */}
-              <div className="bg-white border-2 border-[#e5e7e1] rounded-full px-5 py-3 flex items-center gap-3 text-[#426500] font-bold shadow-sm cursor-pointer shadow-black/5">
-                 <span className="material-symbols-outlined font-bold text-xl">account_circle</span>
-                 <span className="text-base text-[#4a6b10]">Personal Details</span>
-              </div>
-           </div>
-           
-           <div className="text-center pt-3 pb-8">
-              <button onClick={() => setActiveTab('dashboard')} className="text-[#63665e] font-bold text-[13px] tracking-wide hover:underline hover:text-[#426500] transition-colors">
-                 Back to Dashboard
-              </button>
-           </div>
+               {/* Nav selector */}
+               <div className="bg-white border-2 border-[#e5e7e1] rounded-full px-5 py-3 flex items-center gap-3 text-[#426500] font-bold shadow-sm cursor-pointer shadow-black/5">
+                  <span className="material-symbols-outlined font-bold text-xl">account_circle</span>
+                  <span className="text-base text-[#4a6b10]">Personal Details</span>
+               </div>
+            </div>
+            
+            <div className="text-center pt-3 pb-8">
+               <button onClick={() => setActiveTab('dashboard')} className="text-[#63665e] font-bold text-[13px] tracking-wide hover:underline hover:text-[#426500] transition-colors">
+                  Back to Dashboard
+               </button>
+            </div>
        </div>
 
        {/* Right Panel (Form) */}
@@ -495,19 +709,13 @@ function FamilyBonusDashboard() {
 
               {/* D.O.B. */}
               <div className="col-span-1">
-                  <label className="block text-[14px] font-bold text-[#63665e] mb-2 ml-[2px]">D.O.B. (Optional)</label>
-                  <div className="relative">
-                      <input 
-                        type="date" 
-                        value={formData.date_of_birth}
-                        onChange={(e) => setFormData({...formData, date_of_birth: e.target.value})}
-                        className="w-full bg-[#dcdcd8] border-none rounded-full px-5 py-3.5 focus:ring-2 focus:ring-[#426500]/40 transition-shadow text-[#555] font-semibold text-sm" 
-                      />
-                       <div className="absolute right-4 top-[10px] flex flex-col items-center leading-none text-on-surface-variant/40 select-none pointer-events-none">
-                          <span className="material-symbols-outlined text-[18px]">calendar_month</span>
-                          <span className="text-[7px] font-bold uppercase mt-0.5">Edit</span>
-                       </div>
-                  </div>
+                  <CustomDatePicker 
+                    label="D.O.B. (Optional)"
+                    value={formData.date_of_birth}
+                    onChange={(val) => setFormData({...formData, date_of_birth: val})}
+                    placeholder="Select birthday"
+                    inputClassName="!bg-[#dcdcd8] !shadow-none !border-transparent hover:!border-[#426500]/20"
+                  />
               </div>
           </div>
 
@@ -542,15 +750,24 @@ function FamilyBonusDashboard() {
            {activeTab === 'giveaways' && renderGiveaways()}
            {activeTab === 'rewards' && renderRewards()}
            {activeTab === 'reward-details' && renderRewardDetails()}
+           {activeTab === 'vouchers' && renderMyVouchers()}
            {activeTab === 'edit-account' && renderEditAccount()}
         </main>
 
         {renderBottomNav()}
       </div>
+
+      <ModernConfirm 
+        isOpen={confirmData.isOpen}
+        title="Redeem Points?"
+        message={confirmData.message}
+        confirmText="Yes, Redeem Now"
+        cancelText="Maybe Later"
+        onConfirm={() => executeClaimReward(confirmData.reward)}
+        onCancel={() => setConfirmData({ isOpen: false, reward: null })}
+      />
     </div>
   );
 }
 
 export default FamilyBonusDashboard;
-
-

@@ -1,11 +1,15 @@
 class User < ApplicationRecord
   # Roles and Authentication
   has_secure_password
-  enum :role, { customer: 'customer', admin: 'admin' }
+  enum :role, { customer: "customer", admin: "admin" }
 
   # Associations
   has_many :transactions, dependent: :destroy
   has_many :claimed_bonuses, class_name: "PendingBonus", foreign_key: "claimed_by_user_id"
+  has_many :giveaway_entries, dependent: :destroy
+  has_many :entered_giveaways, through: :giveaway_entries, source: :giveaway
+  has_many :redemptions, dependent: :destroy
+  has_many :claimed_rewards, through: :redemptions, source: :reward
 
   # Validations
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -36,11 +40,11 @@ class User < ApplicationRecord
     PendingBonus.where(email: self.email).find_each do |pending|
       transactions.create!(
         points: pending.points_amount || 0,
-        transaction_type: 'bonus',
+        transaction_type: "bonus",
         notes: "Welcome bonus from pending list"
       )
       # Delete or update status to 'claimed'
-      pending.destroy 
+      pending.destroy
     end
   end
 end

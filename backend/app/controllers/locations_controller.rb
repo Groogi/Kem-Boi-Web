@@ -1,7 +1,7 @@
 class LocationsController < ApplicationController
-  before_action :authorize_request, except: [:index, :show]
-  before_action :authorize_admin, except: [:index, :show]
-  before_action :set_location, only: [:show, :update, :destroy]
+  before_action :authorize_request, except: [ :index, :show ]
+  before_action :authorize_admin, except: [ :index, :show ]
+  before_action :set_location, only: [ :show, :update, :destroy ]
 
   # GET /locations
   def index
@@ -44,14 +44,10 @@ class LocationsController < ApplicationController
   def set_location
     @location = Location.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    render json: { error: 'Location not found' }, status: :not_found
+    render json: { error: "Location not found" }, status: :not_found
   end
 
   def location_params
     params.require(:location).permit(:name, :address_line_1, :suburb, :state, :postcode, :map_url, :active)
-  end
-
-  def authorize_admin
-    render json: { error: 'Unauthorized' }, status: :unauthorized unless @current_user.role == 'admin'
   end
 end
