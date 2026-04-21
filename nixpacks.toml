@@ -1,10 +1,10 @@
 [phases.setup]
-nixPkgs = ["nodejs", "ruby"]
+nixPkgs = ["nodejs", "ruby", "postgresql"]
 
 [phases.install]
 cmds = [
   "gem install bundler -v 2.6.9",
-  "cd backend && bundle config set --local path 'vendor/bundle' && bundle install",
+  "cd backend && bundle install",
   "npm install"
 ]
 
