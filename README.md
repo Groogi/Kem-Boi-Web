@@ -10,6 +10,13 @@ Kem Boi is a dessert brand launching on the Gold Coast, Australia. The company s
 
 <img width="500" height="400" alt="image" src="https://github.com/user-attachments/assets/8d561338-7ae1-478a-aac8-24340fe93013" />
 
+### __Prerequisites__
+
+Before starting, ensure you have the following installed:
+- **Ruby**: `3.4.9`
+- **Node.js**: `20.x` or higher
+- **PostgreSQL**: Ensure the service is running locally.
+
 
 ### Frontend Dependencies
 
@@ -72,6 +79,7 @@ rails s
 ## Frontend Setup
 
 ```bash
+# Note: Run this in a separate terminal window
 cd frontend
 npm install
 npm run dev
@@ -85,6 +93,10 @@ The database seed includes pre-configured accounts for testing:
 - **Customer**: `tester@kemboi.com` / `password123`
 
 The customer account is pre-loaded with **800 points**, which automatically populates **4 punches** on the loyalty card. The seed also includes three store locations and two active giveaways for UI demonstration.
+---
 
+### __Troubleshooting__
 
-
+- **Database Connection**: Ensure your PostgreSQL service is running. If you get an authentication error, double-check your `DB_USERNAME` and `DB_PASSWORD` in `backend/.env`.
+- **Port Conflicts**: Ensure port `3000` is not being used by another application.
+- **Node Modules**: If you encounter issues with frontend packages, try deleting `node_modules` and running `npm install` again.
