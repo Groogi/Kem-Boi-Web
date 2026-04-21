@@ -27,4 +27,7 @@ Rails.application.routes.draw do
   resources :redemptions, only: [ :index, :update, :destroy ]
   post "/rewards/:id/claim", to: "redemptions#create"
   get "/my_redemptions", to: "redemptions#my_redemptions"
+  resources :links
+  get "/social_links", to: "links#social_links"
+  put "/social_links", to: "links#update_social_links"
 end

@@ -16,6 +16,7 @@ function GiveawayEditor({ giveaway, onSave, onCancel, onDelete, loading }) {
   
   const [entries, setEntries] = useState([]);
   const [loadingEntries, setLoadingEntries] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchEntries = async () => {
@@ -37,6 +38,15 @@ function GiveawayEditor({ giveaway, onSave, onCancel, onDelete, loading }) {
     };
     fetchEntries();
   }, [data.id, token]);
+  const filteredEntries = entries.filter(entry => {
+    if (!searchTerm) return true;
+    const term = searchTerm.toLowerCase();
+    const fullName = `${entry.user?.first_name || ''} ${entry.user?.last_name || ''}`.toLowerCase();
+    const email = (entry.user?.email || '').toLowerCase();
+    const accountId = (entry.user?.account_id || entry.user?.id || '').toString().toLowerCase();
+    
+    return fullName.includes(term) || email.includes(term) || accountId.includes(term);
+  });
 
 
   return (
@@ -102,7 +112,18 @@ function GiveawayEditor({ giveaway, onSave, onCancel, onDelete, loading }) {
         {/* Entries Table Section */}
         <div className="mb-12">
            <div className="flex justify-between items-center mb-6 pl-1">
-              <h4 className="text-xl font-bold font-headline text-[#4A6B10]">Participation List ({entries.length})</h4>
+              <h4 className="text-xl font-bold font-headline text-[#4A6B10]">Participation List ({filteredEntries.length})</h4>
+              
+              <div className="relative">
+                <input 
+                  type="text" 
+                  placeholder="Search participants..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-white border-none rounded-full px-5 py-2.5 pl-11 shadow-inner text-sm font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none min-w-[280px]"
+                />
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-[20px]">search</span>
+              </div>
            </div>
 
            <div className="bg-white rounded-[2rem] overflow-hidden border border-primary/5 shadow-sm">
@@ -118,10 +139,10 @@ function GiveawayEditor({ giveaway, onSave, onCancel, onDelete, loading }) {
                  <tbody className="divide-y divide-[#426500]/5">
                     {loadingEntries ? (
                        <tr><td colSpan="4" className="px-8 py-10 text-center text-sm font-medium text-on-surface-variant/40 italic">Loading entries...</td></tr>
-                    ) : entries.length === 0 ? (
-                       <tr><td colSpan="4" className="px-8 py-10 text-center text-sm font-medium text-on-surface-variant/40 italic">No entries yet.</td></tr>
+                    ) : filteredEntries.length === 0 ? (
+                       <tr><td colSpan="4" className="px-8 py-10 text-center text-sm font-medium text-on-surface-variant/40 italic">{searchTerm ? 'No matches found.' : 'No entries yet.'}</td></tr>
                     ) : (
-                       entries.map((entry, idx) => (
+                       filteredEntries.map((entry, idx) => (
                           <tr key={idx}>
                              <td className="px-8 py-5 text-[10px] font-black text-on-surface-variant/40">#{entry.user?.account_id || entry.user?.id}</td>
                              <td className="px-8 py-5 text-sm font-bold text-on-surface">{entry.user?.first_name} {entry.user?.last_name}</td>

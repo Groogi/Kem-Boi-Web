@@ -147,6 +147,11 @@ function LoginForm() {
         {activeTab === "login" ? "Welcome Back to the World of Kem Boi." : "Start your avocado journey today."}
       </p>
 
+      <form 
+        className="w-full flex flex-col items-center" 
+        onSubmit={activeTab === "login" ? handleLogin : handleSignup}
+      >
+
       {/* Split Interior - Match Screenshot */}
       <div className="w-full flex-grow flex flex-col md:flex-row items-stretch justify-center gap-12 mb-12">
         
@@ -154,11 +159,11 @@ function LoginForm() {
         <div className="flex-1 flex flex-col items-center justify-center">
           <p className="text-[13px] font-bold text-[#7d8076] mb-6">Log in With:</p>
           <div className="space-y-4 w-full max-w-[280px]">
-            <button className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-[#E3E5D7] rounded-full shadow-lg shadow-black/5 hover:bg-white/80 transition-all">
+            <button type="button" className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-[#E3E5D7] rounded-full shadow-lg shadow-black/5 hover:bg-white/80 transition-all">
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-6 h-6" />
               <span className="text-[15px] font-bold text-[#4A5440] tracking-wide">Google</span>
             </button>
-            <button className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-[#E3E5D7] rounded-full shadow-lg shadow-black/5 hover:bg-white/80 transition-all">
+            <button type="button" className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-[#E3E5D7] rounded-full shadow-lg shadow-black/5 hover:bg-white/80 transition-all">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17.057 10.78a4.425 4.425 0 0 1 2.067-3.693 4.48 4.48 0 0 0-3.522-1.895c-1.493-.153-2.91.88-3.667.88-.756 0-1.928-.862-3.174-.836a4.704 4.704 0 0 0-3.95 2.39c-1.696 2.94-.434 7.288 1.216 9.673 1.05 1.517 2.152 3.012 3.483 2.962 1.282-.05 1.767-.827 3.32-.827 1.554 0 1.99.827 3.333.801 1.366-.025 2.316-1.34 3.155-2.564a10.456 10.456 0 0 0 1.442-2.955 4.28 4.28 0 0 1-2.204-4.635zM15.42 5.093c1-.86 1.724-2.053 1.54-3.243-1.026.041-2.268.683-3.004 1.543-.66.756-1.238 1.967-1.082 3.132 1.0.078 2.162-.572 2.546-1.432z"/>
               </svg>
@@ -183,10 +188,7 @@ function LoginForm() {
 
         {/* Right: Form */}
         <div className="flex-1 flex flex-col justify-center">
-          <form 
-            className="w-full flex flex-col gap-6" 
-            onSubmit={activeTab === "login" ? handleLogin : handleSignup}
-          >
+          <div className="w-full flex flex-col gap-6">
             {activeTab === "signup" && (
               <div className="space-y-1">
                 <label className="text-[12px] text-[#7d8076] ml-5 font-bold tracking-widest uppercase">Full Name</label>
@@ -245,20 +247,18 @@ function LoginForm() {
                 />
               </div>
             </div>
-          </form>
+          </div>
         </div>
       </div>
 
-      <button
-        onClick={() => {
-           const form = document.querySelector('form');
-           if (form) form.requestSubmit();
-        }}
-        className="w-full max-w-[500px] bg-[#4d7902] text-white font-bold text-[1.3rem] md:text-[1.6rem] tracking-wide py-5 rounded-full hover:bg-[#3d6101] active:scale-[0.98] transition-all shadow-2xl shadow-[#4d7902]/20"
-        disabled={loading}
-      >
-        {loading ? "Please wait..." : (activeTab === "login" ? "Login" : "Join The Family")}
-      </button>
+        <button
+          type="submit"
+          className="w-full max-w-[500px] bg-[#4d7902] text-white font-bold text-[1.3rem] md:text-[1.6rem] tracking-wide py-5 rounded-full hover:bg-[#3d6101] active:scale-[0.98] transition-all shadow-2xl shadow-[#4d7902]/20"
+          disabled={loading}
+        >
+          {loading ? "Please wait..." : (activeTab === "login" ? "Login" : "Join The Family")}
+        </button>
+      </form>
 
       <p className="text-center text-[10px] text-[#7d8076] font-bold mt-6 opacity-60">
         By Continuing, you agree to Kem Boi's <Link to="/terms" className="underline">Terms of Service</Link> and <Link to="/privacy" className="underline">Privacy Policy</Link>

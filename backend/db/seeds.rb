@@ -114,6 +114,14 @@ puts "💰 Seeding Transaction History (800 points total)..."
   )
 end
 
+# 7. Create Social Links
+puts "🔗 Creating Social Links..."
+Link.create!([
+  { label: "instagram", url: "https://www.instagram.com/kemboi", active: true },
+  { label: "facebook", url: "https://www.facebook.com/kemboi", active: true },
+  { label: "website", url: "https://www.kemboi.com", active: true }
+])
+
 puts "✅ SUCCESS: Database is now fully seeded with Demo Data!"
 puts "Admin: admin@kemboi.com (password123)"
 puts "Tester: tester@kemboi.com (password123) - Balance: 800 pts (4 Punches)"

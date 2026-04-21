@@ -1,17 +1,50 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "../../context/ToastContext";
+import { useAuth } from "../../context/AuthContext";
 
 function WebsiteLinksForm() {
   const [socialLinks, setSocialLinks] = useState({ instagram: "", facebook: "", website: "" });
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+  const { token } = useAuth();
+
+  useEffect(() => {
+    const fetchLinks = async () => {
+      try {
+        const res = await fetch("/api/social_links");
+        if (res.ok) {
+          const data = await res.json();
+          setSocialLinks(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch links", err);
+      }
+    };
+    fetchLinks();
+  }, []);
   
-  const handleUpdate = (field) => {
+  const handleUpdate = async (field) => {
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/social_links", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ [field]: socialLinks[field] })
+      });
+      
+      if (res.ok) {
+        showToast(`${field.charAt(0).toUpperCase() + field.slice(1)} link updated!`, "success");
+      } else {
+        showToast("Failed to update link", "error");
+      }
+    } catch (err) {
+      showToast("An error occurred", "error");
+    } finally {
       setLoading(false);
-      showToast(`${field.charAt(0).toUpperCase() + field.slice(1)} link updated!`, "success");
-    }, 800);
+    }
   };
 
   const handleKeyDown = (e, field) => {

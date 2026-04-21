@@ -1,0 +1,2 @@
+class PendingBonus < ApplicationRecord
+end
