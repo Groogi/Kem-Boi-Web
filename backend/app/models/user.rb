@@ -5,11 +5,16 @@ class User < ApplicationRecord
 
   # Associations
   has_many :transactions, dependent: :destroy
-  has_many :claimed_bonuses, class_name: "PendingBonus", foreign_key: "claimed_by_user_id"
+  has_many :bonus_transactions, dependent: :destroy
+  has_many :claimed_bonuses, class_name: "PendingBonus", foreign_key: "claimed_by_user_id", dependent: :nullify
   has_many :giveaway_entries, dependent: :destroy
   has_many :entered_giveaways, through: :giveaway_entries, source: :giveaway
   has_many :redemptions, dependent: :destroy
   has_many :claimed_rewards, through: :redemptions, source: :reward
+
+  # Referral Tracking
+  belongs_to :referred_by, class_name: "User", optional: true
+  has_many :referrals, class_name: "User", foreign_key: "referred_by_id"
 
   # Validations
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -18,7 +23,11 @@ class User < ApplicationRecord
 
   # Points Ledger Logic
   def points_balance
-    transactions.sum(:points)
+    self.points_balance_cache
+  end
+
+  def update_points_balance_cache!
+    update_column(:points_balance_cache, transactions.sum(:points))
   end
 
   # Registration Hook
@@ -28,9 +37,9 @@ class User < ApplicationRecord
   private
 
   def generate_account_id
-    # Format: account_1001, account_1002, etc.
+    # Format: kemboi_1001, kemboi_1002, etc.
     last_id = User.maximum(:id) || 0
-    self.account_id = "account_#{1000 + last_id + 1}"
+    self.account_id = "kemboi_#{1000 + last_id + 1}"
   end
 
   def process_pending_bonuses

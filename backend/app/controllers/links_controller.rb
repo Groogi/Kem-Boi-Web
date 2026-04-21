@@ -1,6 +1,6 @@
 class LinksController < ApplicationController
-  before_action :authorize_request, except: [:social_links]
-  before_action :authorize_admin, only: [:update_social_links, :index, :create, :update, :destroy]
+  before_action :authorize_request, except: [ :social_links ]
+  before_action :authorize_admin, only: [ :update_social_links, :index, :create, :update, :destroy ]
 
   def index
     @links = Link.all
@@ -8,15 +8,15 @@ class LinksController < ApplicationController
   end
 
   def social_links
-    instagram = Link.find_by(label: 'instagram')&.url || ""
-    facebook = Link.find_by(label: 'facebook')&.url || ""
-    website = Link.find_by(label: 'website')&.url || ""
-    
+    instagram = Link.find_by(label: "instagram")&.url || ""
+    facebook = Link.find_by(label: "facebook")&.url || ""
+    website = Link.find_by(label: "website")&.url || ""
+
     render json: { instagram: instagram, facebook: facebook, website: website }
   end
 
   def update_social_links
-    [:instagram, :facebook, :website].each do |type|
+    [ :instagram, :facebook, :website ].each do |type|
       if params[type].present?
         link = Link.find_or_initialize_by(label: type.to_s)
         link.url = params[type]

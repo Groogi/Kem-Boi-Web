@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_20_093019) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_130838) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -50,6 +50,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_093019) do
 
   create_table "giveaways", force: :cascade do |t|
     t.boolean "active", default: false, null: false
+    t.boolean "archived", default: false, null: false
     t.datetime "created_at", null: false
     t.text "description"
     t.date "end_date"
@@ -107,15 +108,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_093019) do
     t.string "voucher_code"
     t.index ["reward_id"], name: "index_redemptions_on_reward_id"
     t.index ["user_id"], name: "index_redemptions_on_user_id"
+    t.index ["voucher_code"], name: "index_redemptions_on_voucher_code", unique: true
   end
 
   create_table "rewards", force: :cascade do |t|
     t.boolean "active"
+    t.boolean "archived", default: false, null: false
     t.datetime "created_at", null: false
     t.text "description"
+    t.date "end_date"
+    t.integer "fulfilled_count", default: 0
     t.string "images"
+    t.integer "limit_per_user"
     t.string "name"
     t.integer "point_cost"
+    t.integer "redemptions_count", default: 0
+    t.string "reward_type", default: "standard"
+    t.date "start_date"
+    t.integer "total_limit", default: 0
     t.datetime "updated_at", null: false
   end
 
@@ -140,6 +150,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_093019) do
     t.string "name"
     t.string "password_digest"
     t.string "phone"
+    t.integer "points_balance_cache", default: 0, null: false
+    t.integer "referred_by_id"
     t.string "role"
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_users_on_account_id"

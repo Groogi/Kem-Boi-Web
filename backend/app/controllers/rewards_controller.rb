@@ -1,9 +1,12 @@
 class RewardsController < ApplicationController
   before_action :authorize_request
-  before_action :authorize_admin, only: [:create, :update, :destroy]
+  before_action :authorize_admin, only: [ :create, :update, :destroy ]
 
   def index
-    @rewards = Reward.all
+    # Passive cleanup: Archive expired rewards instead of deleting
+    Reward.where("end_date < ? AND archived = ?", Date.today, false).update_all(archived: true, active: false)
+
+    @rewards = Reward.where(archived: false)
     render json: @rewards
   end
 
@@ -34,6 +37,6 @@ class RewardsController < ApplicationController
   private
 
   def reward_params
-    params.require(:reward).permit(:name, :description, :point_cost, :active, :images)
+    params.require(:reward).permit(:name, :description, :point_cost, :active, :images, :start_date, :end_date, :limit_per_user, :reward_type, :total_limit)
   end
 end

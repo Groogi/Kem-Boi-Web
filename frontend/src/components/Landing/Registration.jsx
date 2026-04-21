@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 
 function Registration() {
   return (
@@ -22,38 +22,65 @@ function Registration() {
           <ul className="space-y-10 mb-14 text-left w-full max-w-lg">
             <li className="flex items-start gap-6">
               <span className="flex-shrink-0 mt-1">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#426500" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="34"
+                  height="34"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#426500"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <circle cx="12" cy="12" r="10" />
                   <path d="M8 12l3 3 5-5" />
                 </svg>
               </span>
               <div>
-                <h4 className="font-bold text-[24px] text-[#426500] font-headline mb-2 leading-none">Loyalty Rewards</h4>
-                <p className="text-[#63665e] font-medium text-[17px] leading-relaxed">Every 5th dessert is on us. Forever.</p>
+                <h4 className="font-bold text-[24px] text-[#426500] font-headline mb-2 leading-none">
+                  Loyalty Rewards
+                </h4>
+                <p className="text-[#63665e] font-medium text-[17px] leading-relaxed">
+                  Every 5th dessert is on us. Forever.
+                </p>
               </div>
             </li>
             <li className="flex items-start gap-6">
               <span className="flex-shrink-0 mt-1">
-                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#426500" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="34"
+                  height="34"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#426500"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <circle cx="12" cy="12" r="10" />
                   <path d="M8 12l3 3 5-5" />
                 </svg>
               </span>
               <div>
-                <h4 className="font-bold text-[24px] text-[#426500] font-headline mb-2 leading-none">Weekly Giveaways</h4>
-                <p className="text-[#63665e] font-medium text-[17px] leading-relaxed">Win limited edition toppings and custom glass ware.</p>
+                <h4 className="font-bold text-[24px] text-[#426500] font-headline mb-2 leading-none">
+                  Exclusive Rewards
+                </h4>
+                <p className="text-[#63665e] font-medium text-[17px] leading-relaxed">
+                  Win limited edition toppings and custom glassware through our point system.
+                </p>
               </div>
             </li>
           </ul>
-          <a href="/login" className="inline-block bg-[#4d7902] text-white px-14 py-5 rounded-full font-bold text-xl hover:bg-[#3d6101] transition-all shadow-xl shadow-[#4d7902]/10 active:scale-95 font-headline">
+          <a
+            href="/login"
+            className="inline-block bg-[#4d7902] text-white px-14 py-5 rounded-full font-bold text-xl hover:bg-[#3d6101] transition-all shadow-xl shadow-[#4d7902]/10 active:scale-95 font-headline"
+          >
             Join Free Today
           </a>
         </div>
       </div>
     </section>
-  );
+  )
 }
 
-export default Registration;
-
-
+export default Registration

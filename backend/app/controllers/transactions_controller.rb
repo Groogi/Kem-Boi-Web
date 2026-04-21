@@ -3,7 +3,12 @@ class TransactionsController < ApplicationController
   before_action :authorize_admin, only: [ :quick_add, :user_transactions ]
 
   def index
-    render json: @current_user.transactions.order(created_at: :desc)
+    if params[:user_id].present? && @current_user.admin?
+      @user = User.find(params[:user_id])
+      render json: @user.transactions.order(created_at: :desc)
+    else
+      render json: @current_user.transactions.order(created_at: :desc)
+    end
   end
 
   def create

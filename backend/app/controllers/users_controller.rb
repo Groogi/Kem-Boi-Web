@@ -1,9 +1,13 @@
 class UsersController < ApplicationController
   before_action :authorize_request, except: [ :create ]
-  before_action :authorize_admin, only: [ :index, :admin_update, :destroy, :add_points ]
+  before_action :authorize_admin, only: [ :index, :admin_update, :destroy, :add_points, :quick_add_points ]
 
   def index
     render json: User.all.as_json(methods: :points_balance)
+  end
+
+  def profile
+    render json: @current_user.as_json(methods: :points_balance)
   end
 
   def create
@@ -15,23 +19,64 @@ class UsersController < ApplicationController
     end
 
     @user = User.new(props.merge(role: "customer"))
-    if @user.save
-      token = JsonWebToken.encode(user_id: @user.id)
-      time = Time.now + 24.hours.to_i
-      render json: {
-        id: @user.id,
-        token: token,
-        exp: time.strftime("%m-%d-%Y %H:%M"),
-        email: @user.email,
-        first_name: @user.first_name,
-        last_name: @user.last_name,
-        account_id: @user.account_id,
-        points_balance: @user.points_balance
-      }, status: :created
-    else
-      render json: { errors: @user.errors.full_messages },
-             status: :unprocessable_entity
+
+    # Automated Referral Processing
+    referrer = nil
+    redemption = nil
+    if params[:referral_code].present?
+      redemption = Redemption.joins(:reward).find_by(
+        voucher_code: params[:referral_code].strip.upcase,
+        status: "pending",
+        rewards: { reward_type: "referral" }
+      )
+      if redemption
+        referrer = redemption.user
+        @user.referred_by_id = referrer.id
+      else
+        render json: { errors: [ "Invalid or expired referral code" ] }, status: :unprocessable_entity
+        return
+      end
     end
+
+    ActiveRecord::Base.transaction do
+      if @user.save
+        # Process Referral Rewards
+        if referrer && redemption
+          # Referrer Reward (+100)
+          referrer.transactions.create!(
+            points: 100,
+            transaction_type: "bonus",
+            notes: "Referral Bonus for inviting #{@user.email}"
+          )
+          # New Member Reward (+50)
+          @user.transactions.create!(
+            points: 50,
+            transaction_type: "bonus",
+            notes: "Welcome Gift from referral by #{referrer.first_name}"
+          )
+          # Finalize Voucher
+          redemption.update!(status: "used")
+        end
+
+        token = JsonWebToken.encode(user_id: @user.id)
+        time = Time.now + 24.hours.to_i
+        render json: {
+          id: @user.id,
+          token: token,
+          exp: time.strftime("%m-%d-%Y %H:%M"),
+          email: @user.email,
+          first_name: @user.first_name,
+          last_name: @user.last_name,
+          account_id: @user.account_id,
+          points_balance: @user.points_balance
+        }, status: :created
+      else
+        render json: { errors: @user.errors.full_messages },
+               status: :unprocessable_entity
+      end
+    end
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { errors: [ e.message ] }, status: :unprocessable_entity
   end
 
   def update
@@ -75,12 +120,31 @@ class UsersController < ApplicationController
   end
 
   def add_points
-    if @current_user.admin?
-      @user = User.find(params[:id])
+    @user = User.find(params[:id])
+    @transaction = @user.transactions.new(
+      points: params[:points].to_i,
+      transaction_type: "manual",
+      notes: params[:notes] || "Admin Manual Addition"
+    )
+
+    if @transaction.save
+      render json: { message: "Points added", new_balance: @user.points_balance }
+    else
+      render json: { errors: @transaction.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def quick_add_points
+    email = params[:email].to_s.strip.downcase
+    points = params[:points].to_i
+
+    @user = User.find_by(email: email)
+
+    if @user
       @transaction = @user.transactions.new(
-        points: params[:points].to_i,
+        points: points,
         transaction_type: "manual",
-        notes: params[:notes] || "Admin adjustment"
+        notes: "Staff Quick Add"
       )
 
       if @transaction.save
@@ -89,7 +153,8 @@ class UsersController < ApplicationController
         render json: { errors: @transaction.errors.full_messages }, status: :unprocessable_entity
       end
     else
-      render json: { error: "Not authorized" }, status: :unauthorized
+      # If user doesn't exist, we could return error or create a placeholder/pending bonus
+      render json: { error: "User not found. Please register member first." }, status: :not_found
     end
   end
 

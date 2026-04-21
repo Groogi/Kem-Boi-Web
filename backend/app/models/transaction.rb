@@ -2,13 +2,18 @@ class Transaction < ApplicationRecord
   belongs_to :user
 
   # Validations
-  validates :points, presence: true, numericality: { other_than: 0 }
+  validates :points, presence: true, numericality: { only_integer: true }
   validates :transaction_type, presence: true, inclusion: { in: %w[bonus manual redemption] }
 
   # Redemption Guard
   validate :sufficient_points_for_redemption, if: :redemption?
 
-  private
+  after_create :update_user_cache
+  after_destroy :update_user_cache
+
+  def update_user_cache
+    user.update_points_balance_cache!
+  end
 
   def redemption?
     transaction_type == "redemption" || (points.present? && points < 0)
