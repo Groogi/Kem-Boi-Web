@@ -1,4 +1,5 @@
 import React from 'react'
+import useEmblaCarousel from 'embla-carousel-react'
 
 function VisualLayers() {
   return (
