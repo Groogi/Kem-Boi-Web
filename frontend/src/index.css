@@ -8,6 +8,11 @@ html {
   scroll-behavior: smooth;
 }
 
+.embla {overflow: hidden; width: 100%; max-width: 660px;}
+.embla_viewport{overflow: hidden;}
+.embla_container {display:flex;}
+.embla_slide {flex: 0 0 100%; min-width: 0; height:520px; overflow: hidden; border-radius:40px;}
+
 ::selection {
   background-color: rgba(66, 101, 0, 0.15);
   color: #1a2a00;

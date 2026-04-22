@@ -2,6 +2,8 @@ import React from 'react'
 import useEmblaCarousel from 'embla-carousel-react'
 
 function VisualLayers() {
+  const [emblaRef, emblaApi] = useEmblaCarousel()
+  const slides = [{src: '/socials-holding.png', alt: 'Avocado Desert'},{src: '/socials-dessert.png', alt: 'Avocado Desert'},{src: '/socials-store-front.png', alt: 'Avocado Desert'}]
   return (
     <div className="bg-[#f7f7f2]">
       {/* Our Products Section */}
@@ -16,13 +18,18 @@ function VisualLayers() {
           </p>
 
           <div className="flex gap-4 md:gap-10 overflow-hidden items-center justify-center mb-10 w-full">
-            <div className="hidden md:block w-[380px] h-[520px] bg-white/20 backdrop-blur-3xl rounded-[40px] border border-white/30 flex-shrink-0"></div>
-            <div className="w-full max-w-[660px] aspect-[4/5] md:h-[580px] bg-white/40 backdrop-blur-[100px] rounded-[40px] md:rounded-[50px] shadow-[0_40px_80px_rgba(66,101,0,0.08)] border-2 border-white/60 flex-shrink-0 z-10 mx-4 flex items-center justify-center">
-              <span className="text-[#426500]/20 font-headline font-bold text-xl uppercase tracking-widest">
-                Premium Product
-              </span>
+            {/* className="hidden md:block w-[380px] h-[520px] bg-white/20 backdrop-blur-3xl rounded-[40px] border border-white/30 flex-shrink-0" */}
+            <div className='embla w-full'>
+              <div className='embla_viewport' ref={emblaRef}>
+                <div className='embla_container'>
+                  {slides.map((slide, index) => (
+                    <div className='embla_slide' key={index}>
+                      <img src={slide.src} alt={slide.alt} className='w-full h-full object-cover block'/>
+                    </div>)
+                    )}
+                </div>
+              </div>
             </div>
-            <div className="hidden md:block w-[380px] h-[520px] bg-white/20 backdrop-blur-3xl rounded-[40px] border border-white/30 flex-shrink-0"></div>
           </div>
 
           <div className="flex justify-center gap-4 mt-8">
