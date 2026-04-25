@@ -76,25 +76,34 @@ html {
   transform: scale(1);
 }
 
+.embla_slide_float {
+  height: 100%;
+  width: 100%;
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Stagger the animations so they don't move in perfect sync */
+.embla_slide:nth-child(even) .embla_slide_float {
+  animation-delay: -3s;
+}
+
 .embla_slide img {
   display: block;
   height: 100%;
   width: 100%;
   object-fit: cover;
-  animation: float 6s ease-in-out infinite;
-  /* Applying your hero float! */
+  transition: transform 0.7s ease-out;
+  transform-origin: center;
 }
 
-/* Stagger the animations so they don't move in perfect sync */
-.embla_slide:nth-child(even) img {
-  animation-delay: -3s;
+.embla_slide:hover img {
+  transform: scale(1.08); /* The zoom effect */
 }
 
 .embla_slide_number {
   font-size: 4rem;
   font-weight: 600;
   color: #426500;
-  animation: float 6s ease-in-out infinite;
 }
 
 .embla_controls {

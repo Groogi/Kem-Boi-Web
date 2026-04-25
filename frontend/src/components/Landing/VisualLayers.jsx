@@ -37,10 +37,14 @@ function VisualLayers() {
               bringing the soul of Vietnamese dessert culture to your doorstep.
             </p>
           </div>
-          <div className="lg:w-1/2 w-full aspect-[4/3] max-w-[650px] bg-white/40 backdrop-blur-[120px] rounded-[40px] md:rounded-[50px] shadow-[30px_30px_90px_rgba(0,0,0,0.05)] border-2 border-white/60 flex items-center justify-center">
-            <span className="text-[#426500]/20 font-headline font-bold text-xl uppercase tracking-widest">
-              Heritage Visual
-            </span>
+          <div className="lg:w-1/2 w-full aspect-[4/3] max-w-[650px] overflow-hidden rounded-[40px] md:rounded-[50px] shadow-[30px_30px_90px_rgba(0,0,0,0.05)] border-2 border-white/60 relative animate-float">
+            <img
+              src="/placeholder-heritage.png"
+              alt="Kem Bo Heritage"
+              className="w-full h-full object-cover transition-transform duration-700 ease-out hover:scale-[1.08]"
+            />
+            {/* Glossy Overlay/Shine Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent w-full h-full animate-shine pointer-events-none" />
           </div>
         </div>
       </section>

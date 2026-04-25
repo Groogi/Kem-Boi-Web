@@ -41,17 +41,19 @@ const EmblaCarousel = (props) => {
               key={index}
             >
               <div className="embla_slide_inner">
-                {typeof slide === 'number' ? (
-                  <div className="embla_slide_number">
-                    <span>{slide + 1}</span>
-                  </div>
-                ) : (
-                  <img
-                    src={slide.src}
-                    alt={slide.alt || ''}
-                    className="w-full h-full object-cover block"
-                  />
-                )}
+                <div className="embla_slide_float">
+                  {typeof slide === 'number' ? (
+                    <div className="embla_slide_number">
+                      <span>{slide + 1}</span>
+                    </div>
+                  ) : (
+                    <img
+                      src={slide.src}
+                      alt={slide.alt || ''}
+                      className="w-full h-full object-cover block"
+                    />
+                  )}
+                </div>
               </div>
             </div>
           ))}
