@@ -2,7 +2,7 @@ import React from 'react'
 import EmblaCarousel from './EmblaCarousel'
 
 function VisualLayers() {
-  const slides = [{src: '/socials-holding.png', alt: 'Avocado Desert'},{src: '/socials-dessert.png', alt: 'Avocado Desert'},{src: '/socials-store-front.png', alt: 'Avocado Desert'}]
+  const slides = [{ src: '/socials-holding.png', alt: 'Avocado Desert' }, { src: '/socials-dessert.png', alt: 'Avocado Desert' }, { src: '/socials-store-front.png', alt: 'Avocado Desert' }]
   return (
     <div className="bg-[#f7f7f2]">
       {/* Our Products Section */}
@@ -15,10 +15,10 @@ function VisualLayers() {
             A silky symphony of fresh avocado mousse, artisanal coconut ice cream, and a crunch of
             toasted toppings. Experience the creamy heart of Dalat in every spoonful.
           </p>
+        </div>
 
-          <div className="flex items-center justify-center mb-10 w-full">
-            <EmblaCarousel slides={slides} options={{ loop: true }} />
-          </div>
+        <div className="flex items-center justify-center mb-10 w-full">
+          <EmblaCarousel slides={slides} options={{ loop: true }} />
         </div>
       </section>
 

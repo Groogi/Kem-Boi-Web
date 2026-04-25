@@ -5,12 +5,22 @@ import { DotButton, useDotButton } from './EmblaCarouselDotButton'
 
 const EmblaCarousel = (props) => {
   const { slides, options } = props
+  
+  // Double the slides if we have very few, to ensure a seamless infinite loop
+  const displaySlides = slides.length < 6 ? [...slides, ...slides] : slides;
+
   const autoplayInstance = useMemo(
     () => Autoplay({ delay: 8000, stopOnInteraction: false }),
     []
   )
   const [emblaRef, emblaApi] = useEmblaCarousel(
-    { duration: 50, align: 'center', ...options },
+    { 
+      duration: 50, 
+      align: 'center', 
+      containScroll: false,
+      loop: true, // Forcing loop: true to be absolute
+      ...options 
+    },
     [autoplayInstance]
   )
 
@@ -21,9 +31,13 @@ const EmblaCarousel = (props) => {
     <div className="embla">
       <div className="embla_viewport" ref={emblaRef}>
         <div className="embla_container">
-          {slides.map((slide, index) => (
+          {displaySlides.map((slide, index) => (
             <div
-              className={`embla_slide ${index === selectedIndex ? 'is-selected' : ''}`}
+              className={`embla_slide ${
+                index % slides.length === selectedIndex % slides.length
+                  ? 'is-selected'
+                  : ''
+              }`}
               key={index}
             >
               <div className="embla_slide_inner">
@@ -46,12 +60,12 @@ const EmblaCarousel = (props) => {
 
       <div className="embla_controls">
         <div className="embla_dots">
-          {scrollSnaps.map((_, index) => (
+          {slides.map((_, index) => (
             <DotButton
               key={index}
               onClick={() => onDotButtonClick(index)}
               className={'embla_dot'.concat(
-                index === selectedIndex ? ' embla_dot--selected' : ''
+                index === selectedIndex % slides.length ? ' embla_dot--selected' : ''
               )}
             />
           ))}
