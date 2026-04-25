@@ -1,8 +1,7 @@
 import React from 'react'
-import useEmblaCarousel from 'embla-carousel-react'
+import EmblaCarousel from './EmblaCarousel'
 
 function VisualLayers() {
-  const [emblaRef, emblaApi] = useEmblaCarousel()
   const slides = [{src: '/socials-holding.png', alt: 'Avocado Desert'},{src: '/socials-dessert.png', alt: 'Avocado Desert'},{src: '/socials-store-front.png', alt: 'Avocado Desert'}]
   return (
     <div className="bg-[#f7f7f2]">
@@ -17,26 +16,8 @@ function VisualLayers() {
             toasted toppings. Experience the creamy heart of Dalat in every spoonful.
           </p>
 
-          <div className="flex gap-4 md:gap-10 overflow-hidden items-center justify-center mb-10 w-full">
-            {/* className="hidden md:block w-[380px] h-[520px] bg-white/20 backdrop-blur-3xl rounded-[40px] border border-white/30 flex-shrink-0" */}
-            <div className='embla w-full'>
-              <div className='embla_viewport' ref={emblaRef}>
-                <div className='embla_container'>
-                  {slides.map((slide, index) => (
-                    <div className='embla_slide' key={index}>
-                      <img src={slide.src} alt={slide.alt} className='w-full h-full object-cover block'/>
-                    </div>)
-                    )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-center gap-4 mt-8">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#426500]"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-[#426500]/20"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-[#426500]/20"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-[#426500]/20"></div>
+          <div className="flex items-center justify-center mb-10 w-full">
+            <EmblaCarousel slides={slides} options={{ loop: true }} />
           </div>
         </div>
       </section>
