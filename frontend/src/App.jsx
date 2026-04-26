@@ -4,6 +4,7 @@ import LandingPage from './pages/LandingPage'
 import AdminPanel from './pages/AdminPanel'
 import FamilyBonusDashboard from './pages/FamilyBonusDashboard'
 import SignUpLogin from './pages/SignUpLogin'
+import ResetPassword from './pages/ResetPassword'
 import LegalPage from './pages/LegalPage'
 import { useAuth } from './context/AuthContext'
 
@@ -62,6 +63,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<SignUpLogin />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route
           path="/privacy"
           element={

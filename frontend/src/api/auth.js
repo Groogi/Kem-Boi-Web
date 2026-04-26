@@ -35,3 +35,25 @@ export async function updateProfile(userData, token) {
   if (!res.ok) throw new Error(data.errors?.join(', ') || 'Update failed')
   return data
 }
+
+export async function forgotPassword(email) {
+  const res = await fetch(`${API_BASE}/password/forgot`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Failed to send reset link')
+  return data
+}
+
+export async function resetPassword({ email, token, password }) {
+  const res = await fetch(`${API_BASE}/password/reset`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, token, password }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Failed to reset password')
+  return data
+}

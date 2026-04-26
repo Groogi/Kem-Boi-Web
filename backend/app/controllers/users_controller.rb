@@ -20,25 +20,28 @@ class UsersController < ApplicationController
 
     @user = User.new(props.merge(role: "customer"))
 
-    # Automated Referral Processing
-    referrer = nil
-    redemption = nil
-    if params[:referral_code].present?
-      redemption = Redemption.joins(:reward).find_by(
-        voucher_code: params[:referral_code].strip.upcase,
-        status: "pending",
-        rewards: { reward_type: "referral" }
-      )
-      if redemption
-        referrer = redemption.user
-        @user.referred_by_id = referrer.id
-      else
-        render json: { errors: [ "Invalid or expired referral code" ] }, status: :unprocessable_entity
-        return
-      end
-    end
+    referral_code = params[:referral_code].to_s.strip.upcase
 
     ActiveRecord::Base.transaction do
+      referrer = nil
+      redemption = nil
+
+      if referral_code.present?
+        # Find and lock the redemption immediately to prevent race conditions
+        redemption = Redemption.joins(:reward)
+                               .where(rewards: { reward_type: "referral" })
+                               .lock("FOR UPDATE")
+                               .find_by(voucher_code: referral_code)
+
+        if redemption && redemption.status == "pending"
+          referrer = redemption.user
+          @user.referred_by_id = referrer.id
+        else
+          render json: { errors: [ "Invalid or expired referral code" ] }, status: :unprocessable_entity
+          raise ActiveRecord::Rollback
+        end
+      end
+
       if @user.save
         # Process Referral Rewards
         if referrer && redemption

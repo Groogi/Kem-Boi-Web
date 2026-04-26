@@ -7,8 +7,6 @@ class User < ApplicationRecord
   has_many :transactions, dependent: :destroy
   has_many :bonus_transactions, dependent: :destroy
   has_many :claimed_bonuses, class_name: "PendingBonus", foreign_key: "claimed_by_user_id", dependent: :nullify
-  has_many :giveaway_entries, dependent: :destroy
-  has_many :entered_giveaways, through: :giveaway_entries, source: :giveaway
   has_many :redemptions, dependent: :destroy
   has_many :claimed_rewards, through: :redemptions, source: :reward
 
@@ -30,16 +28,32 @@ class User < ApplicationRecord
     update_column(:points_balance_cache, transactions.sum(:points))
   end
 
+  # Password Reset Logic
+  def generate_password_reset_token!
+    self.reset_password_token = SecureRandom.urlsafe_base64
+    self.reset_password_sent_at = Time.now.utc
+    save!
+  end
+
+  def password_reset_valid?
+    (reset_password_sent_at + 2.hours) > Time.now.utc
+  end
+
+  def reset_password!(password)
+    self.reset_password_token = nil
+    self.password = password
+    save!
+  end
+
   # Registration Hook
-  before_create :generate_account_id
+  after_create :generate_account_id
   after_create :process_pending_bonuses
 
   private
 
   def generate_account_id
     # Format: kemboi_1001, kemboi_1002, etc.
-    last_id = User.maximum(:id) || 0
-    self.account_id = "kemboi_#{1000 + last_id + 1}"
+    update_column(:account_id, "kemboi_#{1000 + self.id}")
   end
 
   def process_pending_bonuses

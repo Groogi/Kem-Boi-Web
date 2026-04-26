@@ -44,7 +44,7 @@ class RedemptionsController < ApplicationController
       begin
         @redemption = @current_user.redemptions.create!(
           reward: @reward,
-          voucher_code: "KB-#{SecureRandom.hex(3).upcase}",
+          voucher_code: "KB-#{SecureRandom.hex(4).upcase}",
           status: "pending"
         )
       rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
@@ -110,27 +110,30 @@ class RedemptionsController < ApplicationController
     @user = User.find(params[:user_id])
     @reward = Reward.find(params[:reward_id])
 
-    # Global limit check
-    if @reward.total_limit.to_i > 0 && @reward.redemptions_count.to_i >= @reward.total_limit.to_i
-      render json: { error: "This reward is sold out!" }, status: :unprocessable_entity
-      return
-    end
-
-    # User limit check
-    if @reward.limit_per_user.to_i > 0
-      user_redemption_count = @user.redemptions.where(reward_id: @reward.id).count
-      if user_redemption_count >= @reward.limit_per_user.to_i
-        render json: { error: "User has reached the limit for this reward." }, status: :unprocessable_entity
-        return
-      end
-    end
-
-    if @user.points_balance < @reward.point_cost
-      render json: { error: "Insufficient points" }, status: :unprocessable_entity
-      return
-    end
-
     ActiveRecord::Base.transaction do
+      @reward.lock!
+      @user.lock!
+
+      # Global limit check
+      if @reward.total_limit.to_i > 0 && @reward.redemptions_count.to_i >= @reward.total_limit.to_i
+        render json: { error: "This reward is sold out!" }, status: :unprocessable_entity
+        raise ActiveRecord::Rollback
+      end
+
+      # User limit check
+      if @reward.limit_per_user.to_i > 0
+        user_redemption_count = @user.redemptions.where(reward_id: @reward.id).count
+        if user_redemption_count >= @reward.limit_per_user.to_i
+          render json: { error: "User has reached the limit for this reward." }, status: :unprocessable_entity
+          raise ActiveRecord::Rollback
+        end
+      end
+
+      if @user.points_balance < @reward.point_cost
+        render json: { error: "Insufficient points" }, status: :unprocessable_entity
+        raise ActiveRecord::Rollback
+      end
+
       # Deduct points if cost > 0
       if @reward.point_cost > 0
          @user.transactions.create!(
@@ -140,14 +143,25 @@ class RedemptionsController < ApplicationController
          )
       end
 
-      # Create and fulfill redemption immediately
-      @redemption = @user.redemptions.create!(
-        reward: @reward,
-        voucher_code: "INSTORE-#{SecureRandom.hex(3).upcase}",
-        status: "used"
-      )
+      # Create and fulfill redemption immediately (with retry for voucher collision)
+      max_retries = 5
+      begin
+        @redemption = @user.redemptions.create!(
+          reward: @reward,
+          voucher_code: "INSTORE-#{SecureRandom.hex(4).upcase}",
+          status: "used"
+        )
+      rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
+        if e.is_a?(ActiveRecord::RecordNotUnique) || (e.is_a?(ActiveRecord::RecordInvalid) && e.record.errors[:voucher_code].present?)
+          max_retries -= 1
+          retry if max_retries > 0
+        end
+        raise e
+      end
     end
 
-    render json: { message: "Redemption successful", user_balance: @user.reload.points_balance }
+    if @redemption
+      render json: { message: "Redemption successful", user_balance: @user.reload.points_balance }
+    end
   end
 end

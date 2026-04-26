@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_21_130838) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_26_072907) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -152,10 +152,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_130838) do
     t.string "phone"
     t.integer "points_balance_cache", default: 0, null: false
     t.integer "referred_by_id"
+    t.datetime "reset_password_sent_at"
+    t.string "reset_password_token"
     t.string "role"
     t.datetime "updated_at", null: false
-    t.index ["account_id"], name: "index_users_on_account_id"
-    t.index ["email"], name: "index_users_on_email"
+    t.index ["account_id"], name: "index_users_on_account_id", unique: true
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token"
   end
 
   add_foreign_key "bonus_transactions", "bonus_definitions"

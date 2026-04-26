@@ -11,12 +11,5 @@ class CleanupExpiredRewardsJob < ApplicationJob
       Rails.logger.info "CleanupExpiredRewardsJob: Archived #{count} expired rewards."
     end
     
-    # Also cleanup expired giveaways
-    expired_giveaways = Giveaway.where("end_date < ? AND archived = ?", Date.today, false)
-    giveaway_count = expired_giveaways.count
-    if giveaway_count > 0
-      expired_giveaways.update_all(archived: true, active: false)
-      Rails.logger.info "CleanupExpiredRewardsJob: Archived #{giveaway_count} expired giveaways."
-    end
   end
 end
