@@ -58,7 +58,7 @@ html {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  border-radius: 40px;
+  border-radius: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,16 +94,21 @@ html {
   object-fit: cover;
   transition: transform 0.7s ease-out;
   transform-origin: center;
+  border-radius: 80px;
+  /* Now the image itself is rounded! */
 }
 
 .embla_slide:hover img {
-  transform: scale(1.08); /* The zoom effect */
+  transform: scale(1.08);
+  /* The zoom effect */
 }
 
 .embla_slide_number {
   font-size: 4rem;
   font-weight: 600;
   color: #426500;
+  border-radius: 80px;
+  /* Round the placeholder backgrounds too */
 }
 
 .embla_controls {
