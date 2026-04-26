@@ -17,8 +17,8 @@ function VisualLayers() {
           </p>
         </div>
 
-        <div className="flex items-center justify-center mb-10 w-full border-radius:20%">
-          <EmblaCarousel className="img" slides={slides} options={{ loop: true }} />
+        <div className="flex items-center justify-center mb-10 w-full">
+          <EmblaCarousel slides={slides} options={{ loop: true }} />
         </div>
       </section>
 
