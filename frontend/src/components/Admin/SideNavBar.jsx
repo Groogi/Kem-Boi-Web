@@ -60,7 +60,6 @@ function SideNavbar() {
           onClick={handleLogout}
           className="w-full mt-2 py-2 bg-error-container text-on-error-container rounded-full text-xs font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2"
         >
-          <span className="material-symbols-outlined text-sm">logout</span>
           Logout
         </button>
       </div>

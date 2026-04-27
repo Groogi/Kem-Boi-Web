@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_21_130838) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_27_183747) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -83,7 +83,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_130838) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "pending_bonus", force: :cascade do |t|
+  create_table "pending_bonuses", force: :cascade do |t|
     t.integer "assigned_by_admin_id"
     t.integer "bonus_definition_id", null: false
     t.datetime "claimed_at"
@@ -94,9 +94,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_130838) do
     t.integer "points_amount"
     t.string "status"
     t.datetime "updated_at", null: false
-    t.index ["assigned_by_admin_id"], name: "index_pending_bonus_on_assigned_by_admin_id"
-    t.index ["bonus_definition_id"], name: "index_pending_bonus_on_bonus_definition_id"
-    t.index ["claimed_by_user_id"], name: "index_pending_bonus_on_claimed_by_user_id"
+    t.index ["assigned_by_admin_id"], name: "index_pending_bonuses_on_assigned_by_admin_id"
+    t.index ["bonus_definition_id"], name: "index_pending_bonuses_on_bonus_definition_id"
+    t.index ["claimed_by_user_id"], name: "index_pending_bonuses_on_claimed_by_user_id"
   end
 
   create_table "redemptions", force: :cascade do |t|
@@ -144,18 +144,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_130838) do
     t.datetime "created_at", null: false
     t.date "date_of_birth"
     t.string "email"
-    t.string "first_name"
-    t.string "last_name"
+    t.string "first_name", null: false
+    t.string "last_name", null: false
     t.string "member_id"
-    t.string "name"
     t.string "password_digest"
     t.string "phone"
     t.integer "points_balance_cache", default: 0, null: false
     t.integer "referred_by_id"
+    t.datetime "reset_password_sent_at"
+    t.string "reset_password_token"
     t.string "role"
     t.datetime "updated_at", null: false
-    t.index ["account_id"], name: "index_users_on_account_id"
-    t.index ["email"], name: "index_users_on_email"
+    t.index ["account_id"], name: "index_users_on_account_id", unique: true
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token"
   end
 
   add_foreign_key "bonus_transactions", "bonus_definitions"
@@ -163,7 +165,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_130838) do
   add_foreign_key "giveaway_entries", "giveaways"
   add_foreign_key "giveaway_entries", "users"
   add_foreign_key "links", "locations"
-  add_foreign_key "pending_bonus", "bonus_definitions"
+  add_foreign_key "pending_bonuses", "bonus_definitions"
   add_foreign_key "redemptions", "rewards"
   add_foreign_key "redemptions", "users"
   add_foreign_key "transactions", "users"

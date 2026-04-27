@@ -436,10 +436,9 @@ function AdminPanel() {
             logout()
             navigate('/')
           }}
-          className="mt-auto mb-4 flex items-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 text-on-surface-variant hover:bg-red-50 hover:text-red-600"
+          className="mt-auto mb-4 flex items-center justify-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 text-on-surface-variant hover:bg-red-50 hover:text-red-600 border border-outline-variant/10 bg-white"
         >
-          <span className="material-symbols-outlined pointer-events-none">logout</span>
-          <span className="text-[15px] font-bold">Sign Out</span>
+          <span className="text-[15px] font-bold">Logout</span>
         </div>
       </div>
     </>

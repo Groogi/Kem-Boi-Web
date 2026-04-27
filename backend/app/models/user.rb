@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :referrals, class_name: "User", foreign_key: "referred_by_id"
 
   # Validations
+  validates :first_name, :last_name, presence: true
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :phone, format: { with: /\A\d{10,}\z/, message: "must be numeric and at least 10 digits" }, allow_blank: true
   validates :role, inclusion: { in: %w[admin customer] }, presence: true

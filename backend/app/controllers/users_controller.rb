@@ -12,11 +12,6 @@ class UsersController < ApplicationController
 
   def create
     props = user_params.to_h
-    if props[:name].present? && props[:first_name].blank?
-      parts = props[:name].split(" ")
-      props[:first_name] = parts.first
-      props[:last_name] = parts[1..-1].join(" ") if parts.size > 1
-    end
 
     @user = User.new(props.merge(role: "customer"))
 
@@ -75,6 +70,8 @@ class UsersController < ApplicationController
                status: :unprocessable_entity
       end
     end
+  rescue ActiveRecord::RecordNotUnique => e
+    render json: { errors: [ "Email has already been taken" ] }, status: :conflict
   rescue ActiveRecord::RecordInvalid => e
     render json: { errors: [ e.message ] }, status: :unprocessable_entity
   end
@@ -161,7 +158,7 @@ class UsersController < ApplicationController
   private
   def user_params
     params.permit(
-      :email, :password, :password_confirmation, :first_name, :last_name, :phone, :date_of_birth, :name
+      :email, :password, :password_confirmation, :first_name, :last_name, :phone, :date_of_birth
     )
   end
 end

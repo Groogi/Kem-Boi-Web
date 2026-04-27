@@ -212,12 +212,9 @@ function FamilyBonusDashboard() {
                 logout()
                 navigate('/')
               }}
-              className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/40 flex items-center justify-center text-primary border border-white/60 hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm"
-              title="Logout"
+              className="px-4 md:px-5 py-1.5 md:py-2 rounded-full bg-white/40 flex items-center justify-center text-primary border border-white/60 hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm font-bold text-sm tracking-wide"
             >
-              <span className="material-symbols-outlined text-[1.1rem] md:text-[1.2rem] pointer-events-none">
-                logout
-              </span>
+              Logout
             </button>
           </div>
         </>

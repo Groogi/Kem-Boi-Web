@@ -16,7 +16,7 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const [signupData, setSignupData] = useState({ name: '', email: '', password: '', password_confirmation: '', referralCode: '' })
+  const [signupData, setSignupData] = useState({ firstName: '', lastName: '', email: '', password: '', password_confirmation: '', referralCode: '' })
   const [loginData, setLoginData] = useState({ email: '', password: '' })
 
   const handleSignup = async (e) => {
@@ -35,7 +35,8 @@ function LoginForm() {
     setLoading(true)
     try {
       await register({
-        name: signupData.name,
+        first_name: signupData.firstName,
+        last_name: signupData.lastName,
         email: signupData.email,
         password: signupData.password,
         password_confirmation: signupData.password,
@@ -223,18 +224,33 @@ function LoginForm() {
           <div className="flex-1 flex flex-col justify-center">
             <div className="w-full flex flex-col gap-6">
               {activeTab === 'signup' && (
-                <div className="space-y-1">
-                  <label className="text-[12px] text-[#7d8076] ml-5 font-bold tracking-widest uppercase">
-                    Full Name
-                  </label>
-                  <input
-                    className="w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none"
-                    type="text"
-                    placeholder="Enter name"
-                    value={signupData.name}
-                    onChange={(e) => setSignupData({ ...signupData, name: e.target.value })}
-                    required
-                  />
+                <div className="flex gap-4">
+                  <div className="space-y-1 flex-1">
+                    <label className="text-[12px] text-[#7d8076] ml-5 font-bold tracking-widest uppercase">
+                      First Name
+                    </label>
+                    <input
+                      className="w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none"
+                      type="text"
+                      placeholder="First name"
+                      value={signupData.firstName}
+                      onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-1 flex-1">
+                    <label className="text-[12px] text-[#7d8076] ml-5 font-bold tracking-widest uppercase">
+                      Last Name
+                    </label>
+                    <input
+                      className="w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none"
+                      type="text"
+                      placeholder="Last name"
+                      value={signupData.lastName}
+                      onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })}
+                      required
+                    />
+                  </div>
                 </div>
               )}
 
