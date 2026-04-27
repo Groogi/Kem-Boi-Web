@@ -58,35 +58,31 @@ Location.create!([
   }
 ])
 
-# 4. Create Giveaways
-puts "🎁 Creating Giveaways..."
-Giveaway.create!([
+# 4. Create Rewards (Including former Giveaways)
+puts "🏆 Creating Rewards..."
+Reward.create!([
   {
-    title: "Free Tote Bag for 100th Member",
-    description: "Our signature editorial tote bag is up for grabs!",
-    participation_conditions: "Must be a registered member with at least 1 transaction.",
+    name: "Free Tote Bag for 100th Member",
+    description: "Our signature editorial tote bag is up for grabs! Must be a registered member with at least 1 transaction.",
+    point_cost: 0,
     start_date: Date.today - 7,
     end_date: Date.today + 14,
     active: true
   },
   {
-    title: "Win an Avocado Plushie",
-    description: "The cutest companion for your Kem Boi journey.",
-    participation_conditions: "Follow us on Instagram and Enter here.",
+    name: "Win an Avocado Plushie",
+    description: "The cutest companion for your Kem Boi journey. Follow us on Instagram and Enter here.",
+    point_cost: 0,
     start_date: Date.today + 5,
     end_date: Date.today + 20,
-    active: false # Upcoming
-  }
-])
-
-# 5. Create Rewards
-puts "🏆 Creating Rewards..."
-Reward.create!([
+    active: false
+  },
   {
     name: "Refer A Friend",
     description: "Sweet Treats are better with a friend.",
-    point_cost: 0, # Or whatever cost
-    active: true
+    point_cost: 0,
+    active: true,
+    reward_type: "referral"
   },
   {
     name: "Loyalty Level Up",

@@ -11,21 +11,6 @@ class TransactionsController < ApplicationController
     end
   end
 
-  def create
-    @transaction = @current_user.transactions.build(transaction_params)
-
-    if @transaction.save
-      render json: {
-        message: "Transaction successful",
-        transaction: @transaction,
-        new_balance: @current_user.points_balance
-      }, status: :created
-    else
-      render json: { errors: @transaction.errors.full_messages },
-             status: :unprocessable_entity
-    end
-  end
-
   def quick_add
     user = User.where("LOWER(email) = ?", params[:email].to_s.downcase).first
     if user

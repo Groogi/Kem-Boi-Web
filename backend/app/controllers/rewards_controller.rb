@@ -4,7 +4,6 @@ class RewardsController < ApplicationController
 
   def index
     # Passive cleanup: Archive expired rewards instead of deleting
-    Reward.where("end_date < ? AND archived = ?", Date.today, false).update_all(archived: true, active: false)
 
     @rewards = Reward.where(archived: false)
     render json: @rewards

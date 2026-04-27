@@ -68,4 +68,9 @@ Rails.application.configure do
   # Allow access from local network IP
   # config.hosts << "192.168.1.105"
   config.hosts << "localhost"
+
+  # Use letter_opener to preview emails in the browser
+  config.action_mailer.delivery_method = :letter_opener
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
 end

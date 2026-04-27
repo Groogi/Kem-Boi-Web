@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
+import { forgotPassword } from '../../api/auth'
 
 function LoginForm() {
   const { login, register } = useAuth()
@@ -65,13 +66,22 @@ function LoginForm() {
     }
   }
 
-  const handleForgotSubmit = (e) => {
+  const handleForgotSubmit = async (e) => {
     e.preventDefault()
+    if (!forgotEmail) {
+      showToast('Please enter your email', 'error')
+      return
+    }
+
     setLoading(true)
-    setTimeout(() => {
+    try {
+      await forgotPassword(forgotEmail)
       setResetSent(true)
+    } catch (err) {
+      showToast(err.message || 'Failed to send reset link', 'error')
+    } finally {
       setLoading(false)
-    }, 1500)
+    }
   }
 
   if (isForgotMode) {

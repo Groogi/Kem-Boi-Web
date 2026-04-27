@@ -1,6 +1,8 @@
 import React from 'react'
+import EmblaCarousel from './EmblaCarousel'
 
 function VisualLayers() {
+  const slides = [{ src: '/socials-holding.png', alt: 'Avocado Desert' }, { src: '/socials-dessert.png', alt: 'Avocado Desert' }, { src: '/socials-store-front.png', alt: 'Avocado Desert' }]
   return (
     <div className="bg-[#f7f7f2]">
       {/* Our Products Section */}
@@ -13,23 +15,10 @@ function VisualLayers() {
             A silky symphony of fresh avocado mousse, artisanal coconut ice cream, and a crunch of
             toasted toppings. Experience the creamy heart of Dalat in every spoonful.
           </p>
+        </div>
 
-          <div className="flex gap-4 md:gap-10 overflow-hidden items-center justify-center mb-10 w-full">
-            <div className="hidden md:block w-[380px] h-[520px] bg-white/20 backdrop-blur-3xl rounded-[40px] border border-white/30 flex-shrink-0"></div>
-            <div className="w-full max-w-[660px] aspect-[4/5] md:h-[580px] bg-white/40 backdrop-blur-[100px] rounded-[40px] md:rounded-[50px] shadow-[0_40px_80px_rgba(66,101,0,0.08)] border-2 border-white/60 flex-shrink-0 z-10 mx-4 flex items-center justify-center">
-              <span className="text-[#426500]/20 font-headline font-bold text-xl uppercase tracking-widest">
-                Premium Product
-              </span>
-            </div>
-            <div className="hidden md:block w-[380px] h-[520px] bg-white/20 backdrop-blur-3xl rounded-[40px] border border-white/30 flex-shrink-0"></div>
-          </div>
-
-          <div className="flex justify-center gap-4 mt-8">
-            <div className="w-2.5 h-2.5 rounded-full bg-[#426500]"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-[#426500]/20"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-[#426500]/20"></div>
-            <div className="w-2.5 h-2.5 rounded-full bg-[#426500]/20"></div>
-          </div>
+        <div className="flex items-center justify-center mb-10 w-full">
+          <EmblaCarousel slides={slides} options={{ loop: true }} />
         </div>
       </section>
 
@@ -48,10 +37,14 @@ function VisualLayers() {
               bringing the soul of Vietnamese dessert culture to your doorstep.
             </p>
           </div>
-          <div className="lg:w-1/2 w-full aspect-[4/3] max-w-[650px] bg-white/40 backdrop-blur-[120px] rounded-[40px] md:rounded-[50px] shadow-[30px_30px_90px_rgba(0,0,0,0.05)] border-2 border-white/60 flex items-center justify-center">
-            <span className="text-[#426500]/20 font-headline font-bold text-xl uppercase tracking-widest">
-              Heritage Visual
-            </span>
+          <div className="lg:w-1/2 w-full aspect-[4/3] max-w-[650px] overflow-hidden rounded-[40px] md:rounded-[50px] shadow-[30px_30px_90px_rgba(0,0,0,0.05)] border-2 border-white/60 relative animate-float">
+            <img
+              src="/placeholder-heritage.png"
+              alt="Kem Bo Heritage"
+              className="w-full h-full object-cover transition-transform duration-700 ease-out hover:scale-[1.08]"
+            />
+            {/* Glossy Overlay/Shine Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent w-full h-full animate-shine pointer-events-none" />
           </div>
         </div>
       </section>

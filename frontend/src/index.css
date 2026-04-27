@@ -8,6 +8,135 @@ html {
   scroll-behavior: smooth;
 }
 
+.embla {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.embla_viewport {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  background: linear-gradient(to bottom,
+      #f2f6e9 0%,
+      #f7f7f2 20%,
+      #f7f7f2 80%,
+      #f2f6e9 100%);
+  mask-image: linear-gradient(to bottom,
+      transparent,
+      black 5%,
+      black 95%,
+      transparent);
+  -webkit-mask-image: linear-gradient(to bottom,
+      transparent,
+      black 5%,
+      black 95%,
+      transparent);
+}
+
+.embla_container {
+  display: flex;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -khtml-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  align-items: center;
+  transform-style: preserve-3d;
+}
+
+.embla_slide {
+  flex: 0 0 48%;
+  min-width: 0;
+  height: 416px;
+  position: relative;
+  padding: 0 0.75rem;
+}
+
+.embla_slide_inner {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.4;
+  filter: blur(4px);
+  /* The blur effect */
+  transition: opacity 0.6s ease, filter 0.6s ease, transform 0.6s ease;
+  transform: scale(0.92);
+  backface-visibility: hidden;
+}
+
+.embla_slide.is-selected .embla_slide_inner {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+}
+
+.embla_slide_float {
+  height: 100%;
+  width: 100%;
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Stagger the animations so they don't move in perfect sync */
+.embla_slide:nth-child(even) .embla_slide_float {
+  animation-delay: -3s;
+}
+
+.embla_slide img {
+  display: block;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  transition: transform 0.7s ease-out;
+  transform-origin: center;
+  border-radius: 80px;
+  /* Now the image itself is rounded! */
+}
+
+.embla_slide:hover img {
+  transform: scale(1.08);
+  /* The zoom effect */
+}
+
+.embla_slide_number {
+  font-size: 4rem;
+  font-weight: 600;
+  color: #426500;
+  border-radius: 80px;
+  /* Round the placeholder backgrounds too */
+}
+
+.embla_controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.embla_dots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.embla_dot {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  border: 2px solid #426500;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.2s;
+}
+
+.embla_dot--selected {
+  background-color: #426500;
+}
+
 ::selection {
   background-color: rgba(66, 101, 0, 0.15);
   color: #1a2a00;
@@ -69,6 +198,7 @@ input[type='number'] {
     opacity: 0;
     transform: translateY(-12px) scale(0.96);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -84,6 +214,7 @@ input[type='number'] {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -95,10 +226,12 @@ input[type='number'] {
 }
 
 @keyframes bounce-short {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-4px);
   }
@@ -111,21 +244,26 @@ input[type='number'] {
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: rgba(66, 101, 0, 0.1);
   border-radius: 10px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(66, 101, 0, 0.2);
 }
+
 @keyframes scale-in {
   from {
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -137,10 +275,12 @@ input[type='number'] {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0) rotate(0deg);
   }
+
   50% {
     transform: translateY(-18px) rotate(1deg);
   }
@@ -154,6 +294,7 @@ input[type='number'] {
   0% {
     transform: translateX(-100%) skewX(-15deg);
   }
+
   30%,
   100% {
     transform: translateX(200%) skewX(-15deg);

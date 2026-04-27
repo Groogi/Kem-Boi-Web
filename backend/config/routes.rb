@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   post "/login", to: "authentication#login"
   get "/profile", to: "users#profile"
   put "/profile", to: "users#update"
+  post "/password/forgot", to: "passwords#forgot"
+  post "/password/reset", to: "passwords#reset"
 
   # Admin User routes
   get "/users_list", to: "users#index"
@@ -29,8 +31,5 @@ Rails.application.routes.draw do
   get "/social_links", to: "links#social_links"
   put "/social_links", to: "links#update_social_links"
 
-  # Bonus/Promotions (Managed as active/inactive rewards in unified system)
-  resources :bonus_definitions
-  post "/pending_bonus/issue", to: "pending_bonus#issue"
-  post "/pending_bonus/claim", to: "pending_bonus#claim"
+
 end
