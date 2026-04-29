@@ -1,11 +1,27 @@
 const API_BASE = '/api'
 
-export async function register({ name, email, password, password_confirmation, referral_code }) {
+export async function register({
+  first_name,
+  last_name,
+  email,
+  password,
+  password_confirmation,
+  referral_code
+}) {
   const res = await fetch(`${API_BASE}/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, password, password_confirmation, referral_code, role: 'customer' }),
+    body: JSON.stringify({
+      first_name,
+      last_name,
+      email,
+      password,
+      password_confirmation,
+      referral_code,
+      role: 'customer'
+    }),
   })
+
   const data = await res.json()
   if (!res.ok) throw new Error(data.errors?.join(', ') || 'Registration failed')
   return data

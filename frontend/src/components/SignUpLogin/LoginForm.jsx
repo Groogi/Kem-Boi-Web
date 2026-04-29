@@ -40,7 +40,7 @@ function LoginForm() {
         last_name: signupData.lastName,
         email: signupData.email,
         password: signupData.password,
-        password_confirmation: signupData.password,
+        password_confirmation: signupData.password_confirmation,
         referral_code: signupData.referralCode,
       })
       showToast('Welcome to the Kem Boi Family!', 'success')

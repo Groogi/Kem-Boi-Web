@@ -2,7 +2,6 @@
 puts "🧹 Cleaning database..."
 Transaction.destroy_all
 Location.destroy_all
-Giveaway.destroy_all
 Link.destroy_all
 Reward.destroy_all
 Redemption.destroy_all
