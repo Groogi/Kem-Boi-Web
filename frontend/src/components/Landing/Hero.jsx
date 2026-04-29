@@ -1,33 +1,47 @@
-import { Link } from 'react-router-dom';
+import React from 'react'
+import { Link } from 'react-router-dom'
 
 function Hero() {
   return (
-    <section className="relative min-h-[921px] flex items-center px-6 overflow-hidden">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
-        <div className="order-2 lg:order-1">
-          <span className="inline-block px-4 py-1 bg-primary-container text-on-primary-container rounded-full text-xs font-bold tracking-widest uppercase mb-6">Traditional Reimagined</span>
-          <h1 className="text-5xl lg:text-7xl font-extrabold text-on-surface tracking-tight leading-[1.1] mb-6 font-headline">
-            Vietnamese <br /> <span className="text-primary italic">Avocado</span> Dessert
+    <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 flex items-center px-6 overflow-hidden bg-[#fbfcf8]">
+      <div className="max-w-[1440px] px-4 md:px-12 mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
+        {/* Left Column */}
+        <div className="order-2 lg:order-1 lg:col-span-7 flex flex-col items-center text-center lg:items-start lg:text-left">
+          <h1 className="text-[54px] md:text-7xl lg:text-[88px] font-bold text-[#426500] tracking-[-0.03em] leading-[1.05] mb-6 font-headline">
+            Vietnamese <br className="hidden lg:block" /> Avocado Dessert
           </h1>
-          <p className="text-lg text-on-surface-variant max-w-lg mb-10 leading-relaxed font-body">
-            A silky symphony of fresh avocado mousse, artisanal coconut ice cream, and a crunch of toasted toppings. Experience the creamy heart of Dalat in every spoonful.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link to="/login" className="inline-block bg-primary text-on-primary px-8 py-4 rounded-full font-bold text-lg editorial-shadow hover:bg-primary-dim transition-all active:scale-95">
-              Join the Kem Bơ Family
+
+          <div className="text-[#395800] text-[24px] md:text-[30px] font-bold tracking-tight mb-14 font-body opacity-90">
+            Traditional Reimagined
+          </div>
+
+          <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-5 w-full sm:w-auto">
+            <Link
+              to="/login"
+              className="inline-block bg-[#4d7902] text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-[#3d6101] transition-all shadow-xl shadow-[#4d7902]/10 active:scale-95 font-headline text-center"
+            >
+              Join the Kem Boi Family
             </Link>
-            <button className="bg-surface-container-lowest border border-outline-variant/20 text-on-surface px-8 py-4 rounded-full font-bold text-lg hover:bg-surface-container-low transition-all active:scale-95">
+            <a
+              href="#story"
+              className="bg-[#f0f4e8] text-[#4d7902] px-14 py-5 rounded-full font-bold text-xl hover:bg-[#e4ebda] transition-all active:scale-95 font-headline flex items-center justify-center text-center"
+            >
               Our Story
-            </button>
+            </a>
           </div>
         </div>
-        <div className="order-1 lg:order-2 relative">
-          <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-primary-container/40 to-transparent rounded-full blur-3xl"></div>
-          <img
-            className="w-full h-auto object-cover rounded-lg rotate-3 hover:rotate-0 transition-transform duration-700 editorial-shadow"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoA4r_KYan9Js5V99ZoTaQC-iTbBA0jJ7cZTspjRzGW4x92aAuLuNzY5iQrYyoF_o2nEzohEajOL-tFxlJQ64_xID5glze8HNdrm2uDywetG4V5JYnWGuqrqGEHX8EPexxZcKk--D3Lk3TZAxgVQx58o6dQE-CFRqIhqawyfueyKysjBXFeAPcRqfS9eFpIaWZ9RpFf_a3aDzhpFSl-5SoFE4nchhUD6FVDj6CrZWWLGaUCJsebHpWR-qEzxtnRGhBtj0a4PYiI1dL"
-            alt="Premium close-up of a layered avocado dessert in a crystal glass"
-          />
+
+        {/* Right Column */}
+        <div className="order-1 lg:order-2 lg:col-span-5 flex justify-center lg:justify-end mb-12 lg:mb-0 relative py-6">
+          <div className="relative w-full max-w-[520px] aspect-square rounded-[4rem] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.15)] animate-float">
+            <img
+              className="w-full h-full object-cover scale-[1.3] object-center transition-transform duration-1000 ease-out hover:scale-[1.38]"
+              src="/intro-product-pic.png"
+              alt="Vietnamese Avocado Dessert"
+            />
+            {/* Glossy Overlay/Shine Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent w-full h-full animate-shine pointer-events-none" />
+          </div>
         </div>
       </div>
     </section>
