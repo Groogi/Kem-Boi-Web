@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { DotButton } from '../../../components/Landing/EmblaCarouselDotButton';
+import { DotButton } from '../../components/Landing/EmblaCarouselDotButton';
 
 describe('DotButton Component', () => {
   test('renders children correctly', () => {
