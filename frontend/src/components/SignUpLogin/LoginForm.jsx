@@ -3,9 +3,10 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { forgotPassword } from '../../api/auth'
+import { useGoogleLogin } from '@react-oauth/google'
 
 function LoginForm() {
-  const { login, register } = useAuth()
+  const { login, register, googleAuth } = useAuth()
   const { showToast } = useToast()
   const navigate = useNavigate()
 
@@ -65,6 +66,26 @@ function LoginForm() {
       setLoading(false)
     }
   }
+
+  const handleGoogleSuccess = async (tokenResponse) => {
+    setLoading(true)
+    try {
+      // useGoogleLogin implicitly grants an access_token for the 'implicit flow'
+      // We send this token to the backend
+      const user = await googleAuth(tokenResponse.access_token)
+      showToast('Successfully signed in with Google!', 'success')
+      navigate(user.role === 'admin' ? '/admin' : '/family')
+    } catch (err) {
+      showToast(err.message || 'Google sign in failed', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleClick = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => showToast('Google sign in failed', 'error'),
+  })
 
   const handleForgotSubmit = async (e) => {
     e.preventDefault()
@@ -189,7 +210,9 @@ function LoginForm() {
             <div className="space-y-4 w-full max-w-[280px]">
               <button
                 type="button"
-                className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-[#E3E5D7] rounded-full shadow-lg shadow-black/5 hover:bg-white/80 transition-all"
+                onClick={() => handleGoogleClick()}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-[#E3E5D7] rounded-full shadow-lg shadow-black/5 hover:bg-white/80 transition-all disabled:opacity-50"
               >
                 <img
                   src="https://www.svgrepo.com/show/475656/google-color.svg"

@@ -95,3 +95,14 @@ export async function resetPassword({ email, token, password }) {
   if (!res.ok) throw new Error(data.error || 'Failed to reset password')
   return data
 }
+
+export async function googleLogin(token) {
+  const res = await fetch(`${API_BASE}/auth/google`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Google login failed')
+  return data
+}

@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   # API Routes
   post "/register", to: "users#create"
   post "/login", to: "authentication#login"
+  post "/auth/google", to: "google_auth#create"
   get "/profile", to: "users#profile"
   put "/profile", to: "users#update"
   post "/password/forgot", to: "passwords#forgot"

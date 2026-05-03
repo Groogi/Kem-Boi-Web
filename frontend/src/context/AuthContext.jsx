@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback } from 'react'
-import { login as apiLogin, register as apiRegister } from '../api/auth'
+import { login as apiLogin, register as apiRegister, googleLogin as apiGoogleLogin } from '../api/auth'
 
 const AuthContext = createContext(null)
 
@@ -34,6 +34,12 @@ export function AuthProvider({ children }) {
 
   const register = useCallback(async (credentials) => {
     const data = await apiRegister(credentials)
+    persist(data)
+    return data
+  }, [])
+
+  const googleAuth = useCallback(async (token) => {
+    const data = await apiGoogleLogin(token)
     persist(data)
     return data
   }, [])
@@ -79,6 +85,7 @@ export function AuthProvider({ children }) {
         isAuthenticated: !!token,
         login,
         register,
+        googleAuth,
         logout,
         updateUser,
         refreshProfile,
