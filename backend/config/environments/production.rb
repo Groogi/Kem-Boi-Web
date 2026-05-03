@@ -60,7 +60,7 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address:              "smtp.mailgun.org",
-    port:                 587,
+    port:                 2525,
     domain:               "kemboi-demo.vercel.app",
     user_name:            ENV.fetch("MAILGUN_SMTP_LOGIN", ""),
     password:             ENV.fetch("MAILGUN_SMTP_PASSWORD", ""),

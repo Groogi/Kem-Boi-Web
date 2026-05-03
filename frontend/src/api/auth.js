@@ -75,7 +75,12 @@ export async function forgotPassword(email) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email }),
   })
-  const data = await res.json()
+  let data;
+  try {
+    data = await res.json()
+  } catch (err) {
+    throw new Error('Server error sending email. Please make sure your email is verified in Mailgun Sandbox.')
+  }
   if (!res.ok) throw new Error(data.error || 'Failed to send reset link')
   return data
 }
