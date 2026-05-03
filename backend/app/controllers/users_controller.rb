@@ -11,7 +11,7 @@ class UsersController < ApplicationController
   end
 
   def create
-    props = user_params.to_h
+    props = user_params.to_h.except("referral_code")
 
     @user = User.new(props.merge(role: "customer"))
 
