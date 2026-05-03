@@ -855,21 +855,32 @@ function FamilyBonusDashboard() {
             </h1>
           </div>
 
-          <div
-            onClick={() => setActiveTab('edit-account')}
-            className="flex items-center gap-3 bg-white pr-4 pl-1 py-1 rounded-full border border-outline-variant/20 shadow-sm shadow-black/5 cursor-pointer active:scale-95 transition-all"
-          >
-            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white">
-              <span className="material-symbols-outlined text-[1.1rem]">person</span>
+          <div className="flex items-center gap-2">
+            <div
+              onClick={() => setActiveTab('edit-account')}
+              className="flex items-center gap-2 md:gap-3 bg-white pr-3 md:pr-4 pl-1 py-1 rounded-full border border-outline-variant/20 shadow-sm shadow-black/5 cursor-pointer active:scale-95 transition-all"
+            >
+              <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary flex items-center justify-center text-white">
+                <span className="material-symbols-outlined text-[1rem] md:text-[1.1rem]">person</span>
+              </div>
+              <div className="flex flex-col pr-1">
+                <span className="text-[11px] md:text-[12px] font-bold text-primary leading-tight">
+                  {user?.first_name ? `${user.first_name}` : 'Member'}
+                </span>
+                <span className="text-[8px] md:text-[9px] text-on-surface-variant/60 font-bold uppercase leading-tight tracking-tighter">
+                  Member
+                </span>
+              </div>
             </div>
-            <div className="flex flex-col pr-1">
-              <span className="text-[12px] font-bold text-primary leading-tight">
-                {user?.first_name ? `${user.first_name}` : 'Member'}
-              </span>
-              <span className="text-[9px] text-on-surface-variant/60 font-bold uppercase leading-tight tracking-tighter">
-                Member
-              </span>
-            </div>
+            <button
+              onClick={() => {
+                logout()
+                navigate('/')
+              }}
+              className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-red-500 border border-outline-variant/20 shadow-sm hover:bg-red-50 active:scale-95 transition-all"
+            >
+              <span className="material-symbols-outlined text-[1.1rem] ml-1">logout</span>
+            </button>
           </div>
         </div>
 
