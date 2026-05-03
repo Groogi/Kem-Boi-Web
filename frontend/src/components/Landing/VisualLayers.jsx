@@ -30,7 +30,7 @@ function VisualLayers() {
               Our Story
             </h2>
             <p className="text-[#5B5D56] text-[20px] md:text-[26px] leading-[1.6] font-normal font-body text-center lg:text-left max-w-xl opacity-90">
-              Born in the misty highlands of Dalat, Kem Bơ represents the perfect balance between
+              Born in the misty highlands of Dalat, Kem Boi represents the perfect balance between
               natural buttery richness and cool artisanal freshness. <br />
               <br />
               What started as a roadside delicacy has been elevated into an atelier experience,
