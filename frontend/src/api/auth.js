@@ -22,7 +22,16 @@ export async function register({
     }),
   })
 
-  const data = await res.json()
+  let data;
+  try {
+    data = await res.json()
+  } catch (err) {
+    if (!res.ok) {
+      throw new Error('The server is currently waking up from sleep. Please wait 30 seconds and try again!')
+    }
+    throw new Error('An unexpected error occurred.')
+  }
+
   if (!res.ok) throw new Error(data.errors?.join(', ') || 'Registration failed')
   return data
 }
@@ -33,7 +42,15 @@ export async function login({ email, password }) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   })
-  const data = await res.json()
+  let data;
+  try {
+    data = await res.json()
+  } catch (err) {
+    if (!res.ok) {
+      throw new Error('The server is currently waking up from sleep. Please wait 30 seconds and try again!')
+    }
+    throw new Error('An unexpected error occurred.')
+  }
   if (!res.ok) throw new Error(data.error || 'Login failed')
   return data
 }
