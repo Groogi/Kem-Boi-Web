@@ -50,16 +50,16 @@ class GoogleAuthController < ApplicationController
       # Generate JWT for our app
       jwt_token = JsonWebToken.encode(user_id: user.id)
       
+      time = Time.now + 24.hours.to_i
       render json: {
-        message: "Google Login successful",
-        user: {
-          id: user.id,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          email: user.email,
-          role: user.role
-        },
-        token: jwt_token
+        token: jwt_token,
+        exp: time.strftime("%m-%d-%Y %H:%M"),
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        account_id: user.account_id,
+        role: user.role,
+        points_balance: user.points_balance
       }, status: :ok
 
     rescue StandardError => e
