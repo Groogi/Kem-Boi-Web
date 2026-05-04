@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { forgotPassword } from '../../api/auth'
@@ -9,11 +9,18 @@ function LoginForm() {
   const { login, register, googleAuth } = useAuth()
   const { showToast } = useToast()
   const navigate = useNavigate()
+  const location = useLocation()
 
-  const [activeTab, setActiveTab] = useState('login') // "login" | "signup"
+  const [activeTab, setActiveTab] = useState(location.state?.mode === 'signup' ? 'signup' : 'login') // "login" | "signup"
   const [isForgotMode, setIsForgotMode] = useState(false)
   const [resetSent, setResetSent] = useState(false)
   const [forgotEmail, setForgotEmail] = useState('')
+
+  useEffect(() => {
+    if (location.state?.mode) {
+      setActiveTab(location.state.mode)
+    }
+  }, [location.state])
 
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)

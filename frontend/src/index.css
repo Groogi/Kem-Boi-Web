@@ -112,14 +112,31 @@ html {
 }
 
 .embla_controls {
+  width: 100%;
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
   display: flex;
   justify-content: center;
-  margin-top: 1.5rem;
+  align-items: center;
+  margin-top: 2rem;
+  padding: 0 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .embla_controls {
+    padding: 0 3rem;
+  }
 }
 
 .embla_dots {
   display: flex;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  transform: translateX(7px); /* Tiny additional nudge to the right */
 }
 
 .embla_dot {
@@ -130,7 +147,11 @@ html {
   background-color: transparent;
   cursor: pointer;
   padding: 0;
-  transition: background-color 0.2s;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, transform 0.2s;
 }
 
 .embla_dot--selected {

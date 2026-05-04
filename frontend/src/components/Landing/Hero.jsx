@@ -18,6 +18,7 @@ function Hero() {
           <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-5 w-full sm:w-auto">
             <Link
               to="/login"
+              state={{ mode: 'signup' }}
               className="inline-block bg-[#4d7902] text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-[#3d6101] transition-all shadow-xl shadow-[#4d7902]/10 active:scale-95 font-headline text-center"
             >
               Join the Kem Boi Family

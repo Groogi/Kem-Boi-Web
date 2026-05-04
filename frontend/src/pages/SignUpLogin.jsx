@@ -78,38 +78,38 @@ function SignUpLogin() {
         </div>
       </div>
 
-      <footer className="w-full py-12 px-6 flex flex-col md:flex-row justify-between items-center gap-10 bg-[#EEF4E4]/40 backdrop-blur-xl relative z-10">
+      <footer className="w-full py-12 px-6 grid grid-cols-1 md:grid-cols-3 items-center gap-10 bg-[#EEF4E4]/40 backdrop-blur-xl relative z-10 text-[13px] text-[#5B5C59] font-medium font-body">
         <div className="flex flex-col items-center md:items-start text-center md:text-left">
-          <div className="font-headline font-bold text-[#426500] text-xl mb-1 tracking-tight">
+          <div className="font-headline font-bold text-[#426500] text-[20px] mb-1 tracking-tight">
             Kem Boi
           </div>
-          <div className="text-[10px] uppercase tracking-widest opacity-60 font-bold">
-            © 2026 DIGITAL EDITORIAL ATELIER
+          <div className="opacity-50 text-[11px]">
+            © 2026 Kem Boi Digital Editorial
           </div>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 font-bold text-[11px] uppercase tracking-widest opacity-80">
+        <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 font-medium -translate-x-2">
           <a
             href="/#locations"
-            className="hover:text-[#426500] transition-colors border-b border-transparent hover:border-[#426500]"
+            className="hover:text-[#426500] transition-colors"
           >
             Location
           </a>
           <Link
             to="/privacy"
-            className="hover:text-[#426500] transition-colors border-b border-transparent hover:border-[#426500]"
+            className="hover:text-[#426500] transition-colors"
           >
             Privacy
           </Link>
           <Link
             to="/terms"
-            className="hover:text-[#426500] transition-colors border-b border-transparent hover:border-[#426500]"
+            className="hover:text-[#426500] transition-colors"
           >
             Terms
           </Link>
         </div>
 
-        <div className="flex gap-6 items-center">
+        <div className="flex gap-6 items-center justify-center md:justify-end">
           <a
             href={ensureHttps(socialLinks.facebook)}
             target="_blank"

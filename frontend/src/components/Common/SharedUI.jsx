@@ -208,7 +208,8 @@ export const CustomDatePicker = ({
 
   const parseDate = (val) => {
     if (!val) return null
-    const d = new Date(val)
+    // Parsing YYYY-MM-DD as local time by appending T00:00:00
+    const d = new Date(val.includes('T') ? val : `${val}T00:00:00`)
     return isNaN(d.getTime()) ? null : d
   }
 
@@ -232,17 +233,22 @@ export const CustomDatePicker = ({
   const changeMonth = (offset) =>
     setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() + offset, 1))
 
+  const formatDateLocal = (date) => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
   const handleSelect = (day) => {
     const newDate = new Date(viewDate.getFullYear(), viewDate.getMonth(), day)
-    const formatted = newDate.toISOString().split('T')[0]
-    onChange(formatted)
+    onChange(formatDateLocal(newDate))
     setIsOpen(false)
   }
 
   const selectToday = () => {
     const today = new Date()
-    const formatted = today.toISOString().split('T')[0]
-    onChange(formatted)
+    onChange(formatDateLocal(today))
     setViewDate(today)
     setIsOpen(false)
   }
@@ -306,7 +312,7 @@ export const CustomDatePicker = ({
       >
         <span className={`font-semibold text-sm ${value ? 'text-[#555]' : 'text-[#555]/50'}`}>
           {value
-            ? new Date(value).toLocaleDateString('en-AU', {
+            ? parseDate(value).toLocaleDateString('en-AU', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',

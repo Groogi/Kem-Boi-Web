@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 function Registration() {
   return (
@@ -71,12 +72,13 @@ function Registration() {
               </div>
             </li>
           </ul>
-          <a
-            href="/login"
+          <Link
+            to="/login"
+            state={{ mode: 'signup' }}
             className="inline-block bg-[#4d7902] text-white px-14 py-5 rounded-full font-bold text-xl hover:bg-[#3d6101] transition-all shadow-xl shadow-[#4d7902]/10 active:scale-95 font-headline"
           >
             Join Free Today
-          </a>
+          </Link>
         </div>
       </div>
     </section>
