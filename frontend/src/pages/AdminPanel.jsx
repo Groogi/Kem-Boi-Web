@@ -450,7 +450,7 @@ function AdminPanel() {
         {(() => {
           if (activeTab === 'dashboard') return 'Customer Directory'
           if (activeTab === 'bonus-entry') return 'Staff Service Hub'
-          if (activeTab === 'redemptions') return 'Rewards History'
+          if (activeTab === 'redemptions') return 'Rewards'
           return activeTab.replace('-', ' ')
         })()}
       </h2>
@@ -835,7 +835,7 @@ function AdminPanel() {
       <div className="flex justify-between items-center mb-12">
         <div>
           <h2 className="text-5xl font-headline font-bold text-primary capitalize tracking-[-0.03em]">
-            Redemption Log
+            Rewards History
           </h2>
           <p className="text-on-surface-variant font-medium opacity-60 text-lg mt-2">
             Track and verify customer reward claims.
