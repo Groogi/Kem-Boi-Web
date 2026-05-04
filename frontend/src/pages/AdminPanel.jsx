@@ -488,7 +488,7 @@ function AdminPanel() {
       </div>
 
       <div className="bg-[#EEF4E4]/70 rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-14 relative border border-white/40 shadow-sm">
-        <div className="bg-[#FCFDF9]/60 backdrop-blur-sm rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-white/20 whitespace-nowrap lg:whitespace-normal">
+        <div className="bg-[#F8F8F0]/60 backdrop-blur-sm rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-white/20 whitespace-nowrap lg:whitespace-normal">
           <table className="w-full text-left">
             <thead className="bg-[#F2F3EB]/60 border-b border-[#4A6B10]/5">
               <tr>
@@ -577,7 +577,7 @@ function AdminPanel() {
 
   const renderAddUserView = () => (
     <div className="bg-[#EEF4E4]/70 rounded-[1.5rem] md:rounded-[2.5rem] p-8 md:p-14 max-w-4xl relative border border-white/40 shadow-sm">
-      <div className="bg-[#FCFDF9]/60 backdrop-blur-sm rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-12 space-y-8 md:space-y-10 border border-white/20">
+      <div className="bg-[#F8F8F0]/60 backdrop-blur-sm rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-12 space-y-8 md:space-y-10 border border-white/20">
         <div>
           <label className="block text-sm font-bold text-[#4A6B10] mb-3 px-1">Full Name</label>
           <div className="relative group">
@@ -688,7 +688,7 @@ function AdminPanel() {
   }
 
   const renderDeleteModal = () => (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#FCFDF9]/40 animate-fade-in px-6">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#F8F8F0]/40 animate-fade-in px-6">
       <div className="bg-[#FBFBF5] rounded-[3rem] p-10 md:p-14 max-w-lg w-full shadow-2xl border border-white/20 relative animate-scale-in">
         <div className="flex flex-col items-center mb-10">
           <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-6">
@@ -766,8 +766,8 @@ function AdminPanel() {
         </button>
       </div>
 
-      <div className="bg-[#fcfdf9] rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 shadow-sm border border-outline-variant/30">
-        <div className="bg-[#FCFDF9] rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-primary/5 shadow-sm whitespace-nowrap lg:whitespace-normal">
+      <div className="bg-[#F8F8F0] rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 shadow-sm border border-outline-variant/30">
+        <div className="bg-[#F8F8F0] rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-primary/5 shadow-sm whitespace-nowrap lg:whitespace-normal">
           <table className="w-full text-left">
             <thead className="bg-[#F2F3EB]/30 border-b border-primary/5">
               <tr>
@@ -1304,7 +1304,7 @@ const UserDetailsView = ({
                       .map((red) => (
                         <div
                           key={red.id}
-                          className="bg-surface-container-highest/10 rounded-3xl p-5 shadow-sm border border-white flex justify-between items-center hover:bg-white transition-all"
+                          className="bg-surface-container-highest/10 rounded-3xl p-5 shadow-sm border border-primary/10 flex justify-between items-center hover:bg-[#F8F8F0] transition-all"
                         >
                           <div className="flex flex-col">
                             <span className="text-[9px] font-black text-primary/40 uppercase tracking-widest mb-1">
@@ -1322,7 +1322,7 @@ const UserDetailsView = ({
                                 redemptionId: red.id,
                               })
                             }
-                            className="bg-white border-2 border-[#426500] text-[#426500] font-bold py-2 px-6 rounded-full text-[10px] tracking-widest hover:bg-[#426500] hover:text-white transition-all shadow-sm whitespace-nowrap"
+                            className="bg-[#FBFBF5] border-2 border-[#426500] text-[#426500] font-bold py-2 px-6 rounded-full text-[10px] tracking-widest hover:bg-[#426500] hover:text-white transition-all shadow-sm whitespace-nowrap"
                           >
                             USE NOW
                           </button>
@@ -1387,7 +1387,7 @@ const UserDetailsView = ({
                       .map((r) => (
                         <div
                           key={r.id}
-                          className="bg-surface-container-highest/10 rounded-3xl p-5 shadow-sm border border-white flex justify-between items-center hover:bg-white transition-all"
+                          className="bg-surface-container-highest/10 rounded-3xl p-5 shadow-sm border border-primary/10 flex justify-between items-center hover:bg-[#F8F8F0] transition-all"
                         >
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2 mb-1">

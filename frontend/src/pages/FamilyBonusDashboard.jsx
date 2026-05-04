@@ -459,7 +459,7 @@ function FamilyBonusDashboard() {
                     setSelectedReward(r)
                     setActiveTab('reward-details')
                   }}
-                  className="bg-surface-container-highest/30 rounded-2xl p-6 shadow-sm flex flex-col border border-outline-variant/10 opacity-70 cursor-pointer hover:opacity-100 transition-all hover:bg-white/40"
+                  className="bg-surface-container-highest/30 rounded-2xl p-6 shadow-sm flex flex-col border border-outline-variant/10 opacity-70 cursor-pointer hover:opacity-100 transition-all hover:bg-[#F8F8F0]/40"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-bold text-on-surface-variant text-lg font-headline">
@@ -542,7 +542,7 @@ function FamilyBonusDashboard() {
                 Claimed {new Date(red.created_at).toLocaleDateString('en-AU')}
               </p>
 
-              <div className="bg-[#FBFCF6] border-2 border-dashed border-[#E5E7D9] rounded-2xl p-5 flex flex-col items-center justify-center group-hover:border-primary/30 transition-colors">
+              <div className="bg-[#F8F8F0] border-2 border-dashed border-[#E5E7D9] rounded-2xl p-5 flex flex-col items-center justify-center group-hover:border-primary/30 transition-colors">
                 <span className="text-[10px] font-black text-on-surface-variant/30 uppercase tracking-[0.2em] mb-2">
                   Voucher Code
                 </span>
@@ -585,7 +585,7 @@ function FamilyBonusDashboard() {
               <h2 className="font-bold text-primary text-3xl md:text-4xl font-headline mb-1">
                 {selectedReward.name}
               </h2>
-              <span className="bg-white/50 px-6 py-2 rounded-full font-bold text-primary shadow-sm border border-white/60 whitespace-nowrap">
+              <span className="bg-[#F8F8F0]/50 px-6 py-2 rounded-full font-bold text-primary shadow-sm border border-white/60 whitespace-nowrap">
                 {selectedReward.point_cost} PTS
               </span>
             </div>
@@ -594,7 +594,7 @@ function FamilyBonusDashboard() {
               {selectedReward.description || 'No description provided.'}
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4 md:mt-12 bg-white/30 p-6 md:p-8 rounded-[2rem] border border-white/40">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4 md:mt-12 bg-[#F8F8F0]/30 p-6 md:p-8 rounded-[2rem] border border-white/40">
               <div>
                 <h3 className="font-bold text-primary text-[11px] uppercase tracking-widest mb-4">
                   Availability Period:
@@ -683,7 +683,7 @@ function FamilyBonusDashboard() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in pb-12 pt-2">
       {/* Left Panel */}
       <div className="col-span-1 flex flex-col h-full">
-        <div className="bg-[#fcfdf9] rounded-[1.5rem] p-6 shadow-sm border border-outline-variant/30 flex-grow">
+        <div className="bg-[#F8F8F0] rounded-[1.5rem] p-6 shadow-sm border border-outline-variant/30 flex-grow">
           {/* Profile Box */}
           <div className="flex items-center gap-4 mb-8">
             <div className="w-16 h-16 rounded-full bg-[#426500] flex flex-col justify-center items-center text-white text-3xl font-bold border-4 border-[#FBFBF5] shadow-sm">
@@ -717,7 +717,7 @@ function FamilyBonusDashboard() {
       </div>
 
       {/* Right Panel (Form) */}
-      <div className="col-span-1 lg:col-span-2 bg-[#fcfdf9] rounded-[1.5rem] p-8 md:p-10 shadow-sm border border-outline-variant/30 flex flex-col h-full min-h-[460px]">
+      <div className="col-span-1 lg:col-span-2 bg-[#F8F8F0] rounded-[1.5rem] p-8 md:p-10 shadow-sm border border-outline-variant/30 flex flex-col h-full min-h-[460px]">
         <div className="flex items-center gap-4 mb-8">
           <h2 className="text-3xl font-bold text-[#426500] font-headline">Personal Details</h2>
           <span className="border-2 border-[#dbdfd2] bg-[#edf2e6] text-[#4a5440] font-extrabold text-[11px] tracking-widest px-4 py-1.5 rounded-full shadow-inner uppercase">
