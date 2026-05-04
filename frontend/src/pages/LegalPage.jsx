@@ -30,7 +30,7 @@ function LegalPage({ title, lastUpdated, sections }) {
 
       {/* Content */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-12">
-        <div className="bg-white rounded-[40px] p-8 md:p-16 shadow-sm border border-black/[0.03] max-w-4xl">
+        <div className="bg-[#F8F8F0] rounded-[40px] p-8 md:p-16 shadow-sm border border-black/[0.03] max-w-4xl">
           <div className="space-y-12">
             {sections.map((section, idx) => (
               <div key={idx} className="space-y-4">

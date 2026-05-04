@@ -190,7 +190,7 @@ function FamilyBonusDashboard() {
           <div className="flex items-center gap-2 md:gap-4 ml-auto">
             <div
               onClick={() => setActiveTab('edit-account')}
-              className="flex items-center gap-3 bg-white/40 pr-3 md:pr-4 pl-1 py-1 rounded-full border border-white/60 cursor-pointer hover:bg-white/60 transition-colors shadow-sm"
+              className="flex items-center gap-3 bg-[#FBFBF5]/40 pr-3 md:pr-4 pl-1 py-1 rounded-full border border-white/60 cursor-pointer hover:bg-white/60 transition-colors shadow-sm"
             >
               <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary flex items-center justify-center text-[#e8ebe3] font-bold">
                 <span className="material-symbols-outlined text-[1.1rem] md:text-[1.2rem]">
@@ -520,7 +520,7 @@ function FamilyBonusDashboard() {
           pendingVouchers.map((red) => (
             <div
               key={red.id}
-              className="bg-white rounded-[2rem] p-8 shadow-sm border border-outline-variant/10 flex flex-col relative group overflow-hidden"
+              className="bg-[#FBFBF5] rounded-[2rem] p-8 shadow-sm border border-outline-variant/10 flex flex-col relative group overflow-hidden"
             >
               {/* Status Badge */}
               <div className="absolute top-6 right-6">

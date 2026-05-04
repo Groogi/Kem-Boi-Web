@@ -865,8 +865,8 @@ function AdminPanel() {
         </button>
       </div>
 
-      <div className="bg-[#fcfdf9] rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 shadow-sm border border-outline-variant/30">
-        <div className="bg-white rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-primary/5 shadow-sm whitespace-nowrap lg:whitespace-normal">
+      <div className="bg-[#F8F8F0] rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 shadow-sm border border-outline-variant/30">
+        <div className="bg-[#F8F8F0] rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-primary/5 shadow-sm whitespace-nowrap lg:whitespace-normal">
           <table className="w-full text-left">
             <thead className="bg-[#F2F3EB]/30 border-b border-primary/5">
               <tr>
@@ -957,7 +957,7 @@ function AdminPanel() {
             Kem Boi
           </h1>
         </div>
-        <div className="flex items-center gap-3 bg-white pr-4 pl-1 py-1 rounded-full border border-outline-variant/20 shadow-sm shadow-black/5">
+        <div className="flex items-center gap-3 bg-[#FBFBF5] pr-4 pl-1 py-1 rounded-full border border-outline-variant/20 shadow-sm shadow-black/5">
           <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
             <span className="material-symbols-outlined text-[1.2rem]">person</span>
           </div>
@@ -1063,7 +1063,7 @@ const RedemptionRow = ({ red, onUpdate, onDelete }) => {
   const [loading, setLoading] = useState(false)
 
   return (
-    <tr className="hover:bg-white/60 transition-all group">
+    <tr className="hover:bg-[#F8F8F0]/60 transition-all group">
       <td className="px-8 py-8">
         <span className="text-[11px] font-bold text-on-surface-variant font-mono">
           {new Date(red.created_at).toLocaleDateString('en-AU')}
@@ -1249,8 +1249,8 @@ const UserDetailsView = ({
               </span>
             </div>
 
-            <div className="bg-[#F2F3EB]/60 rounded-full p-1.5 shadow-inner flex items-center border border-white max-w-md mb-8">
-              <div className="bg-white rounded-full px-10 py-1.5 flex flex-col items-center flex-grow shadow-sm">
+            <div className="bg-[#F2F3EB]/60 rounded-full p-1.5 shadow-inner flex items-center border border-[#D1D3C8]/40 max-w-md mb-8">
+              <div className="bg-[#F8F8F0] rounded-full px-10 py-1.5 flex flex-col items-center flex-grow shadow-sm">
                 <p className="text-[9px] font-bold text-[#4A6B10]/50 uppercase tracking-[0.2em] leading-none mb-1">
                   Points Balance:
                 </p>
@@ -1406,7 +1406,7 @@ const UserDetailsView = ({
                           </div>
                           <button
                             onClick={() => setConfirmFulfill({ isOpen: true, reward: r })}
-                            className="bg-white border-2 border-[#426500] text-[#426500] font-bold py-2 px-6 rounded-full text-[10px] tracking-widest hover:bg-[#426500] hover:text-white transition-all shadow-sm whitespace-nowrap"
+                            className="bg-[#FBFBF5] border-2 border-[#426500] text-[#426500] font-bold py-2 px-6 rounded-full text-[10px] tracking-widest hover:bg-[#426500] hover:text-white transition-all shadow-sm whitespace-nowrap"
                           >
                             CLAIM & USE
                           </button>
@@ -1428,7 +1428,7 @@ const UserDetailsView = ({
           </button>
           <button
             onClick={() => setViewMode('list')}
-            className="w-full sm:w-auto bg-white border-2 border-[#D1D3C8] text-on-surface-variant font-bold py-3.5 px-14 text-[10px] tracking-[0.2em] rounded-full hover:bg-surface-container-highest/20 transition-all uppercase"
+            className="w-full sm:w-auto bg-[#FBFBF5] border-2 border-[#D1D3C8] text-on-surface-variant font-bold py-3.5 px-14 text-[10px] tracking-[0.2em] rounded-full hover:bg-surface-container-highest/20 transition-all uppercase"
           >
             Return to list
           </button>
