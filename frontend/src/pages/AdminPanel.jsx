@@ -413,7 +413,7 @@ function AdminPanel() {
               }}
               className={`flex items-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 group ${
                 activeTab === item.id
-                  ? 'bg-white border-2 border-[#E5E7E1] text-primary shadow-sm shadow-black/5'
+                  ? 'bg-[#EEF4E4] border-2 border-[#E5E7E1] text-primary shadow-sm shadow-black/5'
                   : 'text-on-surface-variant hover:bg-surface-container-highest/30'
               }`}
             >
@@ -436,7 +436,7 @@ function AdminPanel() {
             logout()
             navigate('/')
           }}
-          className="mt-auto mb-4 flex items-center justify-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 text-on-surface-variant hover:bg-red-50 hover:text-red-600 border border-outline-variant/10 bg-white"
+          className="mt-auto mb-4 flex items-center justify-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 text-on-surface-variant hover:bg-red-50 hover:text-red-600 border border-outline-variant/10 bg-[#FBFBF5]"
         >
           <span className="text-[15px] font-bold">Logout</span>
         </div>
@@ -450,12 +450,13 @@ function AdminPanel() {
         {(() => {
           if (activeTab === 'dashboard') return 'Customer Directory'
           if (activeTab === 'bonus-entry') return 'Staff Service Hub'
+          if (activeTab === 'redemptions') return 'Rewards History'
           return activeTab.replace('-', ' ')
         })()}
       </h2>
 
       {/* Hide full profile badge on mobile since it's now in the top-right sticky bar */}
-      <div className="hidden md:flex items-center gap-3 bg-white pr-4 pl-1 py-1 rounded-full border border-outline-variant/20 shadow-sm">
+      <div className="hidden md:flex items-center gap-3 bg-[#FBFBF5] pr-4 pl-1 py-1 rounded-full border border-outline-variant/20 shadow-sm">
         <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
           <span className="material-symbols-outlined text-[1.2rem]">person</span>
         </div>
@@ -487,7 +488,7 @@ function AdminPanel() {
       </div>
 
       <div className="bg-[#EEF4E4]/70 rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-14 relative border border-white/40 shadow-sm">
-        <div className="bg-white/60 backdrop-blur-sm rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-white/20 whitespace-nowrap lg:whitespace-normal">
+        <div className="bg-[#FCFDF9]/60 backdrop-blur-sm rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-white/20 whitespace-nowrap lg:whitespace-normal">
           <table className="w-full text-left">
             <thead className="bg-[#F2F3EB]/60 border-b border-[#4A6B10]/5">
               <tr>
@@ -576,7 +577,7 @@ function AdminPanel() {
 
   const renderAddUserView = () => (
     <div className="bg-[#EEF4E4]/70 rounded-[1.5rem] md:rounded-[2.5rem] p-8 md:p-14 max-w-4xl relative border border-white/40 shadow-sm">
-      <div className="bg-white/60 backdrop-blur-sm rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-12 space-y-8 md:space-y-10 border border-white/20">
+      <div className="bg-[#FCFDF9]/60 backdrop-blur-sm rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-12 space-y-8 md:space-y-10 border border-white/20">
         <div>
           <label className="block text-sm font-bold text-[#4A6B10] mb-3 px-1">Full Name</label>
           <div className="relative group">
@@ -641,7 +642,7 @@ function AdminPanel() {
         </button>
         <button
           onClick={() => setViewMode('list')}
-          className="w-full sm:w-auto bg-white border-2 border-[#D1D3C8] text-on-surface-variant/80 font-bold py-[12px] px-10 text-xs tracking-widest rounded-full hover:bg-surface-container-highest/20 transition-all uppercase"
+          className="w-full sm:w-auto bg-[#FBFBF5] border-2 border-[#D1D3C8] text-on-surface-variant/80 font-bold py-[12px] px-10 text-xs tracking-widest rounded-full hover:bg-surface-container-highest/20 transition-all uppercase"
         >
           Cancel
         </button>
@@ -687,7 +688,7 @@ function AdminPanel() {
   }
 
   const renderDeleteModal = () => (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/40 animate-fade-in px-6">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#FCFDF9]/40 animate-fade-in px-6">
       <div className="bg-[#FBFBF5] rounded-[3rem] p-10 md:p-14 max-w-lg w-full shadow-2xl border border-white/20 relative animate-scale-in">
         <div className="flex flex-col items-center mb-10">
           <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-6">
@@ -732,7 +733,7 @@ function AdminPanel() {
                 setShowDeleteModal(false)
                 setDeleteConfirmText('')
               }}
-              className="flex-1 bg-white border-2 border-[#D1D3C8] text-on-surface-variant/60 font-bold py-4 rounded-full transition-all hover:bg-surface-container-highest/20 text-sm tracking-widest uppercase"
+              className="flex-1 bg-[#FBFBF5] border-2 border-[#D1D3C8] text-on-surface-variant/60 font-bold py-4 rounded-full transition-all hover:bg-surface-container-highest/20 text-sm tracking-widest uppercase"
             >
               Keep User
             </button>
@@ -766,7 +767,7 @@ function AdminPanel() {
       </div>
 
       <div className="bg-[#fcfdf9] rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 shadow-sm border border-outline-variant/30">
-        <div className="bg-white rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-primary/5 shadow-sm whitespace-nowrap lg:whitespace-normal">
+        <div className="bg-[#FCFDF9] rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-primary/5 shadow-sm whitespace-nowrap lg:whitespace-normal">
           <table className="w-full text-left">
             <thead className="bg-[#F2F3EB]/30 border-b border-primary/5">
               <tr>

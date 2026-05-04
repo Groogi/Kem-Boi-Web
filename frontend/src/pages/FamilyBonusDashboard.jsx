@@ -155,7 +155,7 @@ function FamilyBonusDashboard() {
   // Reusable header navigation
   const renderHeader = () => (
     <header
-      className={`hidden md:flex justify-between items-center py-6 md:py-8 mb-6 border-outline-variant/10 gap-4 md:gap-10 ${activeTab === 'edit-account' ? 'border-b-0' : 'border-b'}`}
+      className={`hidden md:flex justify-between items-center h-20 md:h-28 mb-6 border-b border-outline-variant/10 gap-4 md:gap-10`}
     >
       <div
         onClick={() => setActiveTab('dashboard')}
@@ -686,7 +686,7 @@ function FamilyBonusDashboard() {
         <div className="bg-[#fcfdf9] rounded-[1.5rem] p-6 shadow-sm border border-outline-variant/30 flex-grow">
           {/* Profile Box */}
           <div className="flex items-center gap-4 mb-8">
-            <div className="w-16 h-16 rounded-full bg-[#426500] flex flex-col justify-center items-center text-white text-3xl font-bold border-4 border-white shadow-sm">
+            <div className="w-16 h-16 rounded-full bg-[#426500] flex flex-col justify-center items-center text-white text-3xl font-bold border-4 border-[#FBFBF5] shadow-sm">
               <span className="material-symbols-outlined text-[2.5rem]">person</span>
             </div>
             <div>
@@ -700,7 +700,7 @@ function FamilyBonusDashboard() {
           </div>
 
           {/* Nav selector */}
-          <div className="bg-white border-2 border-[#e5e7e1] rounded-full px-5 py-3 flex items-center gap-3 text-[#426500] font-bold shadow-sm cursor-pointer shadow-black/5">
+          <div className="bg-[#FBFBF5] border-2 border-[#e5e7e1] rounded-full px-5 py-3 flex items-center gap-3 text-[#426500] font-bold shadow-sm cursor-pointer shadow-black/5">
             <span className="material-symbols-outlined font-bold text-xl">account_circle</span>
             <span className="text-base text-[#4a6b10]">Personal Details</span>
           </div>
@@ -832,7 +832,7 @@ function FamilyBonusDashboard() {
           </button>
           <button
             onClick={() => setActiveTab('dashboard')}
-            className="bg-white border-2 border-[#e6e8e2] text-[#426500] font-bold py-2.5 px-8 text-[15px] tracking-wide rounded-full hover:bg-[#f4f5f0] transition-colors shadow-sm shadow-black/5 hover:-translate-y-0.5 duration-200"
+            className="bg-[#FBFBF5] border-2 border-[#e6e8e2] text-[#426500] font-bold py-2.5 px-8 text-[15px] tracking-wide rounded-full hover:bg-[#f4f5f0] transition-colors shadow-sm shadow-black/5 hover:-translate-y-0.5 duration-200"
           >
             Cancel
           </button>
@@ -858,7 +858,7 @@ function FamilyBonusDashboard() {
           <div className="flex items-center gap-2">
             <div
               onClick={() => setActiveTab('edit-account')}
-              className="flex items-center gap-2 md:gap-3 bg-white pr-3 md:pr-4 pl-1 py-1 rounded-full border border-outline-variant/20 shadow-sm shadow-black/5 cursor-pointer active:scale-95 transition-all"
+              className="flex items-center gap-2 md:gap-3 bg-[#FBFBF5] pr-3 md:pr-4 pl-1 py-1 rounded-full border border-outline-variant/20 shadow-sm shadow-black/5 cursor-pointer active:scale-95 transition-all"
             >
               <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-primary flex items-center justify-center text-white">
                 <span className="material-symbols-outlined text-[1rem] md:text-[1.1rem]">person</span>
@@ -877,7 +877,7 @@ function FamilyBonusDashboard() {
                 logout()
                 navigate('/')
               }}
-              className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-red-500 border border-outline-variant/20 shadow-sm hover:bg-red-50 active:scale-95 transition-all"
+              className="w-10 h-10 rounded-full bg-[#FBFBF5] flex items-center justify-center text-red-500 border border-outline-variant/20 shadow-sm hover:bg-red-50 active:scale-95 transition-all"
             >
               <span className="material-symbols-outlined text-[1.1rem] ml-1">logout</span>
             </button>

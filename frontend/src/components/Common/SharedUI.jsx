@@ -16,8 +16,8 @@ export const ConfirmationModal = ({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 sm:p-0 bg-white/40">
-      <div className="absolute inset-0 bg-white/40 transition-opacity" onClick={onClose}></div>
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 sm:p-0 bg-[#FCFDF9]/40">
+      <div className="absolute inset-0 bg-[#FCFDF9]/40 transition-opacity" onClick={onClose}></div>
       <div className="bg-[#FCFDF9] rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl relative z-10 animate-fade-in border border-white/40">
         <div className="p-8 md:p-10 text-center">
           <div
@@ -40,7 +40,7 @@ export const ConfirmationModal = ({
             </button>
             <button
               onClick={onClose}
-              className="flex-1 py-4 px-8 rounded-full font-bold tracking-widest text-sm bg-white border-2 border-[#D1D3C8] text-on-surface-variant/80 hover:bg-[#F2F3EB] transition-all active:scale-95"
+              className="flex-1 py-4 px-8 rounded-full font-bold tracking-widest text-sm bg-[#FBFBF5] border-2 border-[#D1D3C8] text-on-surface-variant/80 hover:bg-[#F2F3EB] transition-all active:scale-95"
             >
               {cancelText}
             </button>
@@ -78,9 +78,9 @@ export const ModernAlert = ({
   }
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-white/40 animate-fade-in">
-      <div className="absolute inset-0 bg-white/10 cursor-default" onClick={onClose}></div>
-      <div className="bg-white rounded-[2.5rem] w-full max-w-sm overflow-hidden shadow-[0_32px_64px_-15px_rgba(0,0,0,0.2)] relative z-10 border border-white/60 animate-scale-in">
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-[#FCFDF9]/40 animate-fade-in">
+      <div className="absolute inset-0 bg-[#FCFDF9]/10 cursor-default" onClick={onClose}></div>
+      <div className="bg-[#FCFDF9] rounded-[2.5rem] w-full max-w-sm overflow-hidden shadow-[0_32px_64px_-15px_rgba(0,0,0,0.2)] relative z-10 border border-white/60 animate-scale-in">
         <div className="p-10 text-center flex flex-col items-center">
           <div
             className={`w-24 h-24 rounded-full flex items-center justify-center mb-8 ${colors[type]} shadow-inner`}
@@ -124,9 +124,9 @@ export const ModernConfirm = ({
   const isDeleteValid = variant !== 'danger' || confirmTextVal.toUpperCase() === 'DELETE'
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-white/40 animate-fade-in">
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-[#FCFDF9]/40 animate-fade-in">
       <div className="absolute inset-0 cursor-default" onClick={onCancel}></div>
-      <div className="bg-white rounded-[2.5rem] w-full max-w-sm overflow-hidden shadow-[0_12px_32px_rgba(45,47,44,0.06)] relative z-10 border border-white/60 animate-scale-in">
+      <div className="bg-[#FCFDF9] rounded-[2.5rem] w-full max-w-sm overflow-hidden shadow-[0_12px_32px_rgba(45,47,44,0.06)] relative z-10 border border-white/60 animate-scale-in">
         <div className="p-10 text-center flex flex-col items-center">
           <div
             className={`w-24 h-24 rounded-full flex items-center justify-center mb-8 shadow-inner ${
@@ -325,7 +325,7 @@ export const CustomDatePicker = ({
       </div>
 
       {isOpen && (
-        <div className="absolute top-[105%] left-0 z-[1000] w-full min-w-[280px] max-w-[calc(100vw-2rem)] md:min-w-[320px] bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-[0_30px_80px_-15px_rgba(66,101,0,0.25)] p-5 md:p-6 border border-white animate-dropdown-in overflow-hidden pointer-events-auto">
+        <div className="absolute top-[105%] left-0 z-[1000] w-full min-w-[280px] max-w-[calc(100vw-2rem)] md:min-w-[320px] bg-[#FCFDF9] rounded-[2rem] md:rounded-[2.5rem] shadow-[0_30px_80px_-15px_rgba(66,101,0,0.25)] p-5 md:p-6 border border-white animate-dropdown-in overflow-hidden pointer-events-auto">
           {/* Subtle background glow */}
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
 
