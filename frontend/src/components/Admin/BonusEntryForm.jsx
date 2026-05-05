@@ -55,7 +55,7 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
     const found = users.find(
       (u) =>
         u.email.toLowerCase() === q.toLowerCase() ||
-        (u.account_id && u.account_id.toLowerCase() === q.toLowerCase())
+        (u.account_id && u.account_id.toLowerCase().includes(q.toLowerCase()))
     )
 
     if (found) {

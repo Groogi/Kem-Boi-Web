@@ -894,20 +894,20 @@ function AdminPanel() {
               {redemptions
                 .filter((red) => red.status === 'pending')
                 .filter((red) => {
-                  const name =
-                    `${red.user?.first_name || ''} ${red.user?.last_name || ''}`.toLowerCase()
+                  const name = `${red.user?.first_name || ''} ${red.user?.last_name || ''}`.toLowerCase()
+                  const email = (red.user?.email || '').toLowerCase()
                   const accId = String(red.user?.account_id || '').toLowerCase()
                   const query = redemptionSearch.toLowerCase()
-                  return name.includes(query) || accId.includes(query)
+                  return name.includes(query) || accId.includes(query) || email.includes(query)
                 }).length > 0 ? (
                 redemptions
                   .filter((red) => red.status === 'pending')
                   .filter((red) => {
-                    const name =
-                      `${red.user?.first_name || ''} ${red.user?.last_name || ''}`.toLowerCase()
+                    const name = `${red.user?.first_name || ''} ${red.user?.last_name || ''}`.toLowerCase()
+                    const email = (red.user?.email || '').toLowerCase()
                     const accId = String(red.user?.account_id || '').toLowerCase()
                     const query = redemptionSearch.toLowerCase()
-                    return name.includes(query) || accId.includes(query)
+                    return name.includes(query) || accId.includes(query) || email.includes(query)
                   })
                   .map((red, idx) => (
                     <RedemptionRow
