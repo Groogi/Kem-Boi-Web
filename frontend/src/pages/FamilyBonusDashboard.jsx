@@ -129,11 +129,12 @@ function FamilyBonusDashboard() {
     date_of_birth: user?.date_of_birth || '',
   })
 
-  // Punch Card Logic: 1 punch per 200 points, 6 punches = reward
-  const POINTS_PER_PUNCH = 200
-  const totalPunches = 6
-  const currentPunches = Math.floor((user?.points_balance || 0) / POINTS_PER_PUNCH) % totalPunches
+  // Punch Card Logic: 1 punch per 100 points, 5 punches = reward
+  const POINTS_PER_PUNCH = 100
+  const totalPunches = 5
+  const currentPunches = Math.min(totalPunches, Math.floor((user?.points_balance || 0) / POINTS_PER_PUNCH))
   const moreToGo = totalPunches - currentPunches
+  const isRewardReady = (user?.points_balance || 0) >= (totalPunches * POINTS_PER_PUNCH)
 
   const handleSave = async () => {
     const newErrors = {}
@@ -322,14 +323,14 @@ function FamilyBonusDashboard() {
           <div>
             <h2 className="text-3xl md:text-4xl font-bold font-headline mb-2">Buy 5, Get 1 Free</h2>
             <p className="text-lg font-medium opacity-90 mb-8 font-headline">
-              {moreToGo === 0
+              {isRewardReady
                 ? 'Reward Ready to Claim!'
                 : `Only ${moreToGo} more punch${moreToGo > 1 ? 'es' : ''} to go!`}
             </p>
 
             {/* Punch circles */}
             <div className="flex justify-between items-center gap-3 mb-10">
-              {[1, 2, 3, 4, 5, 6].map((idx) => (
+              {[1, 2, 3, 4, 5].map((idx) => (
                 <div
                   key={idx}
                   className={`h-4 lg:h-5 flex-1 rounded-full shadow-inner ${idx <= currentPunches ? 'bg-[#c3e68c]' : 'bg-[#e2ead3]'}`}
@@ -340,10 +341,15 @@ function FamilyBonusDashboard() {
 
           <div className="flex justify-center">
             <button
-              disabled={moreToGo > 0}
-              className={`font-bold py-3.5 px-10 rounded-full text-lg tracking-wide transition-all ${moreToGo === 0 ? 'bg-[#c3e68c] text-primary shadow-lg hover:scale-105 active:scale-95' : 'bg-[#d5dfc5] text-primary/40 cursor-not-allowed'}`}
+              onClick={() => {
+                const punchCardReward = rewards.find(r => r.point_cost === 500 && r.active);
+                if (punchCardReward) handleClaimReward(punchCardReward);
+                else showToast("Visit us in-store to claim your free reward!", "info");
+              }}
+              disabled={!isRewardReady}
+              className={`font-bold py-3.5 px-10 rounded-full text-lg tracking-wide transition-all ${isRewardReady ? 'bg-[#c3e68c] text-primary shadow-lg hover:scale-105 active:scale-95' : 'bg-[#d5dfc5] text-primary/40 cursor-not-allowed'}`}
             >
-              {moreToGo === 0 ? 'Claim Reward' : 'Claim Offer'}
+              {isRewardReady ? 'Claim Reward' : 'Claim Offer'}
             </button>
           </div>
         </div>
