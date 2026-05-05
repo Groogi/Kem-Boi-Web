@@ -25,7 +25,7 @@ class PasswordsController < ApplicationController
 
     user = User.find_by(email: params[:email])
 
-    if user.present? && user.reset_password_token == token && user.password_reset_valid?
+    if user.present? && ActiveSupport::SecurityUtils.secure_compare(user.reset_password_token, token) && user.password_reset_valid?
       if user.reset_password!(params[:password])
         render json: { message: "Password updated successfully!" }, status: :ok
       else

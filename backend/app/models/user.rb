@@ -25,6 +25,10 @@ class User < ApplicationRecord
             allow_blank: true
   validates :role, inclusion: { in: %w[admin customer] }, presence: true
 
+  def as_json(options = {})
+    super(options.merge(except: [ :password_digest, :reset_password_token, :reset_password_sent_at ]))
+  end
+
   # Points Logic
   def points_balance
     self.points_balance_cache
@@ -54,8 +58,7 @@ class User < ApplicationRecord
   # Callbacks
   after_create :generate_account_id
 
-  # Disabled for demo: PendingBonus flow not implemented yet and currently breaks signup
-  # after_create :process_pending_bonuses
+  after_create :process_pending_bonuses
 
   private
 
@@ -64,15 +67,14 @@ class User < ApplicationRecord
     update_column(:account_id, "kemboi_#{1000 + id}")
   end
 
-  # Disabled for demo: PendingBonus table/model mismatch causes runtime error
-  # def process_pending_bonuses
-  #   PendingBonus.where(email: self.email).find_each do |pending|
-  #     transactions.create!(
-  #       points: pending.points_amount || 0,
-  #       transaction_type: "bonus",
-  #       notes: "Welcome bonus from pending list"
-  #     )
-  #     pending.destroy
-  #   end
-  # end
+  def process_pending_bonuses
+    PendingBonus.where(email: self.email).find_each do |pending|
+      transactions.create!(
+        points: pending.points_amount || 0,
+        transaction_type: "bonus",
+        notes: "Welcome bonus from pending list"
+      )
+      pending.destroy
+    end
+  end
 end

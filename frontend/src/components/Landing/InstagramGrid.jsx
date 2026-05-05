@@ -4,49 +4,49 @@ function InstagramGrid() {
   const desktopTiles = [
     {
       src: '/socials-holding.png',
-      alt: 'Social 1',
+      alt: 'Happy customer holding an avocado dessert cup',
       style: { left: '0%', top: '0%', width: '25.73%', height: '39.21%' },
       imageClassName: 'scale-[1.3]',
     },
     {
       src: '/socials-store-front.png',
-      alt: 'Social 2',
+      alt: 'Our beautiful store front in the afternoon sun',
       style: { left: '27.24%', top: '0.42%', width: '38.53%', height: '54.58%' },
       imageClassName: 'scale-[1.2]',
     },
     {
       src: '/socials-dessert.png',
-      alt: 'Social 3',
+      alt: 'Close up of our signature avocado dessert with pearls',
       style: { left: '67.27%', top: '0.42%', width: '32.73%', height: '42.45%' },
       imageClassName: 'scale-[1.3]',
     },
     {
       src: '/socials-dessert.png',
-      alt: 'Social 4',
+      alt: 'Premium avocado mousse with custom toppings',
       style: { left: '0%', top: '42.03%', width: '15.27%', height: '57.97%' },
       imageClassName: 'scale-[1.3]',
     },
     {
       src: '/socials-dessert.png',
-      alt: 'Social 5',
+      alt: 'Traditional Vietnamese dessert reimagined',
       style: { left: '16.78%', top: '42.03%', width: '8.95%', height: '14.95%' },
       imageClassName: 'scale-[1.3]',
     },
     {
       src: '/socials-swirl-1.png',
-      alt: 'Social 6',
+      alt: 'Artistic avocado swirl pattern',
       style: { left: '16.78%', top: '59.8%', width: '19.41%', height: '40.2%' },
       imageClassName: 'scale-[1.4]',
     },
     {
       src: '/socials-holding.png',
-      alt: 'Social 7',
+      alt: 'Member of the Kem Boi family with a fresh dessert',
       style: { left: '37.7%', top: '59.8%', width: '28.07%', height: '40.2%' },
       imageClassName: 'scale-[1.3]',
     },
     {
       src: '/socials-swirl-2.png',
-      alt: 'Social 8',
+      alt: 'Hand-crafted avocado cream layers',
       style: { left: '67.49%', top: '45.7%', width: '32.51%', height: '54.3%' },
       imageClassName: 'scale-[1.4]',
     },
@@ -92,6 +92,7 @@ function InstagramGrid() {
                 href={ensureHttps(socialLinks.facebook)}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Check our community on Facebook"
                 className="hover:opacity-100 transition-opacity"
               >
                 <svg
@@ -109,6 +110,7 @@ function InstagramGrid() {
                 href={ensureHttps(socialLinks.instagram)}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Follow our journey on Instagram"
                 className="hover:opacity-100 transition-opacity"
               >
                 <svg

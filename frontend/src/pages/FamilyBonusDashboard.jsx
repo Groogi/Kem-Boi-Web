@@ -1,9 +1,6 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { useToast } from '../context/ToastContext'
-import { updateProfile } from '../api/auth'
 import { CustomDatePicker, ModernConfirm } from '../components/Common/SharedUI'
+import useSWR, { useSWRConfig } from 'swr'
+import { fetcher } from '../api/fetcher'
 
 function FamilyBonusDashboard() {
   const { user, token, updateUser, logout, refreshProfile } = useAuth()
@@ -15,42 +12,29 @@ function FamilyBonusDashboard() {
   const [loading, setLoading] = useState(false)
   const [saveStatus, setSaveStatus] = useState('')
   const [errors, setErrors] = useState({})
-  const [rewards, setRewards] = useState([])
-  const [myRedemptions, setMyRedemptions] = useState([])
+  // Use SWR for optimized data fetching and caching
+  const { data: rewardsData, mutate: mutateRewards } = useSWR(token ? ['/api/rewards', token] : null, fetcher)
+  const { data: redemptionsData, mutate: mutateRedemptions } = useSWR(token ? ['/api/my_redemptions', token] : null, fetcher)
+  const { data: profileData, mutate: mutateProfile } = useSWR(token ? ['/api/profile', token] : null, fetcher)
   const [confirmData, setConfirmData] = useState({ isOpen: false, reward: null })
   const [selectedReward, setSelectedReward] = useState(null)
 
+  // Sync profile data with AuthContext when it changes
+  useEffect(() => {
+    if (profileData) {
+      updateUser(profileData)
+    }
+  }, [profileData, updateUser])
+
+  const rewards = rewardsData || []
+  const myRedemptions = redemptionsData || []
+  const displayUser = profileData || user
+
   const refreshAllData = async () => {
     setLoading(true)
-    await Promise.all([refreshProfile(), fetchRewardsData(), fetchMyRedemptionsData()])
+    await Promise.all([mutateProfile(), mutateRewards(), mutateRedemptions()])
     setLoading(false)
   }
-
-  const fetchRewardsData = useCallback(async () => {
-    if (!token) return
-    try {
-      const res = await fetch('/api/rewards', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const data = await res.json()
-      setRewards(Array.isArray(data) ? data : [])
-    } catch (err) {
-      console.error('Failed to fetch rewards', err)
-    }
-  }, [token])
-
-  const fetchMyRedemptionsData = useCallback(async () => {
-    if (!token) return
-    try {
-      const res = await fetch('/api/my_redemptions', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const data = await res.json()
-      setMyRedemptions(Array.isArray(data) ? data : [])
-    } catch (err) {
-      console.error('Failed to fetch my redemptions', err)
-    }
-  }, [token])
 
   const handleClaimReward = async (reward) => {
     const redemptionCount = myRedemptions.filter(
@@ -64,7 +48,7 @@ function FamilyBonusDashboard() {
       return
     }
 
-    if ((user?.points_balance || 0) < reward.point_cost) {
+    if ((displayUser?.points_balance || 0) < reward.point_cost) {
       showToast(`You need ${reward.point_cost} points to claim this!`, 'error')
       return
     }
@@ -87,9 +71,10 @@ function FamilyBonusDashboard() {
       const data = await res.json()
       if (res.ok) {
         showToast(`Success! Your code is: ${data.redemption.voucher_code}`, 'success')
-        updateUser({ ...user, points_balance: data.point_balance })
+        updateUser({ ...displayUser, points_balance: data.point_balance })
         setActiveTab('vouchers')
-        fetchMyRedemptionsData()
+        mutateProfile()
+        mutateRedemptions()
       } else {
         showToast(data.error || 'Failed to claim reward', 'error')
       }
@@ -100,11 +85,11 @@ function FamilyBonusDashboard() {
 
   useEffect(() => {
     if (token) {
-      refreshProfile()
-      fetchRewardsData()
-      fetchMyRedemptionsData()
+      mutateProfile()
+      mutateRewards()
+      mutateRedemptions()
     }
-  }, [token])
+  }, [token, mutateProfile, mutateRewards, mutateRedemptions])
 
   const handleTabClick = (tab) => {
     setActiveTab(tab)
@@ -118,23 +103,36 @@ function FamilyBonusDashboard() {
     return { label: 'BRONZE', class: 'bg-[#EEF4E4] text-[#4A6B10]/60' }
   }
 
-  const status = getStatusBadge(user?.points_balance || 0)
+  const status = getStatusBadge(displayUser?.points_balance || 0)
 
-  // Form state
+  // Form state - using displayUser to initialize
   const [formData, setFormData] = useState({
-    first_name: user?.first_name || '',
-    last_name: user?.last_name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    date_of_birth: user?.date_of_birth || '',
+    first_name: displayUser?.first_name || '',
+    last_name: displayUser?.last_name || '',
+    email: displayUser?.email || '',
+    phone: displayUser?.phone || '',
+    date_of_birth: displayUser?.date_of_birth || '',
   })
+
+  // Keep form in sync when displayUser loads for the first time
+  useEffect(() => {
+    if (displayUser) {
+      setFormData({
+        first_name: displayUser.first_name || '',
+        last_name: displayUser.last_name || '',
+        email: displayUser.email || '',
+        phone: displayUser.phone || '',
+        date_of_birth: displayUser.date_of_birth || '',
+      })
+    }
+  }, [displayUser])
 
   // Punch Card Logic: 1 punch per 100 points, 5 punches = reward
   const POINTS_PER_PUNCH = 100
   const totalPunches = 5
-  const currentPunches = Math.min(totalPunches, Math.floor((user?.points_balance || 0) / POINTS_PER_PUNCH))
+  const currentPunches = Math.min(totalPunches, Math.floor((displayUser?.points_balance || 0) / POINTS_PER_PUNCH))
   const moreToGo = totalPunches - currentPunches
-  const isRewardReady = (user?.points_balance || 0) >= (totalPunches * POINTS_PER_PUNCH)
+  const isRewardReady = (displayUser?.points_balance || 0) >= (totalPunches * POINTS_PER_PUNCH)
 
   const handleSave = async () => {
     const newErrors = {}
@@ -156,7 +154,7 @@ function FamilyBonusDashboard() {
     setErrors({})
     try {
       const updatedUser = await updateProfile(formData, token)
-      updateUser(updatedUser)
+      mutateProfile(updatedUser, false) // Optimistic update
       setSaveStatus('success')
       showToast('Profile updated successfully!', 'success')
       setTimeout(() => setSaveStatus(''), 3000)
@@ -216,10 +214,10 @@ function FamilyBonusDashboard() {
               </div>
               <div className="hidden sm:flex flex-col">
                 <span className="text-sm font-bold text-primary leading-tight">
-                  {user?.first_name ? `${user.first_name} ${user.last_name || ''}` : 'Full Name'}
+                  {displayUser?.first_name ? `${displayUser.first_name} ${displayUser.last_name || ''}` : 'Full Name'}
                 </span>
                 <span className="text-xs text-on-surface-variant/70 leading-tight">
-                  {user?.account_id ? `#${user.account_id}` : 'Member'}
+                  {displayUser?.account_id ? `#${displayUser.account_id}` : 'Member'}
                 </span>
               </div>
             </div>
@@ -280,7 +278,7 @@ function FamilyBonusDashboard() {
       {/* Welcome Banner */}
       <div className="bg-[#DFEECA] rounded-[1.5rem] p-8 md:p-10 shadow-sm border border-white/40">
         <h2 className="text-2xl md:text-3xl font-headline font-bold text-[#4A6B10] mb-2">
-          Welcome to your Kem Boi Dashboard, {user?.first_name || 'Kem Boi'}!
+          Welcome to your Kem Boi Dashboard, {displayUser?.first_name || 'Kem Boi'}!
         </h2>
         <p className="text-on-surface-variant font-medium opacity-60">
           Your one-stop destination for all your Kem Boi rewards and loyalty points.
@@ -301,7 +299,7 @@ function FamilyBonusDashboard() {
               </span>
             </div>
             <div className="text-6xl md:text-[5.5rem] font-bold font-headline text-center my-8 tracking-tighter text-[#e7eed8] drop-shadow-sm group-hover:scale-105 transition-transform duration-500">
-              {user?.points_balance || 0} pt<span className="text-4xl md:text-6xl">s</span>
+              {displayUser?.points_balance || 0} pt<span className="text-4xl md:text-6xl">s</span>
             </div>
           </div>
           <p className="text-base font-semibold leading-relaxed opacity-90 mt-4 max-w-[280px] relative z-10 italic">
@@ -652,7 +650,7 @@ function FamilyBonusDashboard() {
                     Your Balance
                   </p>
                   <p className="text-2xl font-black font-headline text-primary leading-none">
-                    {user?.points_balance || 0} <span className="text-sm">pts</span>
+                    {displayUser?.points_balance || 0} <span className="text-sm">pts</span>
                   </p>
                 </div>
               </div>
@@ -713,10 +711,10 @@ function FamilyBonusDashboard() {
             </div>
             <div>
               <h3 className="font-bold text-[#426500] text-2xl font-headline tracking-tight">
-                {user?.first_name ? `${user.first_name} ${user.last_name || ''}` : 'Full Name'}
+              {displayUser?.first_name ? `${displayUser.first_name} ${displayUser.last_name || ''}` : 'Full Name'}
               </h3>
               <p className="text-[13px] font-bold text-on-surface-variant opacity-80">
-                {user?.account_id ? `#${user.account_id}` : '#account_ID'}
+                {displayUser?.account_id ? `#${displayUser.account_id}` : '#account_ID'}
               </p>
             </div>
           </div>
@@ -743,7 +741,7 @@ function FamilyBonusDashboard() {
         <div className="flex items-center gap-4 mb-8">
           <h2 className="text-3xl font-bold text-[#426500] font-headline">Personal Details</h2>
           <span className="border-2 border-[#dbdfd2] bg-[#edf2e6] text-[#4a5440] font-extrabold text-[11px] tracking-widest px-4 py-1.5 rounded-full shadow-inner uppercase">
-            {user?.account_id ? `#${user.account_id}` : 'Customer'}
+            {displayUser?.account_id ? `#${displayUser.account_id}` : 'Customer'}
           </span>
         </div>
 
@@ -890,7 +888,7 @@ function FamilyBonusDashboard() {
               </div>
               <div className="flex flex-col pr-1">
                 <span className="text-[11px] md:text-[12px] font-bold text-primary leading-tight">
-                  {user?.first_name ? `${user.first_name}` : 'Member'}
+                  {displayUser?.first_name ? `${displayUser.first_name}` : 'Member'}
                 </span>
                 <span className="text-[8px] md:text-[9px] text-on-surface-variant/60 font-bold uppercase leading-tight tracking-tighter">
                   Member

@@ -28,12 +28,25 @@ function LoginForm() {
   const [signupData, setSignupData] = useState({ firstName: '', lastName: '', email: '', password: '', password_confirmation: '', referralCode: '' })
   const [loginData, setLoginData] = useState({ email: '', password: '' })
 
+  const validateEmail = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      )
+  }
+
   const handleSignup = async (e) => {
     e.preventDefault()
     
     const nameRegex = /^[a-zA-Z\s-]+$/
     if (!nameRegex.test(signupData.firstName) || !nameRegex.test(signupData.lastName)) {
       showToast('Names can only contain letters, spaces, or hyphens', 'error')
+      return
+    }
+
+    if (!signupData.email || !validateEmail(signupData.email)) {
+      showToast('Please enter a valid email address', 'error')
       return
     }
 
@@ -68,6 +81,12 @@ function LoginForm() {
 
   const handleLogin = async (e) => {
     e.preventDefault()
+    
+    if (!loginData.email || !validateEmail(loginData.email)) {
+      showToast('Please enter a valid email address', 'error')
+      return
+    }
+
     setLoading(true)
     try {
       const user = await login({ email: loginData.email, password: loginData.password })
@@ -102,8 +121,8 @@ function LoginForm() {
 
   const handleForgotSubmit = async (e) => {
     e.preventDefault()
-    if (!forgotEmail) {
-      showToast('Please enter your email', 'error')
+    if (!forgotEmail || !validateEmail(forgotEmail)) {
+      showToast('Please enter a valid email address', 'error')
       return
     }
 
@@ -139,7 +158,11 @@ function LoginForm() {
         </div>
 
         {!resetSent ? (
-          <form className="max-w-md mx-auto w-full space-y-8" onSubmit={handleForgotSubmit}>
+          <form 
+            className="max-w-md mx-auto w-full space-y-8" 
+            onSubmit={handleForgotSubmit}
+            noValidate
+          >
             <div className="space-y-1">
               <label className="text-[12px] text-[#8ea46a] ml-5 font-black tracking-widest uppercase">
                 Email Address
@@ -214,6 +237,7 @@ function LoginForm() {
       <form
         className="w-full flex flex-col items-center"
         onSubmit={activeTab === 'login' ? handleLogin : handleSignup}
+        noValidate
       >
         {/* Split Interior - Match Screenshot */}
         <div className="w-full flex-grow flex flex-col md:flex-row items-stretch justify-center gap-12 mb-12">

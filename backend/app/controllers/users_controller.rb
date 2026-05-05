@@ -56,6 +56,7 @@ class UsersController < ApplicationController
           redemption.update!(status: "used")
         end
 
+        @user.reload
         token = JsonWebToken.encode(user_id: @user.id)
         time = Time.now + 24.hours.to_i
         render json: {

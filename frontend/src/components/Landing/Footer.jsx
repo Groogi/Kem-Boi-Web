@@ -58,6 +58,7 @@ function Footer() {
               href={ensureHttps(socialLinks.facebook)}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Follow Kem Boi on Facebook"
               className="hover:text-[#426500] transition-colors text-[#2D2F2C]"
             >
               <svg
@@ -74,6 +75,7 @@ function Footer() {
               href={ensureHttps(socialLinks.instagram)}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Follow Kem Boi on Instagram"
               className="hover:text-[#426500] transition-colors text-[#2D2F2C]"
             >
               <svg

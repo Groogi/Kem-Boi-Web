@@ -100,8 +100,12 @@ function Navbar() {
           </Link>
 
           {/* Burger Menu for Mobile */}
-          <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden text-[#426500] p-2">
-            <span className="material-symbols-outlined text-[40px]">
+          <button 
+            onClick={() => setIsOpen(!isOpen)} 
+            className="lg:hidden text-[#426500] p-2"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+          >
+            <span className="material-symbols-outlined text-[40px]" aria-hidden="true">
               {isOpen ? 'close' : 'menu'}
             </span>
           </button>

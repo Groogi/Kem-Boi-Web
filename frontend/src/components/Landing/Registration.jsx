@@ -38,9 +38,9 @@ function Registration() {
                 </svg>
               </span>
               <div>
-                <h4 className="font-bold text-[24px] text-[#426500] font-headline mb-2 leading-none">
+                <h3 className="font-bold text-[24px] text-[#426500] font-headline mb-2 leading-none">
                   Loyalty Rewards
-                </h4>
+                </h3>
                 <p className="text-[#63665e] font-medium text-[17px] leading-relaxed">
                   Every 5th dessert is on us. Forever.
                 </p>
@@ -63,9 +63,9 @@ function Registration() {
                 </svg>
               </span>
               <div>
-                <h4 className="font-bold text-[24px] text-[#426500] font-headline mb-2 leading-none">
+                <h3 className="font-bold text-[24px] text-[#426500] font-headline mb-2 leading-none">
                   Exclusive Rewards
-                </h4>
+                </h3>
                 <p className="text-[#63665e] font-medium text-[17px] leading-relaxed">
                   Win limited edition toppings and custom glassware through our point system.
                 </p>
