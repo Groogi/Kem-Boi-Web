@@ -218,8 +218,8 @@ function FamilyBonusDashboard() {
                 <span className="text-sm font-bold text-primary leading-tight">
                   {user?.first_name ? `${user.first_name} ${user.last_name || ''}` : 'Full Name'}
                 </span>
-                <span className="text-xs text-on-surface-variant/70 leading-tight capitalize">
-                  {user?.role || 'Member'}
+                <span className="text-xs text-on-surface-variant/70 leading-tight">
+                  {user?.account_id ? `#${user.account_id}` : 'Member'}
                 </span>
               </div>
             </div>
@@ -743,7 +743,7 @@ function FamilyBonusDashboard() {
         <div className="flex items-center gap-4 mb-8">
           <h2 className="text-3xl font-bold text-[#426500] font-headline">Personal Details</h2>
           <span className="border-2 border-[#dbdfd2] bg-[#edf2e6] text-[#4a5440] font-extrabold text-[11px] tracking-widest px-4 py-1.5 rounded-full shadow-inner uppercase">
-            {user?.role}
+            {user?.account_id ? `#${user.account_id}` : 'Customer'}
           </span>
         </div>
 
