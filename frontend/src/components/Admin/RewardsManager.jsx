@@ -11,6 +11,7 @@ function RewardsManager({ onRewardsChange }) {
   const [loading, setLoading] = useState(false)
   const [showNewReward, setShowNewReward] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false)
   const [rewardToDelete, setRewardToDelete] = useState(null)
 
@@ -42,13 +43,17 @@ function RewardsManager({ onRewardsChange }) {
     fetchRewards()
   }, [token])
 
-  const handleSaveReward = async () => {
+  const handleSaveReward = () => {
     if (!rewardData.name.trim()) {
       showToast('Reward name is required', 'error')
       return
     }
+    setShowSaveConfirm(true)
+  }
 
+  const executeSave = async () => {
     setLoading(true)
+    setShowSaveConfirm(false)
     const url = editingReward ? `/api/rewards/${editingReward.id}` : '/api/rewards'
     const method = editingReward ? 'PUT' : 'POST'
 
@@ -66,7 +71,7 @@ function RewardsManager({ onRewardsChange }) {
         showToast(editingReward ? 'Reward updated!' : 'Reward created!', 'success')
         fetchRewards()
         if (onRewardsChange) onRewardsChange()
-        cancelEdit()
+        forceCancel() // Close directly after success
       } else {
         const errData = await res.json()
         const errMsg = errData
@@ -100,7 +105,7 @@ function RewardsManager({ onRewardsChange }) {
         showToast('Reward deleted', 'info')
         fetchRewards()
         if (onRewardsChange) onRewardsChange()
-        cancelEdit() // Return to dashboard list
+        forceCancel() 
       }
     } catch (err) {
       console.error(err)
@@ -149,6 +154,7 @@ function RewardsManager({ onRewardsChange }) {
     setEditingReward(null)
     setShowNewReward(false)
     setShowUnsavedWarning(false)
+    setShowSaveConfirm(false)
     setRewardData({
       name: '',
       description: '',
@@ -241,7 +247,6 @@ function RewardsManager({ onRewardsChange }) {
                 />
               </div>
 
-              {/* Status Section - Side by side on mobile */}
               <div className="col-span-1 sm:col-span-1">
                 <label className="block text-xs font-bold text-[#4A6B10] mb-2 px-1 sm:text-center whitespace-nowrap">
                   Active:
@@ -433,6 +438,19 @@ function RewardsManager({ onRewardsChange }) {
         confirmText="Yes, Delete it"
         cancelText="Keep Reward"
         variant="danger"
+      />
+
+      <ModernConfirm
+        isOpen={showSaveConfirm}
+        onConfirm={executeSave}
+        onCancel={() => setShowSaveConfirm(false)}
+        title={editingReward ? "Update Reward?" : "Save New Reward?"}
+        message={editingReward 
+          ? "Are you sure you want to update this reward with your latest changes?" 
+          : "Are you sure you want to create and publish this new reward?"}
+        confirmText={editingReward ? "Yes, Update" : "Yes, Save"}
+        cancelText="Cancel"
+        variant="primary"
       />
 
       <ModernConfirm
