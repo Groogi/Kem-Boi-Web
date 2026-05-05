@@ -1,3 +1,8 @@
+import { useState, useEffect, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
+import { updateProfile } from '../api/auth'
 import { CustomDatePicker, ModernConfirm } from '../components/Common/SharedUI'
 import useSWR, { useSWRConfig } from 'swr'
 import { fetcher } from '../api/fetcher'
@@ -13,22 +18,26 @@ function FamilyBonusDashboard() {
   const [saveStatus, setSaveStatus] = useState('')
   const [errors, setErrors] = useState({})
   // Use SWR for optimized data fetching and caching
-  const { data: rewardsData, mutate: mutateRewards } = useSWR(token ? ['/api/rewards', token] : null, fetcher)
-  const { data: redemptionsData, mutate: mutateRedemptions } = useSWR(token ? ['/api/my_redemptions', token] : null, fetcher)
-  const { data: profileData, mutate: mutateProfile } = useSWR(token ? ['/api/profile', token] : null, fetcher)
+  const { data: rewardsData, isLoading: rewardsLoading, mutate: mutateRewards } = useSWR(token ? ['/api/rewards', token] : null, fetcher)
+  const { data: redemptionsData, isLoading: redemptionsLoading, mutate: mutateRedemptions } = useSWR(token ? ['/api/my_redemptions', token] : null, fetcher)
+  const { data: profileData, isLoading: profileLoading, mutate: mutateProfile } = useSWR(token ? ['/api/profile', token] : null, fetcher)
   const [confirmData, setConfirmData] = useState({ isOpen: false, reward: null })
   const [selectedReward, setSelectedReward] = useState(null)
-
-  // Sync profile data with AuthContext when it changes
-  useEffect(() => {
-    if (profileData) {
-      updateUser(profileData)
-    }
-  }, [profileData, updateUser])
 
   const rewards = rewardsData || []
   const myRedemptions = redemptionsData || []
   const displayUser = profileData || user
+
+  if (!displayUser && (profileLoading || rewardsLoading)) {
+    return (
+      <div className="min-h-screen bg-[#EBECE4] flex items-center justify-center font-headline font-bold text-primary">
+        <div className="flex flex-col items-center gap-4">
+           <span className="material-symbols-outlined text-5xl animate-spin">refresh</span>
+           <p className="text-xl">Loading your avocado goodness...</p>
+        </div>
+      </div>
+    )
+  }
 
   const refreshAllData = async () => {
     setLoading(true)
@@ -71,7 +80,7 @@ function FamilyBonusDashboard() {
       const data = await res.json()
       if (res.ok) {
         showToast(`Success! Your code is: ${data.redemption.voucher_code}`, 'success')
-        updateUser({ ...displayUser, points_balance: data.point_balance })
+        updateUser(data.user || { ...displayUser, points_balance: data.point_balance })
         setActiveTab('vouchers')
         mutateProfile()
         mutateRedemptions()
@@ -154,7 +163,8 @@ function FamilyBonusDashboard() {
     setErrors({})
     try {
       const updatedUser = await updateProfile(formData, token)
-      mutateProfile(updatedUser, false) // Optimistic update
+      updateUser(updatedUser)
+      mutateProfile(updatedUser) 
       setSaveStatus('success')
       showToast('Profile updated successfully!', 'success')
       setTimeout(() => setSaveStatus(''), 3000)
