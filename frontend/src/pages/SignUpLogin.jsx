@@ -93,7 +93,7 @@ function SignUpLogin() {
             href="/#locations"
             className="hover:text-[#426500] transition-colors"
           >
-            Location
+            Locations
           </a>
           <Link
             to="/privacy"

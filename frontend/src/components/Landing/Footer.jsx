@@ -42,7 +42,7 @@ function Footer() {
           {/* Center: Navigation */}
           <div className="flex justify-center gap-12 font-medium">
             <a href="/#locations" className="hover:text-[#426500] transition-colors">
-              Location
+              Locations
             </a>
             <Link to="/privacy" className="hover:text-[#426500] transition-colors">
               Privacy
