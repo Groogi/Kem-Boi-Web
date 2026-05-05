@@ -1,6 +1,57 @@
 import React, { useState, useEffect } from 'react'
 
 function InstagramGrid() {
+  const desktopTiles = [
+    {
+      src: '/socials-holding.png',
+      alt: 'Social 1',
+      style: { left: '0%', top: '0%', width: '25.73%', height: '39.21%' },
+      imageClassName: 'scale-[1.3]',
+    },
+    {
+      src: '/socials-store-front.png',
+      alt: 'Social 2',
+      style: { left: '27.24%', top: '0.42%', width: '38.53%', height: '54.58%' },
+      imageClassName: 'scale-[1.2]',
+    },
+    {
+      src: '/socials-dessert.png',
+      alt: 'Social 3',
+      style: { left: '67.27%', top: '0.42%', width: '32.73%', height: '42.45%' },
+      imageClassName: 'scale-[1.3]',
+    },
+    {
+      src: '/socials-dessert.png',
+      alt: 'Social 4',
+      style: { left: '0%', top: '42.03%', width: '15.27%', height: '57.97%' },
+      imageClassName: 'scale-[1.3]',
+    },
+    {
+      src: '/socials-dessert.png',
+      alt: 'Social 5',
+      style: { left: '16.78%', top: '42.03%', width: '8.95%', height: '14.95%' },
+      imageClassName: 'scale-[1.3]',
+    },
+    {
+      src: '/socials-swirl-1.png',
+      alt: 'Social 6',
+      style: { left: '16.78%', top: '59.8%', width: '19.41%', height: '40.2%' },
+      imageClassName: 'scale-[1.4]',
+    },
+    {
+      src: '/socials-holding.png',
+      alt: 'Social 7',
+      style: { left: '37.7%', top: '59.8%', width: '28.07%', height: '40.2%' },
+      imageClassName: 'scale-[1.3]',
+    },
+    {
+      src: '/socials-swirl-2.png',
+      alt: 'Social 8',
+      style: { left: '67.49%', top: '45.7%', width: '32.51%', height: '54.3%' },
+      imageClassName: 'scale-[1.4]',
+    },
+  ]
+
   const [socialLinks, setSocialLinks] = useState({
     instagram: 'instagram.com/kemboi',
     facebook: 'facebook.com/kemboi',
@@ -85,101 +136,50 @@ function InstagramGrid() {
         </div>
 
         {/* Masonry Scatter Grid (Images with shadows, no white border padding) */}
-        <div className="relative w-full h-[750px] lg:h-[709px] hidden lg:block">
-          <div className="absolute left-0 top-0 w-[342px] h-[278px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
-            <img
-              src="/socials-holding.png"
-              className="w-full h-full object-cover scale-[1.2]"
-              alt="Social 1"
-            />
-          </div>
-          <div className="absolute left-0 top-[298px] w-[203px] h-[411px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
-            <img
-              src="/socials-dessert.png"
-              className="w-full h-full object-cover scale-[1.2]"
-              alt="Social 2"
-            />
-          </div>
-          <div className="absolute left-[223px] top-[298px] w-[119px] h-[106px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
-            <img
-              src="/socials-dessert.png"
-              className="w-full h-full object-cover scale-[1.2]"
-              alt="Social 3"
-            />
-          </div>
-          <div className="absolute left-[223px] top-[424px] w-[258px] h-[285px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
-            <img
-              src="/socials-swirl-1.png"
-              className="w-full h-full object-cover scale-[1.2]"
-              alt="Social 4"
-            />
-          </div>
-          <div className="absolute left-[362px] top-[3px] w-[512px] h-[387px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
-            <img
-              src="/socials-store-front.png"
-              className="w-full h-full object-cover scale-[1.1]"
-              alt="Social 5"
-            />
-          </div>
-          <div className="absolute left-[501px] top-[424px] w-[373px] h-[285px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
-            <img
-              src="/socials-holding.png"
-              className="w-full h-full object-cover scale-[1.2]"
-              alt="Social 6"
-            />
-          </div>
-          <div className="absolute left-[894px] top-[3px] w-[435px] h-[301px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
-            <img
-              src="/socials-dessert.png"
-              className="w-full h-full object-cover scale-[1.2]"
-              alt="Social 7"
-            />
-          </div>
-          <div className="absolute left-[897px] top-[324px] w-[432px] h-[385px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
-            <img
-              src="/socials-swirl-2.png"
-              className="w-full h-full object-cover scale-[1.2]"
-              alt="Social 8"
-            />
-          </div>
+        <div
+          className="relative hidden lg:block w-full mx-auto"
+          style={{ maxWidth: '1329px', aspectRatio: '1329 / 709' }}
+        >
+          {desktopTiles.map((tile) => (
+            <div
+              key={`${tile.src}-${tile.alt}`}
+              className="absolute rounded-[24px] shadow-[20px_25px_60px_-10px_rgba(0,0,0,0.3)] overflow-hidden transition-all duration-500 hover:shadow-[25px_30px_70px_-12px_rgba(0,0,0,0.4)]"
+              style={tile.style}
+            >
+              <img
+                src={tile.src}
+                className={`w-full h-full object-cover ${tile.imageClassName}`}
+                alt={tile.alt}
+              />
+            </div>
+          ))}
         </div>
 
-        {/* Mobile Grid */}
-        <div className="grid grid-cols-2 gap-4 lg:hidden px-2">
-          <div className="rounded-[20px] shadow-lg overflow-hidden h-[240px]">
-            <img
-              src="/socials-holding.png"
-              className="w-full h-full object-cover scale-[1.1]"
-              alt="Social 1"
-            />
+        {/* Mobile & Tablet Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 lg:hidden px-2 mb-20">
+          {/* Item 1 */}
+          <div className="rounded-[20px] shadow-[0_15px_30px_-5px_rgba(0,0,0,0.25)] overflow-hidden h-[240px] md:h-[300px]">
+            <img src="/socials-holding.png" className="w-full h-full object-cover scale-[1.3]" alt="Social 1" />
           </div>
-          <div className="rounded-[20px] shadow-lg overflow-hidden h-[280px] -mt-4">
-            <img
-              src="/socials-dessert.png"
-              className="w-full h-full object-cover scale-[1.1]"
-              alt="Social 2"
-            />
+          {/* Item 2 */}
+          <div className="rounded-[20px] shadow-[0_15px_30px_-5px_rgba(0,0,0,0.25)] overflow-hidden h-[280px] md:h-[340px] -mt-4 md:mt-0">
+            <img src="/socials-dessert.png" className="w-full h-full object-cover scale-[1.3]" alt="Social 2" />
           </div>
-          <div className="rounded-[20px] shadow-lg overflow-hidden h-[180px]">
-            <img
-              src="/socials-swirl-1.png"
-              className="w-full h-full object-cover scale-[1.1]"
-              alt="Social 3"
-            />
+          {/* Item 3 */}
+          <div className="rounded-[20px] shadow-[0_15px_30px_-5px_rgba(0,0,0,0.25)] overflow-hidden h-[180px] md:h-[300px]">
+            <img src="/socials-swirl-1.png" className="w-full h-full object-cover scale-[1.3]" alt="Social 3" />
           </div>
-          <div className="rounded-[20px] shadow-lg overflow-hidden h-[220px]">
-            <img
-              src="/socials-store-front.png"
-              className="w-full h-full object-cover scale-[1.1]"
-              alt="Social 4"
-            />
+          {/* Item 4 */}
+          <div className="rounded-[20px] shadow-[0_15px_30px_-5px_rgba(0,0,0,0.25)] overflow-hidden h-[220px] md:h-[320px] md:mt-4">
+            <img src="/socials-store-front.png" className="w-full h-full object-cover scale-[1.3]" alt="Social 4" />
           </div>
-          <div className="rounded-[20px] shadow-lg overflow-hidden h-[200px] col-span-2 -mt-4">
-            <img
-              src="/socials-swirl-2.png"
-              className="w-full h-full object-cover scale-[1.1]"
-              alt="Social 5"
-            />
+          {/* Item 5 */}
+          <div className="rounded-[20px] shadow-[0_15px_30px_-5px_rgba(0,0,0,0.25)] overflow-hidden h-[200px] md:h-[320px] col-span-2 md:col-span-1 -mt-4 md:mt-4">
+            <img src="/socials-swirl-2.png" className="w-full h-full object-cover scale-[1.5]" alt="Social 5" />
+          </div>
+          {/* Item 6 */}
+          <div className="hidden md:block rounded-[20px] shadow-[0_15px_30px_-5px_rgba(0,0,0,0.25)] overflow-hidden h-[300px] mt-4">
+            <img src="/socials-holding.png" className="w-full h-full object-cover scale-[1.3]" alt="Social 6" />
           </div>
         </div>
       </div>
