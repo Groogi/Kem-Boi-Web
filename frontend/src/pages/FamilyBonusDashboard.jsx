@@ -793,15 +793,9 @@ function FamilyBonusDashboard() {
               <input
                 type="email"
                 value={formData.email}
-                onChange={(e) => {
-                  setFormData({ ...formData, email: e.target.value })
-                  if (errors.email) setErrors({ ...errors, email: false })
-                }}
-                className={`w-full bg-[#dcdcd8] border-none rounded-full px-5 py-3.5 focus:ring-2 focus:ring-[#426500]/40 transition-all text-[#555] font-semibold text-sm ${errors.email ? 'ring-2 ring-red-500/50' : ''}`}
+                readOnly
+                className="w-full bg-[#E5E5E0] border-none rounded-full px-5 py-3.5 cursor-not-allowed text-[#777] font-semibold text-sm"
               />
-              <span className="material-symbols-outlined absolute right-4 top-3.5 text-on-surface-variant/60 text-[20px] pointer-events-none">
-                edit_square
-              </span>
             </div>
           </div>
 
