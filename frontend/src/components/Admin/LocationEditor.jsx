@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { ModernConfirm } from '../Common/SharedUI'
+import { useToast } from '../../context/ToastContext'
 
 function LocationEditor({ location, onSave, onCancel, onDelete, loading }) {
+  const { showToast } = useToast()
   const [data, setData] = useState(
     location || {
       name: '',
@@ -14,6 +16,33 @@ function LocationEditor({ location, onSave, onCancel, onDelete, loading }) {
     }
   )
   const [showConfirm, setShowConfirm] = useState(false)
+
+  const handleSave = () => {
+    // Check mandatory fields
+    if (!data.name?.trim()) {
+      showToast('Store name is required', 'error')
+      return
+    }
+    if (!data.address_line_1?.trim()) {
+      showToast('Street address is required', 'error')
+      return
+    }
+    if (!data.suburb?.trim()) {
+      showToast('Suburb is required', 'error')
+      return
+    }
+    if (!data.state?.trim()) {
+      showToast('State is required', 'error')
+      return
+    }
+    if (!data.postcode?.trim()) {
+      showToast('Postcode is required', 'error')
+      return
+    }
+
+    // map_url is optional, so we proceed
+    onSave(data)
+  }
 
   return (
     <div className="animate-fade-in space-y-8">
@@ -153,7 +182,7 @@ function LocationEditor({ location, onSave, onCancel, onDelete, loading }) {
           </div>
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
             <button
-              onClick={() => onSave(data)}
+              onClick={handleSave}
               disabled={loading}
               className="w-full sm:w-auto bg-[#426500] text-white font-bold py-3.5 px-14 text-sm tracking-widest rounded-full shadow-md hover:bg-[#4a6b10] disabled:opacity-50 transition-all uppercase"
             >
