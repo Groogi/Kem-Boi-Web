@@ -14,6 +14,7 @@ function FamilyBonusDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [loading, setLoading] = useState(false)
   const [saveStatus, setSaveStatus] = useState('')
+  const [errors, setErrors] = useState({})
   const [rewards, setRewards] = useState([])
   const [myRedemptions, setMyRedemptions] = useState([])
   const [confirmData, setConfirmData] = useState({ isOpen: false, reward: null })
@@ -135,8 +136,23 @@ function FamilyBonusDashboard() {
   const moreToGo = totalPunches - currentPunches
 
   const handleSave = async () => {
+    const newErrors = {}
+    const nameRegex = /^[a-zA-Z\s-]+$/
+    
+    if (!formData.first_name || !nameRegex.test(formData.first_name)) newErrors.first_name = true
+    if (!formData.last_name || !nameRegex.test(formData.last_name)) newErrors.last_name = true
+    if (!formData.email || !formData.email.includes('@')) newErrors.email = true
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      setSaveStatus('error')
+      showToast('Please correct the highlighted fields.', 'error')
+      return
+    }
+
     setLoading(true)
     setSaveStatus('')
+    setErrors({})
     try {
       const updatedUser = await updateProfile(formData, token)
       updateUser(updatedUser)
@@ -146,7 +162,7 @@ function FamilyBonusDashboard() {
     } catch (err) {
       console.error(err)
       setSaveStatus('error')
-      showToast('Update failed. Please check your network.', 'error')
+      showToast('Update failed. Please check your data.', 'error')
     } finally {
       setLoading(false)
     }
@@ -735,8 +751,11 @@ function FamilyBonusDashboard() {
               <input
                 type="text"
                 value={formData.first_name}
-                onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                className="w-full bg-[#dcdcd8] border-none rounded-full px-5 py-3.5 focus:ring-2 focus:ring-[#426500]/40 transition-shadow text-[#555] font-semibold text-sm"
+                onChange={(e) => {
+                  setFormData({ ...formData, first_name: e.target.value })
+                  if (errors.first_name) setErrors({ ...errors, first_name: false })
+                }}
+                className={`w-full bg-[#dcdcd8] border-none rounded-full px-5 py-3.5 focus:ring-2 focus:ring-[#426500]/40 transition-all text-[#555] font-semibold text-sm ${errors.first_name ? 'ring-2 ring-red-500/50' : ''}`}
               />
               <span className="material-symbols-outlined absolute right-4 top-3.5 text-on-surface-variant/60 text-[20px] pointer-events-none">
                 edit_square
@@ -753,8 +772,11 @@ function FamilyBonusDashboard() {
               <input
                 type="text"
                 value={formData.last_name}
-                onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                className="w-full bg-[#dcdcd8] border-none rounded-full px-5 py-3.5 focus:ring-2 focus:ring-[#426500]/40 transition-shadow text-[#555] font-semibold text-sm"
+                onChange={(e) => {
+                  setFormData({ ...formData, last_name: e.target.value })
+                  if (errors.last_name) setErrors({ ...errors, last_name: false })
+                }}
+                className={`w-full bg-[#dcdcd8] border-none rounded-full px-5 py-3.5 focus:ring-2 focus:ring-[#426500]/40 transition-all text-[#555] font-semibold text-sm ${errors.last_name ? 'ring-2 ring-red-500/50' : ''}`}
               />
               <span className="material-symbols-outlined absolute right-4 top-3.5 text-on-surface-variant/60 text-[20px] pointer-events-none">
                 edit_square
@@ -771,8 +793,11 @@ function FamilyBonusDashboard() {
               <input
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full bg-[#dcdcd8] border-none rounded-full px-5 py-3.5 focus:ring-2 focus:ring-[#426500]/40 transition-shadow text-[#555] font-semibold text-sm"
+                onChange={(e) => {
+                  setFormData({ ...formData, email: e.target.value })
+                  if (errors.email) setErrors({ ...errors, email: false })
+                }}
+                className={`w-full bg-[#dcdcd8] border-none rounded-full px-5 py-3.5 focus:ring-2 focus:ring-[#426500]/40 transition-all text-[#555] font-semibold text-sm ${errors.email ? 'ring-2 ring-red-500/50' : ''}`}
               />
               <span className="material-symbols-outlined absolute right-4 top-3.5 text-on-surface-variant/60 text-[20px] pointer-events-none">
                 edit_square
@@ -817,10 +842,10 @@ function FamilyBonusDashboard() {
             </span>
           )}
           {saveStatus === 'error' && (
-            <span className="text-red-600 font-bold self-center mr-4 animate-fade-in text-sm text-center sm:text-right">
+            <span className="text-red-600 font-bold self-center mr-4 animate-fade-in text-[13px] text-center sm:text-right leading-tight">
               Update failed.
               <br />
-              Check required fields.
+              Please check the highlighted fields.
             </span>
           )}
           <button

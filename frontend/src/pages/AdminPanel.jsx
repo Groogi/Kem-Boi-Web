@@ -362,7 +362,7 @@ function AdminPanel() {
   // Sidebar navigation
   const navItems = [
     { id: 'dashboard', label: 'Customers', icon: 'group' },
-    { id: 'bonus-entry', label: 'Staff Service Hub', icon: 'point_of_sale' },
+    { id: 'bonus-entry', label: 'Add Points', icon: 'point_of_sale' },
     { id: 'rewards', label: 'Rewards', icon: 'workspace_premium' },
     { id: 'redemptions', label: 'Rewards History', icon: 'history_edu' },
     { id: 'locations', label: 'Store Locations', icon: 'add_location' },
@@ -449,7 +449,7 @@ function AdminPanel() {
       <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary capitalize tracking-[-0.02em]">
         {(() => {
           if (activeTab === 'dashboard') return 'Customer Directory'
-          if (activeTab === 'bonus-entry') return 'Staff Service Hub'
+          if (activeTab === 'bonus-entry') return 'Add Points'
           if (activeTab === 'redemptions') return 'Rewards'
           return activeTab.replace('-', ' ')
         })()}

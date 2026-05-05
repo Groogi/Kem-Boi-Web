@@ -54,3 +54,4 @@ group :development, :test do
 end
 
 gem "google-id-token", "~> 1.4"
+gem "resend"

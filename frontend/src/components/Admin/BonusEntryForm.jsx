@@ -80,7 +80,7 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
   return (
     <div className="animate-fade-in space-y-10">
       <div className="flex flex-col gap-6">
-        <h3 className="text-3xl font-bold font-headline text-[#4A6B10]">Manual Bonus Entry</h3>
+        <h3 className="text-3xl font-bold font-headline text-[#4A6B10]">Add Points</h3>
         <div className="relative max-w-xl flex gap-3">
           <div className="relative flex-grow">
             <input
@@ -111,7 +111,7 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
       {!bonusUser ? (
         <div className="bg-[#EEF4E4] rounded-[2.5rem] p-10 max-w-xl border border-white/40 shadow-sm animate-fade-in">
           <h4 className="text-xl font-bold font-headline text-primary text-center mb-8">
-            Quick Points Entry
+            Add Points
           </h4>
           <div className="space-y-6">
             <div>
@@ -134,11 +134,25 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                 />
               </div>
               <button
-                onClick={() => onQuickAdd(quickEmail, quickPoints)}
+                onClick={() => {
+                  const email = quickEmail.trim()
+                  const points = String(quickPoints).trim()
+
+                  if (!email || !email.includes('@')) {
+                    showToast('Please enter a valid email address.', 'error')
+                    return
+                  }
+                  if (!points || isNaN(points) || Number(points) <= 0) {
+                    showToast('Please enter a valid numeric point amount.', 'error')
+                    return
+                  }
+
+                  onQuickAdd(email, points)
+                }}
                 disabled={loading}
                 className="bg-primary text-white font-bold py-3.5 px-12 rounded-full text-xs shadow-md border-primary/10 transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
               >
-                {loading ? '...' : 'Points'}
+                {loading ? '...' : 'Add Points'}
               </button>
             </div>
           </div>
@@ -196,7 +210,13 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                   </div>
                   <button
                     onClick={async () => {
-                      await onQuickAdd(bonusUser.email, quickPoints)
+                      const points = String(quickPoints).trim()
+                      if (!points || isNaN(points) || Number(points) <= 0) {
+                        showToast('Please enter a valid numeric point amount.', 'error')
+                        return
+                      }
+
+                      await onQuickAdd(bonusUser.email, points)
                       setQuickPoints('')
                       fetchTransactions(bonusUser.id)
                     }}
@@ -206,7 +226,7 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                     <span className="material-symbols-outlined text-[18px] transition-transform group-hover:rotate-12">
                       add_circle
                     </span>
-                    <span className="text-xs tracking-widest uppercase">Quick Add Points</span>
+                    <span className="text-xs tracking-widest uppercase">Add Points</span>
                   </button>
                 </div>
               </div>

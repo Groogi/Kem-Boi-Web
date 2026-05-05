@@ -1,6 +1,32 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 function InstagramGrid() {
+  const [socialLinks, setSocialLinks] = useState({
+    instagram: 'instagram.com/kemboi',
+    facebook: 'facebook.com/kemboi',
+  })
+
+  useEffect(() => {
+    const fetchLinks = async () => {
+      try {
+        const res = await fetch('/api/social_links')
+        if (res.ok) {
+          const data = await res.json()
+          setSocialLinks(data)
+        }
+      } catch (err) {
+        console.error('Failed to fetch social links', err)
+      }
+    }
+    fetchLinks()
+  }, [])
+
+  const ensureHttps = (url) => {
+    if (!url) return '#'
+    if (url.startsWith('http://') || url.startsWith('https://')) return url
+    return `https://${url}`
+  }
+
   return (
     <section className="pt-24 pb-20 md:pt-32 md:pb-24 bg-[#f7f7f2]">
       <div className="max-w-[1440px] px-6 md:px-12 mx-auto">
@@ -11,32 +37,46 @@ function InstagramGrid() {
               Tag Us On Socials
             </h2>
             <div className="flex gap-4 items-center opacity-80">
-              <svg
-                width="36"
-                height="36"
-                className="md:w-[45px] md:h-[45px]"
-                viewBox="0 0 24 24"
-                fill="#5B5C59"
-                xmlns="http://www.w3.org/2000/svg"
+              <a
+                href={ensureHttps(socialLinks.facebook)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:opacity-100 transition-opacity"
               >
-                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z" />
-              </svg>
-              <svg
-                width="36"
-                height="36"
-                className="md:w-[45px] md:h-[45px]"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#5B5C59"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                xmlns="http://www.w3.org/2000/svg"
+                <svg
+                  width="36"
+                  height="36"
+                  className="md:w-[45px] md:h-[45px]"
+                  viewBox="0 0 24 24"
+                  fill="#5B5C59"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z" />
+                </svg>
+              </a>
+              <a
+                href={ensureHttps(socialLinks.instagram)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:opacity-100 transition-opacity"
               >
-                <rect x="2" y="2" width="20" height="20" rx="6" ry="6"></rect>
-                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-              </svg>
+                <svg
+                  width="36"
+                  height="36"
+                  className="md:w-[45px] md:h-[45px]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#5B5C59"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <rect x="2" y="2" width="20" height="20" rx="6" ry="6"></rect>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+              </a>
             </div>
           </div>
           <p className="text-[#5B5C59] font-bold text-[22px] md:text-[35px] tracking-tight opacity-60">

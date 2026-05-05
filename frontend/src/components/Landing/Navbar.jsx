@@ -87,7 +87,7 @@ function Navbar() {
             Our Story
           </a>
           <a className={getLinkClass('locations')} href="#locations">
-            Location
+            Locations
           </a>
         </div>
 
@@ -127,7 +127,7 @@ function Navbar() {
           <a
             onClick={() => setIsOpen(false)}
             href="#products"
-            className={activeSection === 'products' ? 'border-b-2 border-[#426500]' : ''}
+            className="opacity-80"
           >
             Our Products
           </a>
@@ -143,7 +143,7 @@ function Navbar() {
             href="#locations"
             className={activeSection === 'locations' ? 'border-b-2 border-[#426500]' : ''}
           >
-            Location
+            Locations
           </a>
           <Link
             onClick={() => setIsOpen(false)}

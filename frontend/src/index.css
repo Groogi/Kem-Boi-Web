@@ -47,11 +47,19 @@ html {
 }
 
 .embla_slide {
-  flex: 0 0 48%;
+  flex: 0 0 85%;
   min-width: 0;
-  height: 416px;
+  height: 480px;
   position: relative;
-  padding: 0 0.75rem;
+  padding: 0 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .embla_slide {
+    flex: 0 0 48%;
+    height: 520px;
+    padding: 0 1rem;
+  }
 }
 
 .embla_slide_inner {
@@ -92,10 +100,10 @@ html {
   height: 100%;
   width: 100%;
   object-fit: cover;
+  object-position: center 20%;
   transition: transform 0.7s ease-out;
   transform-origin: center;
   border-radius: 80px;
-  /* Now the image itself is rounded! */
 }
 
 .embla_slide:hover img {

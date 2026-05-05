@@ -31,6 +31,12 @@ function LoginForm() {
   const handleSignup = async (e) => {
     e.preventDefault()
     
+    const nameRegex = /^[a-zA-Z\s-]+$/
+    if (!nameRegex.test(signupData.firstName) || !nameRegex.test(signupData.lastName)) {
+      showToast('Names can only contain letters, spaces, or hyphens', 'error')
+      return
+    }
+
     if (signupData.password.length < 8) {
       showToast('Password must be at least 8 characters', 'error')
       return
@@ -213,7 +219,9 @@ function LoginForm() {
         <div className="w-full flex-grow flex flex-col md:flex-row items-stretch justify-center gap-12 mb-12">
           {/* Left: Social Login */}
           <div className="flex-1 flex flex-col items-center justify-center">
-            <p className="text-[13px] font-bold text-[#7d8076] mb-6">Log in With:</p>
+            <p className="text-[13px] font-bold text-[#7d8076] mb-6">
+              {activeTab === 'login' ? 'Log in With:' : 'Sign up With:'}
+            </p>
             <div className="space-y-4 w-full max-w-[280px]">
               <button
                 type="button"
