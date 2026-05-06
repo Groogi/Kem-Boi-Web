@@ -22,9 +22,10 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
   }, [users])
 
   const fetchTransactions = useCallback(
-    async (userId) => {
+    async (userId, email = null) => {
       try {
-        const res = await fetch(`/api/transactions?user_id=${userId}`, {
+        const query = email ? `email=${encodeURIComponent(email)}` : `user_id=${userId}`
+        const res = await fetch(`/api/transactions?${query}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (res.ok) {
@@ -41,8 +42,12 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
   )
 
   useEffect(() => {
-    if (bonusUser && !bonusUser.is_new) {
-      fetchTransactions(bonusUser.id)
+    if (bonusUser) {
+      if (bonusUser.is_new) {
+        fetchTransactions(null, bonusUser.email)
+      } else {
+        fetchTransactions(bonusUser.id)
+      }
     } else {
       setHistory([])
     }
@@ -263,29 +268,7 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#426500]/5">
-                  {bonusUser.is_new ? (
-                    <tr>
-                      <td className="px-8 py-6 text-sm font-bold text-primary">+10</td>
-                      <td className="px-8 py-6 text-sm font-medium text-on-surface-variant/70 italic">
-                        11/07/2026
-                      </td>
-                      <td className="px-8 py-6 text-center">
-                        <div className="flex flex-col leading-tight">
-                          <span className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-tighter">
-                            Pending
-                          </span>
-                          <span className="text-[12px] font-bold text-on-surface-variant/60">
-                            Registration
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6 text-center">
-                        <span className="bg-[#D1D3C8] text-white px-5 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase">
-                          Email Sent
-                        </span>
-                      </td>
-                    </tr>
-                  ) : history.length > 0 ? (
+                  {history.length > 0 ? (
                     history.map((t, i) => {
                       const isPositive = t.points > 0
                       const date = new Date(t.created_at).toLocaleDateString('en-AU', {
@@ -294,9 +277,14 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                         year: 'numeric',
                       })
 
-                      let runningBalance = bonusUser.points_balance
-                      for (let j = 0; j < i; j++) {
-                        runningBalance -= history[j].points
+                      let runningBalance = bonusUser.is_new ? 0 : (bonusUser.points_balance || 0)
+                      if (!bonusUser.is_new) {
+                        for (let j = 0; j < i; j++) {
+                          runningBalance -= history[j].points
+                        }
+                      } else {
+                        // For new users, we calculate from zero up
+                        runningBalance = history.slice(i).reduce((sum, item) => sum + item.points, 0)
                       }
 
                       return (
@@ -310,13 +298,24 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                             {date}
                           </td>
                           <td className="px-8 py-5 text-sm font-bold text-center text-[#4A6B10] font-headline">
-                            {runningBalance} pts
+                            {bonusUser.is_new ? (
+                              <div className="flex flex-col leading-tight">
+                                <span className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-tighter">
+                                  Pending
+                                </span>
+                                <span className="text-[12px] font-bold text-on-surface-variant/60">
+                                  {runningBalance} pts
+                                </span>
+                              </div>
+                            ) : (
+                              `${runningBalance} pts`
+                            )}
                           </td>
                           <td className="px-8 py-5 text-center">
                             <span
-                              className={`inline-block px-5 py-1 rounded-full text-[9px] font-bold tracking-widest ${isPositive ? 'bg-[#BFE9A2] text-[#304c00]' : 'bg-red-100 text-red-800'}`}
+                              className={`inline-block px-5 py-1 rounded-full text-[9px] font-bold tracking-widest ${bonusUser.is_new ? 'bg-[#D1D3C8] text-white' : isPositive ? 'bg-[#BFE9A2] text-[#304c00]' : 'bg-red-100 text-red-800'}`}
                             >
-                              {t.transaction_type.toUpperCase()}
+                              {bonusUser.is_new ? 'EMAIL SENT' : t.transaction_type.toUpperCase()}
                             </span>
                           </td>
                         </tr>

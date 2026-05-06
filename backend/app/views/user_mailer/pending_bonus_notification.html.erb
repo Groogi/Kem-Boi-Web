@@ -1,0 +1,37 @@
+<div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #4A6B10; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #FBFBF5; border-radius: 30px;">
+  <div style="text-align: center; margin-bottom: 30px;">
+    <h1 style="color: #426500; font-size: 28px; margin-bottom: 10px;">You've Got Points! 🥑</h1>
+    <div style="width: 60px; height: 4px; background-color: #BFE9A2; margin: 0 auto; border-radius: 2px;"></div>
+  </div>
+
+  <div style="background-color: white; padding: 30px; border-radius: 24px; box-shadow: 0 4px 20px rgba(74, 107, 16, 0.05); text-align: center; border: 1px solid #EEF4E4;">
+    <p style="font-size: 18px; margin-bottom: 5px; color: #63665e;">Good news!</p>
+    <p style="font-size: 16px; margin-top: 0; color: #8C9181;">Our staff just added points to your account:</p>
+    
+    <div style="margin: 25px 0;">
+      <span style="font-size: 56px; font-weight: 800; color: #426500; display: block; line-height: 1;">+<%= @points %></span>
+      <span style="font-size: 12px; font-weight: bold; color: #8C9181; text-transform: uppercase; letter-spacing: 2px; display: block; margin-top: 10px;">Reward Points</span>
+    </div>
+
+    <p style="font-size: 15px; line-height: 1.6; color: #63665e; margin-bottom: 30px;">
+      To claim these points and start earning delicious rewards like our signature Avocado Smoothies, simply sign up using this email address:
+      <br>
+      <strong style="color: #426500;"><%= @email %></strong>
+    </p>
+
+    <% frontend_url = ENV.fetch('FRONTEND_URL', Rails.env.production? ? 'https://demokemboi.com' : 'http://localhost:5173') %>
+    <a href="<%= frontend_url %>" style="background-color: #426500; color: white; padding: 18px 40px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block; font-size: 14px; letter-spacing: 1px; box-shadow: 0 8px 15px rgba(66, 101, 0, 0.2); text-transform: uppercase;">
+      Claim My Points Now
+    </a>
+  </div>
+
+  <div style="margin-top: 40px; text-align: center;">
+    <p style="font-size: 13px; color: #8C9181; margin-bottom: 5px;">See you soon at Kem Bơ!</p>
+    <p style="font-size: 11px; color: #B9BEB0;">Traditional Atelier & Smoothie Bar</p>
+    <hr style="border: none; border-top: 1px solid #EEF4E4; margin: 20px 0;">
+    <p style="font-size: 10px; color: #B9BEB0; line-height: 1.4;">
+      You received this email because points were added to this address at a Kem Bơ location. 
+      If this wasn't you, feel free to ignore this email.
+    </p>
+  </div>
+</div>

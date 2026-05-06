@@ -8,6 +8,7 @@ function LocationEditor({ location, onSave, onCancel, onDelete, loading }) {
     location || {
       name: '',
       address_line_1: '',
+      address_line_2: '',
       suburb: '',
       state: '',
       postcode: '',
@@ -105,6 +106,21 @@ function LocationEditor({ location, onSave, onCancel, onDelete, loading }) {
                   <span className="material-symbols-outlined text-[18px]">edit_square</span>
                   <span className="text-[9px] font-bold uppercase mt-0.5 tracking-wider">Edit</span>
                 </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-[#4A6B10] mb-2 px-1">
+                Street Address 2 (Optional)
+              </label>
+              <div className="relative group">
+                <input
+                  type="text"
+                  value={data.address_line_2}
+                  onChange={(e) => setData({ ...data, address_line_2: e.target.value })}
+                  placeholder="e.g. Unit 4 or Level 2"
+                  className="w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                />
               </div>
             </div>
 

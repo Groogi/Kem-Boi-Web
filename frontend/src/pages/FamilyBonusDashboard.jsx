@@ -7,6 +7,8 @@ import { CustomDatePicker, ModernConfirm } from '../components/Common/SharedUI'
 import useSWR, { useSWRConfig } from 'swr'
 import { fetcher } from '../api/fetcher'
 
+const APP_NAME = 'Kem Bơ'
+
 function FamilyBonusDashboard() {
   const { user, token, updateUser, logout, refreshProfile } = useAuth()
   const { showToast } = useToast()
@@ -298,10 +300,10 @@ function FamilyBonusDashboard() {
       {/* Welcome Banner */}
       <div className="bg-[#DFEECA] rounded-[1.5rem] p-8 md:p-10 shadow-sm border border-white/40">
         <h2 className="text-2xl md:text-3xl font-headline font-bold text-[#4A6B10] mb-2 capitalize">
-          Welcome to your Kem Boi Dashboard, {displayUser?.first_name || 'Kem Boi'}!
+          Welcome to your {APP_NAME} Dashboard, {displayUser?.first_name || 'Valued Member'}!
         </h2>
         <p className="text-on-surface-variant font-medium opacity-60">
-          Your one-stop destination for all your Kem Boi rewards and loyalty points.
+          Your one-stop destination for all your {APP_NAME} rewards and loyalty points.
         </p>
       </div>
 

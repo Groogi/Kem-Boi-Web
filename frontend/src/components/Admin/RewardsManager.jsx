@@ -14,6 +14,7 @@ function RewardsManager({ onRewardsChange }) {
   const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false)
   const [rewardToDelete, setRewardToDelete] = useState(null)
+  const [pendingClaimsCount, setPendingClaimsCount] = useState(0)
 
   const [rewardData, setRewardData] = useState({
     name: '',
@@ -89,6 +90,13 @@ function RewardsManager({ onRewardsChange }) {
   }
 
   const handleDeleteReward = (id) => {
+    const r = rewards.find(x => x.id === id)
+    if (r) {
+      const pending = (r.redemptions_count || 0) - (r.fulfilled_count || 0)
+      setPendingClaimsCount(pending)
+    } else {
+      setPendingClaimsCount(0)
+    }
     setRewardToDelete(id)
     setShowConfirm(true)
   }
@@ -113,6 +121,7 @@ function RewardsManager({ onRewardsChange }) {
     } finally {
       setShowConfirm(false)
       setRewardToDelete(null)
+      setPendingClaimsCount(0)
     }
   }
 
@@ -432,9 +441,16 @@ function RewardsManager({ onRewardsChange }) {
       <ModernConfirm
         isOpen={showConfirm}
         onConfirm={confirmDelete}
-        onCancel={() => setShowConfirm(false)}
+        onCancel={() => {
+          setShowConfirm(false)
+          setPendingClaimsCount(0)
+        }}
         title="Delete Reward?"
-        message="This will permanently remove this reward from the system. It cannot be undone."
+        message={
+          pendingClaimsCount > 0 
+            ? `WARNING: ${pendingClaimsCount} customer(s) have claimed this reward but haven't used it yet. If you delete it, their vouchers will vanish and their points will NOT be refunded automatically. Are you sure?`
+            : "This will permanently remove this reward from the system. It cannot be undone."
+        }
         confirmText="Yes, Delete it"
         cancelText="Keep Reward"
         variant="danger"
