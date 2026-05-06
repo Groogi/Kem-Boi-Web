@@ -416,7 +416,22 @@ function FamilyBonusDashboard() {
   )
 
   const renderRewards = () => {
-    const redeemable = rewards.filter((r) => r.active)
+    const redeemable = rewards.filter((r) => {
+      if (!r.active) return false
+
+      // Calculate how many times this specific user has claimed this reward
+      const redemptionCount = myRedemptions.filter(
+        (red) => red.reward_id === r.id || (red.reward && red.reward.id === r.id)
+      ).length
+
+      // Hide if user reached their personal limit
+      const isReached = r.limit_per_user > 0 && redemptionCount >= r.limit_per_user
+      
+      // Hide if globally sold out
+      const isSoldOut = r.total_limit > 0 && r.redemptions_count >= r.total_limit
+
+      return !isReached && !isSoldOut
+    })
     const upcoming = rewards.filter((r) => !r.active)
 
     return (

@@ -34,7 +34,7 @@ function Hero() {
 
         {/* Right Column */}
         <div className="order-2 lg:col-span-5 flex justify-center lg:justify-end mb-12 lg:mb-0 relative py-6">
-          <div className="relative w-full max-w-[520px] aspect-square rounded-[4rem] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.15)] animate-float">
+          <div className="relative w-full max-w-[520px] aspect-square rounded-[4rem] overflow-hidden shadow-[0_32px_80px_rgba(0,0,0,0.15)]">
             <img
               className="w-full h-full object-cover scale-[1.2] object-center transition-transform duration-1000 ease-out hover:scale-[1.28]"
               src="/intro-product-pic.png"
