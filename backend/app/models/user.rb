@@ -56,11 +56,17 @@ class User < ApplicationRecord
   end
 
   # Callbacks
+  before_save :normalize_fields
   after_create :generate_account_id
-
   after_create :process_pending_bonuses
 
   private
+
+  def normalize_fields
+    self.email = email.to_s.strip.downcase
+    self.first_name = first_name.to_s.strip.downcase if first_name.present?
+    self.last_name = last_name.to_s.strip.downcase if last_name.present?
+  end
 
   def generate_account_id
     # Simple readable ID for demo

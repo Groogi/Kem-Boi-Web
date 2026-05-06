@@ -13,7 +13,11 @@ function FamilyBonusDashboard() {
   const navigate = useNavigate()
 
   // View state: 'dashboard', 'rewards', 'reward-details', 'edit-account'
-  const [activeTab, setActiveTab] = useState('dashboard')
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('userActiveTab') || 'dashboard')
+  
+  useEffect(() => {
+    localStorage.setItem('userActiveTab', activeTab)
+  }, [activeTab])
   const [loading, setLoading] = useState(false)
   const [saveStatus, setSaveStatus] = useState('')
   const [errors, setErrors] = useState({})
@@ -162,7 +166,13 @@ function FamilyBonusDashboard() {
     setSaveStatus('')
     setErrors({})
     try {
-      const updatedUser = await updateProfile(formData, token)
+      const normalizedData = {
+        ...formData,
+        first_name: formData.first_name.trim().toLowerCase(),
+        last_name: formData.last_name.trim().toLowerCase(),
+        email: formData.email.trim().toLowerCase(),
+      }
+      const updatedUser = await updateProfile(normalizedData, token)
       updateUser(updatedUser)
       mutateProfile(updatedUser) 
       setSaveStatus('success')
@@ -223,7 +233,7 @@ function FamilyBonusDashboard() {
                 </span>
               </div>
               <div className="hidden sm:flex flex-col">
-                <span className="text-sm font-bold text-primary leading-tight">
+                <span className="text-sm font-bold text-primary leading-tight capitalize">
                   {displayUser?.first_name ? `${displayUser.first_name} ${displayUser.last_name || ''}` : 'Full Name'}
                 </span>
                 <span className="text-xs text-on-surface-variant/70 leading-tight">
@@ -287,7 +297,7 @@ function FamilyBonusDashboard() {
     <div className="space-y-6 animate-fade-in">
       {/* Welcome Banner */}
       <div className="bg-[#DFEECA] rounded-[1.5rem] p-8 md:p-10 shadow-sm border border-white/40">
-        <h2 className="text-2xl md:text-3xl font-headline font-bold text-[#4A6B10] mb-2">
+        <h2 className="text-2xl md:text-3xl font-headline font-bold text-[#4A6B10] mb-2 capitalize">
           Welcome to your Kem Boi Dashboard, {displayUser?.first_name || 'Kem Boi'}!
         </h2>
         <p className="text-on-surface-variant font-medium opacity-60">
@@ -720,7 +730,7 @@ function FamilyBonusDashboard() {
               <span className="material-symbols-outlined text-[2.5rem]">person</span>
             </div>
             <div>
-              <h3 className="font-bold text-[#426500] text-2xl font-headline tracking-tight">
+              <h3 className="font-bold text-[#426500] text-2xl font-headline tracking-tight capitalize">
               {displayUser?.first_name ? `${displayUser.first_name} ${displayUser.last_name || ''}` : 'Full Name'}
               </h3>
               <p className="text-[13px] font-bold text-on-surface-variant opacity-80">
@@ -897,7 +907,7 @@ function FamilyBonusDashboard() {
                 <span className="material-symbols-outlined text-[1rem] md:text-[1.1rem]">person</span>
               </div>
               <div className="flex flex-col pr-1">
-                <span className="text-[11px] md:text-[12px] font-bold text-primary leading-tight">
+                <span className="text-[11px] md:text-[12px] font-bold text-primary leading-tight capitalize">
                   {displayUser?.first_name ? `${displayUser.first_name}` : 'Member'}
                 </span>
                 <span className="text-[8px] md:text-[9px] text-on-surface-variant/60 font-bold uppercase leading-tight tracking-tighter">

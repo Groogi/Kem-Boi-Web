@@ -13,7 +13,11 @@ function AdminPanel() {
   const { user, token, logout } = useAuth()
   const { showToast } = useToast()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('dashboard') // dashboard, bonus-entry, giveaways, locations
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('adminActiveTab') || 'dashboard') // dashboard, bonus-entry, giveaways, locations
+  
+  useEffect(() => {
+    localStorage.setItem('adminActiveTab', activeTab)
+  }, [activeTab])
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [viewMode, setViewMode] = useState('list') // list, add-user, user-details
   const [selectedUser, setSelectedUser] = useState(null)
@@ -192,7 +196,7 @@ function AdminPanel() {
       const res = await fetch('/api/transactions/quick_add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ email: targetEmail, points: targetPoints }),
+        body: JSON.stringify({ email: targetEmail.toString().trim().toLowerCase(), points: targetPoints }),
       })
       if (res.ok) {
         setQuickEmail('')
@@ -271,9 +275,9 @@ function AdminPanel() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }, // Registration is usually public
         body: JSON.stringify({
-          email: addUserForm.email,
-          first_name: addUserForm.full_name.trim().split(' ')[0] || addUserForm.full_name.trim(),
-          last_name: addUserForm.full_name.trim().split(' ').slice(1).join(' ') || '',
+          email: addUserForm.email.trim().toLowerCase(),
+          first_name: (addUserForm.full_name.trim().split(' ')[0] || addUserForm.full_name.trim()).toLowerCase(),
+          last_name: (addUserForm.full_name.trim().split(' ').slice(1).join(' ') || '').toLowerCase(),
           password: 'Password123!', // Default password for invitations
           role: 'customer',
         }),
@@ -461,7 +465,7 @@ function AdminPanel() {
           <span className="material-symbols-outlined text-[1.2rem]">person</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-bold text-primary leading-tight">
+          <span className="text-sm font-bold text-primary leading-tight capitalize">
             {user?.first_name ? `${user.first_name} ${user.last_name || ''}` : 'Full Name'}
           </span>
           <span className="text-[11px] text-on-surface-variant/60 font-bold uppercase leading-tight tracking-tighter">
@@ -518,7 +522,7 @@ function AdminPanel() {
                         <td className="px-8 py-5 text-[11px] font-black text-[#5C5F57]">
                           #{u.account_id || u.id}
                         </td>
-                        <td className="px-8 py-5 text-sm font-bold text-on-surface">
+                        <td className="px-8 py-5 text-sm font-bold text-on-surface capitalize">
                           {u.first_name} {u.last_name}
                         </td>
                         <td className="px-8 py-5 text-sm font-bold text-[#5C5F57] italic">
@@ -657,7 +661,11 @@ function AdminPanel() {
       const res = await fetch(`/api/users/${selectedUser.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(editUserForm),
+        body: JSON.stringify({
+          first_name: editUserForm.first_name.trim().toLowerCase(),
+          last_name: editUserForm.last_name.trim().toLowerCase(),
+          email: editUserForm.email.trim().toLowerCase(),
+        }),
       })
       if (res.ok) {
         const data = await res.json()

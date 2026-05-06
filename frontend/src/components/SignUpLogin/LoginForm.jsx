@@ -63,12 +63,12 @@ function LoginForm() {
     setLoading(true)
     try {
       await register({
-        first_name: signupData.firstName,
-        last_name: signupData.lastName,
-        email: signupData.email,
+        first_name: signupData.firstName.trim().toLowerCase(),
+        last_name: signupData.lastName.trim().toLowerCase(),
+        email: signupData.email.trim().toLowerCase(),
         password: signupData.password,
         password_confirmation: signupData.password_confirmation,
-        referral_code: signupData.referralCode,
+        referral_code: signupData.referralCode.trim().toUpperCase(),
       })
       showToast('Welcome to the Kem Boi Family!', 'success')
       navigate('/family')
@@ -89,7 +89,7 @@ function LoginForm() {
 
     setLoading(true)
     try {
-      const user = await login({ email: loginData.email, password: loginData.password })
+      const user = await login({ email: loginData.email.trim().toLowerCase(), password: loginData.password })
       showToast(`Welcome back!`, 'success')
       navigate(user.role === 'admin' ? '/admin' : '/family')
     } catch {
