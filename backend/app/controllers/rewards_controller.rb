@@ -36,6 +36,6 @@ class RewardsController < ApplicationController
   private
 
   def reward_params
-    params.require(:reward).permit(:name, :description, :point_cost, :active, :images, :start_date, :end_date, :limit_per_user, :reward_type, :total_limit)
+    params.require(:reward).permit(:name, :description, :point_cost, :active, :images, :start_date, :end_date, :limit_per_user, :reward_type, :total_limit, :never_expires)
   end
 end

@@ -2,7 +2,8 @@ class Reward < ApplicationRecord
   has_many :redemptions, dependent: :destroy
   has_many :users, through: :redemptions
 
-  validates :name, :start_date, :end_date, presence: true
+  validates :name, :point_cost, :start_date, presence: true
+  validates :end_date, presence: true, unless: :never_expires?
   validates :point_cost, numericality: { greater_than_or_equal_to: 0 }
   validates :reward_type, inclusion: { in: %w[standard referral] }
 

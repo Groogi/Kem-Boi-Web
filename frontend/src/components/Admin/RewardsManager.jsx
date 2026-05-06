@@ -26,6 +26,7 @@ function RewardsManager({ onRewardsChange }) {
     limit_per_user: 0,
     total_limit: 0,
     reward_type: 'standard',
+    never_expires: false,
   })
 
   const fetchRewards = useCallback(async () => {
@@ -136,6 +137,7 @@ function RewardsManager({ onRewardsChange }) {
       limit_per_user: 0,
       total_limit: 0,
       reward_type: 'standard',
+      never_expires: false,
     }
 
     return (
@@ -147,7 +149,8 @@ function RewardsManager({ onRewardsChange }) {
       rewardData.end_date !== (original.end_date || '') ||
       rewardData.limit_per_user !== (original.limit_per_user || 0) ||
       rewardData.total_limit !== (original.total_limit || 0) ||
-      rewardData.reward_type !== (original.reward_type || 'standard')
+      rewardData.reward_type !== (original.reward_type || 'standard') ||
+      rewardData.never_expires !== (original.never_expires || false)
     )
   }
 
@@ -174,6 +177,7 @@ function RewardsManager({ onRewardsChange }) {
       limit_per_user: 0,
       total_limit: 0,
       reward_type: 'standard',
+      never_expires: false,
     })
   }
 
@@ -189,6 +193,7 @@ function RewardsManager({ onRewardsChange }) {
       limit_per_user: reward.limit_per_user || 0,
       total_limit: reward.total_limit || 0,
       reward_type: reward.reward_type || 'standard',
+      never_expires: reward.never_expires || false,
     })
     setShowNewReward(true)
   }
@@ -288,6 +293,20 @@ function RewardsManager({ onRewardsChange }) {
                   </div>
                 </div>
               </div>
+
+              <div className="col-span-1 sm:col-span-1">
+                <label className="block text-xs font-bold text-[#4A6B10] mb-2 px-1 sm:text-center whitespace-nowrap">
+                  Never Expires:
+                </label>
+                <div 
+                  onClick={() => setRewardData({ ...rewardData, never_expires: !rewardData.never_expires })}
+                  className="w-full h-[58px] bg-[#FBFBF5] rounded-[1.2rem] flex items-center justify-center cursor-pointer shadow-inner hover:shadow-md transition-all group"
+                >
+                  <div className={`w-11 h-6 rounded-full relative transition-all duration-500 shadow-inner ${rewardData.never_expires ? 'bg-[#4A6B10]' : 'bg-[#D1D3C8]'}`}>
+                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-md transition-all duration-500 transform ${rewardData.never_expires ? 'left-6 scale-110' : 'left-0.5 scale-90'}`}></div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-8">
               <div className="w-full">
@@ -298,12 +317,12 @@ function RewardsManager({ onRewardsChange }) {
                   placeholder="Set start date"
                 />
               </div>
-              <div className="w-full">
+              <div className={`w-full transition-opacity duration-300 ${rewardData.never_expires ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
                 <CustomDatePicker
                   label="End Date"
                   value={rewardData.end_date}
                   onChange={(val) => setRewardData({ ...rewardData, end_date: val })}
-                  placeholder="Set end date"
+                  placeholder={rewardData.never_expires ? "Permanent Reward" : "Set end date"}
                 />
               </div>
             </div>
