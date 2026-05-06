@@ -7,7 +7,7 @@ import { CustomDatePicker, ModernConfirm } from '../components/Common/SharedUI'
 import useSWR, { useSWRConfig } from 'swr'
 import { fetcher } from '../api/fetcher'
 
-const APP_NAME = 'Kem Bơ'
+const APP_NAME = 'Kemboi'
 
 function FamilyBonusDashboard() {
   const { user, token, updateUser, logout, refreshProfile } = useAuth()
@@ -198,7 +198,7 @@ function FamilyBonusDashboard() {
         onClick={() => setActiveTab('dashboard')}
         className="text-2xl md:text-3xl font-headline font-bold text-primary whitespace-nowrap cursor-pointer hover:opacity-80 transition-opacity"
       >
-        Kem Boi
+        Kemboi
       </div>
 
       {activeTab !== 'edit-account' && (
@@ -239,7 +239,7 @@ function FamilyBonusDashboard() {
                   {displayUser?.first_name ? `${displayUser.first_name} ${displayUser.last_name || ''}` : 'Full Name'}
                 </span>
                 <span className="text-xs text-on-surface-variant/70 leading-tight">
-                  {displayUser?.account_id ? `#${displayUser.account_id}` : 'Member'}
+                  {displayUser?.account_id ? displayUser.account_id : 'Member'}
                 </span>
               </div>
             </div>
@@ -736,7 +736,7 @@ function FamilyBonusDashboard() {
               {displayUser?.first_name ? `${displayUser.first_name} ${displayUser.last_name || ''}` : 'Full Name'}
               </h3>
               <p className="text-[13px] font-bold text-on-surface-variant opacity-80">
-                {displayUser?.account_id ? `#${displayUser.account_id}` : '#account_ID'}
+                {displayUser?.account_id || 'account_ID'}
               </p>
             </div>
           </div>
