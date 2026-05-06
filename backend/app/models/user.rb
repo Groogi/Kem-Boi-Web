@@ -70,7 +70,7 @@ class User < ApplicationRecord
 
   def generate_account_id
     # Premium Membership ID format
-    update_column(:account_id, "KB-#{1000 + id}")
+    update_column(:account_id, "kb-#{1000 + id}")
   end
 
   def process_pending_bonuses

@@ -1,7 +1,7 @@
 class RefreshUserAccountIds < ActiveRecord::Migration[8.1]
   def up
     User.find_each do |user|
-      user.update_column(:account_id, "KB-#{1000 + user.id}")
+      user.update_column(:account_id, "kb-#{1000 + user.id}")
     end
   end
 
