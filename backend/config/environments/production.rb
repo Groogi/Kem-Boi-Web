@@ -54,14 +54,14 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "kemboi-demo.vercel.app", protocol: "https" }
+  config.action_mailer.default_url_options = { host: "demokemboi.com", protocol: "https" }
 
   # Specify outgoing SMTP server via Mailgun.
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address:              "smtp.mailgun.org",
     port:                 2525,
-    domain:               "kemboi-demo.vercel.app",
+    domain:               "demokemboi.com",
     user_name:            ENV.fetch("MAILGUN_SMTP_LOGIN", ""),
     password:             ENV.fetch("MAILGUN_SMTP_PASSWORD", ""),
     authentication:       :plain,
