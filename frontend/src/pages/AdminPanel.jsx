@@ -523,8 +523,8 @@ function AdminPanel() {
                         }}
                         className="hover:bg-surface-container-highest/10 cursor-pointer transition-all"
                       >
-                        <td className="px-8 py-5 text-[11px] font-black text-[#5C5F57] whitespace-nowrap tracking-tighter">
-                          #{u.account_id?.toLowerCase()}
+                        <td className="px-8 py-5 text-sm font-bold text-[#5C5F57] whitespace-nowrap tracking-tighter">
+                          {u.account_id?.toLowerCase()}
                         </td>
                         <td className="px-8 py-5 text-sm font-bold text-on-surface capitalize">
                           {u.first_name} {u.last_name}
