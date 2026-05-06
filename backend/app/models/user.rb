@@ -69,8 +69,8 @@ class User < ApplicationRecord
   end
 
   def generate_account_id
-    # Simple readable ID for demo
-    update_column(:account_id, "kemboi_#{1000 + id}")
+    # Premium Membership ID format
+    update_column(:account_id, "KB-#{1000 + id}")
   end
 
   def process_pending_bonuses
