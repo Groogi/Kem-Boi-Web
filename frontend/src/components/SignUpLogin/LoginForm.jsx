@@ -17,10 +17,15 @@ function LoginForm() {
   const [forgotEmail, setForgotEmail] = useState('')
 
   useEffect(() => {
-    if (location.state?.mode) {
+    const params = new URLSearchParams(location.search)
+    const modeParam = params.get('mode')
+    
+    if (modeParam === 'signup' || modeParam === 'login') {
+      setActiveTab(modeParam)
+    } else if (location.state?.mode) {
       setActiveTab(location.state.mode)
     }
-  }, [location.state])
+  }, [location])
 
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)

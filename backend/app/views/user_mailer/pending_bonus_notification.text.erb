@@ -7,7 +7,7 @@ To claim these points and start earning rewards, simply sign up using this email
 
 Claim your points here:
 <% frontend_url = ENV.fetch('FRONTEND_URL', Rails.env.production? ? 'https://demokemboi.com' : 'http://localhost:5173') %>
-<%= frontend_url %>
+<%= "#{frontend_url}/login?mode=signup" %>
 
 See you soon at Kem Bơ!
 Traditional Atelier & Smoothie Bar

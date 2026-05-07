@@ -20,7 +20,7 @@
     </p>
 
     <% frontend_url = ENV.fetch('FRONTEND_URL', Rails.env.production? ? 'https://demokemboi.com' : 'http://localhost:5173') %>
-    <a href="<%= frontend_url %>" style="background-color: #426500; color: white; padding: 18px 40px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block; font-size: 14px; letter-spacing: 1px; box-shadow: 0 8px 15px rgba(66, 101, 0, 0.2); text-transform: uppercase;">
+    <a href="<%= "#{frontend_url}/login?mode=signup" %>" style="background-color: #426500; color: white; padding: 18px 40px; text-decoration: none; border-radius: 50px; font-weight: bold; display: inline-block; font-size: 14px; letter-spacing: 1px; box-shadow: 0 8px 15px rgba(66, 101, 0, 0.2); text-transform: uppercase;">
       Claim My Points Now
     </a>
   </div>
