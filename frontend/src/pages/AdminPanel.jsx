@@ -56,6 +56,7 @@ function AdminPanel() {
   const [manualPointsAmount, setManualPointsAmount] = useState('')
   const [addUserForm, setAddUserForm] = useState({ full_name: '', email: '', points: '' })
   const [editUserForm, setEditUserForm] = useState({ first_name: '', last_name: '', email: '' })
+  const [errors, setErrors] = useState({})
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -217,7 +218,13 @@ function AdminPanel() {
   }
 
   const handleManualAddPoints = async () => {
-    if (!selectedUser || !manualPointsAmount) return
+    if (!selectedUser) return
+    if (!manualPointsAmount || isNaN(manualPointsAmount) || Number(manualPointsAmount) <= 0) {
+      setErrors({ manualPoints: true })
+      showToast('Please enter a valid numeric point amount.', 'error')
+      return
+    }
+    setErrors({})
     setLoading(true)
     try {
       const res = await fetch(`/api/users/${selectedUser.id}/add_points`, {
@@ -273,6 +280,17 @@ function AdminPanel() {
   }
 
   const handleCreateUser = async () => {
+    const newErrors = {}
+    if (!addUserForm.full_name?.trim()) newErrors.full_name = true
+    if (!addUserForm.email?.trim() || !addUserForm.email.includes('@')) newErrors.email = true
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      showToast('Please fill in all required fields correctly.', 'error')
+      return
+    }
+
+    setErrors({})
     setLoading(true)
     try {
       const res = await fetch('/api/register', {
@@ -592,8 +610,11 @@ function AdminPanel() {
             <input
               type="text"
               value={addUserForm.full_name}
-              onChange={(e) => setAddUserForm({ ...addUserForm, full_name: e.target.value })}
-              className="w-full bg-[#EBECE4] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+              onChange={(e) => {
+                setAddUserForm({ ...addUserForm, full_name: e.target.value })
+                if (errors.full_name) setErrors({ ...errors, full_name: false })
+              }}
+              className={`w-full bg-[#EBECE4] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none ${errors.full_name ? 'ring-2 ring-red-500/50' : ''}`}
             />
             <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-center leading-none text-on-surface-variant/40 pointer-events-none select-none">
               <span className="material-symbols-outlined text-[18px]">edit_square</span>
@@ -608,8 +629,11 @@ function AdminPanel() {
             <input
               type="email"
               value={addUserForm.email}
-              onChange={(e) => setAddUserForm({ ...addUserForm, email: e.target.value })}
-              className="w-full bg-[#EBECE4] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+              onChange={(e) => {
+                setAddUserForm({ ...addUserForm, email: e.target.value })
+                if (errors.email) setErrors({ ...errors, email: false })
+              }}
+              className={`w-full bg-[#EBECE4] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none ${errors.email ? 'ring-2 ring-red-500/50' : ''}`}
             />
             <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-center leading-none text-on-surface-variant/40 pointer-events-none select-none">
               <span className="material-symbols-outlined text-[18px]">edit_square</span>
@@ -660,6 +684,18 @@ function AdminPanel() {
 
   const handleUpdateUser = async () => {
     if (!selectedUser) return
+    const newErrors = {}
+    if (!editUserForm.first_name?.trim()) newErrors.first_name = true
+    if (!editUserForm.last_name?.trim()) newErrors.last_name = true
+    if (!editUserForm.email?.trim() || !editUserForm.email.includes('@')) newErrors.email = true
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      showToast('Please correct the highlighted fields.', 'error')
+      return
+    }
+
+    setErrors({})
     setLoading(true)
     try {
       const res = await fetch(`/api/users/${selectedUser.id}`, {
@@ -1250,10 +1286,11 @@ const UserDetailsView = ({
                   <input
                     type="text"
                     value={editUserForm.first_name}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setEditUserForm({ ...editUserForm, first_name: e.target.value })
-                    }
-                    className="w-full bg-[#EBECE4] border-none rounded-full px-7 py-3.5 shadow-inner text-on-surface font-medium focus:ring-2 focus:ring-[#426500]/20 outline-none"
+                      if (errors.first_name) setErrors({ ...errors, first_name: false })
+                    }}
+                    className={`w-full bg-[#EBECE4] border-none rounded-full px-7 py-3.5 shadow-inner text-on-surface font-medium focus:ring-2 focus:ring-[#426500]/20 outline-none ${errors.first_name ? 'ring-2 ring-red-500/50' : ''}`}
                   />
                 </div>
               </div>
@@ -1265,10 +1302,11 @@ const UserDetailsView = ({
                   <input
                     type="text"
                     value={editUserForm.last_name}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setEditUserForm({ ...editUserForm, last_name: e.target.value })
-                    }
-                    className="w-full bg-[#EBECE4] border-none rounded-full px-7 py-3.5 shadow-inner text-on-surface font-medium focus:ring-2 focus:ring-[#426500]/20 outline-none"
+                      if (errors.last_name) setErrors({ ...errors, last_name: false })
+                    }}
+                    className={`w-full bg-[#EBECE4] border-none rounded-full px-7 py-3.5 shadow-inner text-on-surface font-medium focus:ring-2 focus:ring-[#426500]/20 outline-none ${errors.last_name ? 'ring-2 ring-red-500/50' : ''}`}
                   />
                 </div>
               </div>
@@ -1281,8 +1319,11 @@ const UserDetailsView = ({
                 <input
                   type="email"
                   value={editUserForm.email}
-                  onChange={(e) => setEditUserForm({ ...editUserForm, email: e.target.value })}
-                  className="w-full bg-[#EBECE4] border-none rounded-full px-7 py-3.5 shadow-inner text-on-surface font-medium focus:ring-2 focus:ring-[#426500]/20 outline-none"
+                  onChange={(e) => {
+                    setEditUserForm({ ...editUserForm, email: e.target.value })
+                    if (errors.email) setErrors({ ...errors, email: false })
+                  }}
+                  className={`w-full bg-[#EBECE4] border-none rounded-full px-7 py-3.5 shadow-inner text-on-surface font-medium focus:ring-2 focus:ring-[#426500]/20 outline-none ${errors.email ? 'ring-2 ring-red-500/50' : ''}`}
                 />
               </div>
             </div>
@@ -1325,8 +1366,11 @@ const UserDetailsView = ({
                 <input
                   type="number"
                   value={manualPointsAmount}
-                  onChange={(e) => setManualPointsAmount(e.target.value)}
-                  className="w-full bg-[#EBECE4] border-none rounded-full px-8 py-3.5 shadow-inner font-bold text-lg text-on-surface focus:ring-0"
+                  onChange={(e) => {
+                    setManualPointsAmount(e.target.value)
+                    if (errors.manualPoints) setErrors({ ...errors, manualPoints: false })
+                  }}
+                  className={`w-full bg-[#EBECE4] border-none rounded-full px-8 py-3.5 shadow-inner font-bold text-lg text-on-surface focus:ring-0 ${errors.manualPoints ? 'ring-2 ring-red-500/50' : ''}`}
                 />
                 <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-center leading-none text-on-surface-variant/40 pointer-events-none select-none">
                   <span className="material-symbols-outlined text-[18px]">edit_square</span>

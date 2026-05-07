@@ -7,6 +7,7 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
   const [quickPoints, setQuickPoints] = useState('')
   const [history, setHistory] = useState([])
   const [searchEmail, setSearchEmail] = useState('')
+  const [errors, setErrors] = useState({})
   const { showToast } = useToast()
 
   const searchInputRef = useRef(null)
@@ -124,8 +125,11 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
               <input
                 type="text"
                 value={quickEmail}
-                onChange={(e) => setQuickEmail(e.target.value)}
-                className="w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface"
+                onChange={(e) => {
+                  setQuickEmail(e.target.value)
+                  if (errors.email) setErrors({ ...errors, email: false })
+                }}
+                className={`w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface ${errors.email ? 'ring-2 ring-red-500/50' : ''}`}
               />
             </div>
             <div className="flex gap-4 items-end">
@@ -134,24 +138,30 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                 <input
                   type="number"
                   value={quickPoints}
-                  onChange={(e) => setQuickPoints(e.target.value)}
-                  className="w-full bg-surface-container-highest border-none rounded-full px-5 py-3 shadow-inner font-bold text-lg"
+                  onChange={(e) => {
+                    setQuickPoints(e.target.value)
+                    if (errors.points) setErrors({ ...errors, points: false })
+                  }}
+                  className={`w-full bg-surface-container-highest border-none rounded-full px-5 py-3 shadow-inner font-bold text-lg ${errors.points ? 'ring-2 ring-red-500/50' : ''}`}
                 />
               </div>
               <button
                 onClick={() => {
                   const email = quickEmail.trim()
                   const points = String(quickPoints).trim()
+                  const newErrors = {}
 
-                  if (!email || !email.includes('@')) {
-                    showToast('Please enter a valid email address.', 'error')
+                  if (!email || !email.includes('@')) newErrors.email = true
+                  if (!points || isNaN(points) || Number(points) <= 0) newErrors.points = true
+
+                  if (Object.keys(newErrors).length > 0) {
+                    setErrors(newErrors)
+                    if (newErrors.email) showToast('Please enter a valid email address.', 'error')
+                    else showToast('Please enter a valid numeric point amount.', 'error')
                     return
                   }
-                  if (!points || isNaN(points) || Number(points) <= 0) {
-                    showToast('Please enter a valid numeric point amount.', 'error')
-                    return
-                  }
 
+                  setErrors({})
                   onQuickAdd(email, points)
                 }}
                 disabled={loading}
@@ -206,8 +216,11 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                       type="number"
                       placeholder="000"
                       value={quickPoints}
-                      onChange={(e) => setQuickPoints(e.target.value)}
-                      className="w-full bg-white/80 border-none text-center font-bold text-2xl py-4 rounded-2xl shadow-inner focus:ring-4 focus:ring-[#426500]/10 transition-all outline-none"
+                      onChange={(e) => {
+                        setQuickPoints(e.target.value)
+                        if (errors.quickPoints) setErrors({ ...errors, quickPoints: false })
+                      }}
+                      className={`w-full bg-white/80 border-none text-center font-bold text-2xl py-4 rounded-2xl shadow-inner focus:ring-4 focus:ring-[#426500]/10 transition-all outline-none ${errors.quickPoints ? 'ring-2 ring-red-500/50' : ''}`}
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest">
                       PTS
@@ -217,10 +230,12 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                     onClick={async () => {
                       const points = String(quickPoints).trim()
                       if (!points || isNaN(points) || Number(points) <= 0) {
+                        setErrors({ quickPoints: true })
                         showToast('Please enter a valid numeric point amount.', 'error')
                         return
                       }
 
+                      setErrors({})
                       await onQuickAdd(bonusUser.email, points)
                       setQuickPoints('')
                       fetchTransactions(bonusUser.id)

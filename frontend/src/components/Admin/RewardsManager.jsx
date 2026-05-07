@@ -15,6 +15,7 @@ function RewardsManager({ onRewardsChange }) {
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false)
   const [rewardToDelete, setRewardToDelete] = useState(null)
   const [pendingClaimsCount, setPendingClaimsCount] = useState(0)
+  const [errors, setErrors] = useState({})
 
   const [rewardData, setRewardData] = useState({
     name: '',
@@ -45,11 +46,14 @@ function RewardsManager({ onRewardsChange }) {
     fetchRewards()
   }, [token])
 
+
   const handleSaveReward = () => {
     if (!rewardData.name.trim()) {
+      setErrors({ name: true })
       showToast('Reward name is required', 'error')
       return
     }
+    setErrors({})
     setShowSaveConfirm(true)
   }
 
@@ -179,6 +183,7 @@ function RewardsManager({ onRewardsChange }) {
       reward_type: 'standard',
       never_expires: false,
     })
+    setErrors({})
   }
 
   const startEdit = (reward) => {
@@ -213,9 +218,12 @@ function RewardsManager({ onRewardsChange }) {
               <input
                 type="text"
                 value={rewardData.name}
-                onChange={(e) => setRewardData({ ...rewardData, name: e.target.value })}
+                onChange={(e) => {
+                  setRewardData({ ...rewardData, name: e.target.value })
+                  if (errors.name) setErrors({ ...errors, name: false })
+                }}
                 placeholder="e.g. Free Avocado Smoothie"
-                className="w-full bg-[#FBFBF5] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                className={`w-full bg-[#FBFBF5] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none ${errors.name ? 'ring-2 ring-red-500/50' : ''}`}
               />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 lg:gap-4 xl:gap-8">

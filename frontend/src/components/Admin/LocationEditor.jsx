@@ -17,30 +17,23 @@ function LocationEditor({ location, onSave, onCancel, onDelete, loading }) {
     }
   )
   const [showConfirm, setShowConfirm] = useState(false)
+  const [errors, setErrors] = useState({})
 
   const handleSave = () => {
-    // Check mandatory fields
-    if (!data.name?.trim()) {
-      showToast('Store name is required', 'error')
-      return
-    }
-    if (!data.address_line_1?.trim()) {
-      showToast('Street address is required', 'error')
-      return
-    }
-    if (!data.suburb?.trim()) {
-      showToast('Suburb is required', 'error')
-      return
-    }
-    if (!data.state?.trim()) {
-      showToast('State is required', 'error')
-      return
-    }
-    if (!data.postcode?.trim()) {
-      showToast('Postcode is required', 'error')
+    const newErrors = {}
+    if (!data.name?.trim()) newErrors.name = true
+    if (!data.address_line_1?.trim()) newErrors.address_line_1 = true
+    if (!data.suburb?.trim()) newErrors.suburb = true
+    if (!data.state?.trim()) newErrors.state = true
+    if (!data.postcode?.trim()) newErrors.postcode = true
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      showToast('Please fill in all required fields.', 'error')
       return
     }
 
+    setErrors({})
     // map_url is optional, so we proceed
     onSave(data)
   }
@@ -79,9 +72,12 @@ function LocationEditor({ location, onSave, onCancel, onDelete, loading }) {
                 <input
                   type="text"
                   value={data.name}
-                  onChange={(e) => setData({ ...data, name: e.target.value })}
+                  onChange={(e) => {
+                    setData({ ...data, name: e.target.value })
+                    if (errors.name) setErrors({ ...errors, name: false })
+                  }}
                   placeholder="e.g. Flagship Stall"
-                  className="w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                  className={`w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none ${errors.name ? 'ring-2 ring-red-500/50' : ''}`}
                 />
                 <div className="absolute right-5 top-[10px] flex flex-col items-center leading-none text-on-surface-variant/40 pointer-events-none select-none">
                   <span className="material-symbols-outlined text-[18px]">edit_square</span>
@@ -98,9 +94,12 @@ function LocationEditor({ location, onSave, onCancel, onDelete, loading }) {
                 <input
                   type="text"
                   value={data.address_line_1}
-                  onChange={(e) => setData({ ...data, address_line_1: e.target.value })}
+                  onChange={(e) => {
+                    setData({ ...data, address_line_1: e.target.value })
+                    if (errors.address_line_1) setErrors({ ...errors, address_line_1: false })
+                  }}
                   placeholder="123 Avocado St"
-                  className="w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                  className={`w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none ${errors.address_line_1 ? 'ring-2 ring-red-500/50' : ''}`}
                 />
                 <div className="absolute right-5 top-[10px] flex flex-col items-center leading-none text-on-surface-variant/40 pointer-events-none select-none">
                   <span className="material-symbols-outlined text-[18px]">edit_square</span>
@@ -130,8 +129,11 @@ function LocationEditor({ location, onSave, onCancel, onDelete, loading }) {
                 <input
                   type="text"
                   value={data.suburb}
-                  onChange={(e) => setData({ ...data, suburb: e.target.value })}
-                  className="w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none"
+                  onChange={(e) => {
+                    setData({ ...data, suburb: e.target.value })
+                    if (errors.suburb) setErrors({ ...errors, suburb: false })
+                  }}
+                  className={`w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none ${errors.suburb ? 'ring-2 ring-red-500/50' : ''}`}
                 />
               </div>
               <div>
@@ -139,8 +141,11 @@ function LocationEditor({ location, onSave, onCancel, onDelete, loading }) {
                 <input
                   type="text"
                   value={data.state}
-                  onChange={(e) => setData({ ...data, state: e.target.value })}
-                  className="w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none"
+                  onChange={(e) => {
+                    setData({ ...data, state: e.target.value })
+                    if (errors.state) setErrors({ ...errors, state: false })
+                  }}
+                  className={`w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none ${errors.state ? 'ring-2 ring-red-500/50' : ''}`}
                 />
               </div>
             </div>
@@ -152,8 +157,11 @@ function LocationEditor({ location, onSave, onCancel, onDelete, loading }) {
               <input
                 type="text"
                 value={data.postcode}
-                onChange={(e) => setData({ ...data, postcode: e.target.value })}
-                className="w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none"
+                onChange={(e) => {
+                  setData({ ...data, postcode: e.target.value })
+                  if (errors.postcode) setErrors({ ...errors, postcode: false })
+                }}
+                className={`w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 outline-none ${errors.postcode ? 'ring-2 ring-red-500/50' : ''}`}
               />
             </div>
 

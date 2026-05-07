@@ -27,6 +27,7 @@ function LoginForm() {
 
   const [signupData, setSignupData] = useState({ firstName: '', lastName: '', email: '', password: '', password_confirmation: '', referralCode: '' })
   const [loginData, setLoginData] = useState({ email: '', password: '' })
+  const [errors, setErrors] = useState({})
 
   const validateEmail = (email) => {
     return String(email)
@@ -39,26 +40,29 @@ function LoginForm() {
   const handleSignup = async (e) => {
     e.preventDefault()
     
+    const newErrors = {}
     const nameRegex = /^[a-zA-Z\s-]+$/
-    if (!nameRegex.test(signupData.firstName) || !nameRegex.test(signupData.lastName)) {
-      showToast('Names can only contain letters, spaces, or hyphens', 'error')
+
+    if (!signupData.firstName || !nameRegex.test(signupData.firstName)) newErrors.firstName = true
+    if (!signupData.lastName || !nameRegex.test(signupData.lastName)) newErrors.lastName = true
+    if (!signupData.email || !validateEmail(signupData.email)) newErrors.email = true
+    if (signupData.password.length < 8) newErrors.password = true
+    if (signupData.password !== signupData.password_confirmation) newErrors.password_confirmation = true
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      if (newErrors.password_confirmation && signupData.password === signupData.password_confirmation) {
+          // This case won't happen based on the logic above, but keeping it safe
+      }
+      
+      if (newErrors.firstName || newErrors.lastName) showToast('Names can only contain letters, spaces, or hyphens', 'error')
+      else if (newErrors.email) showToast('Please enter a valid email address', 'error')
+      else if (newErrors.password) showToast('Password must be at least 8 characters', 'error')
+      else if (newErrors.password_confirmation) showToast('Passwords do not match', 'error')
       return
     }
 
-    if (!signupData.email || !validateEmail(signupData.email)) {
-      showToast('Please enter a valid email address', 'error')
-      return
-    }
-
-    if (signupData.password.length < 8) {
-      showToast('Password must be at least 8 characters', 'error')
-      return
-    }
-
-    if (signupData.password !== signupData.password_confirmation) {
-      showToast('Passwords do not match', 'error')
-      return
-    }
+    setErrors({})
 
     setLoading(true)
     try {
@@ -83,9 +87,13 @@ function LoginForm() {
     e.preventDefault()
     
     if (!loginData.email || !validateEmail(loginData.email)) {
+      setErrors({ email: true })
       showToast('Please enter a valid email address', 'error')
       return
     }
+
+    setErrors({})
+    setLoading(true)
 
     setLoading(true)
     try {
@@ -168,11 +176,14 @@ function LoginForm() {
                 Email Address
               </label>
               <input
-                className="w-full px-8 py-5 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[16px] font-semibold outline-none"
+                className={`w-full px-8 py-5 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[16px] font-semibold outline-none ${errors.forgotEmail ? 'ring-2 ring-red-500/50' : ''}`}
                 type="email"
                 placeholder="hello@example.com"
                 value={forgotEmail}
-                onChange={(e) => setForgotEmail(e.target.value)}
+                onChange={(e) => {
+                  setForgotEmail(e.target.value)
+                  if (errors.forgotEmail) setErrors({ ...errors, forgotEmail: false })
+                }}
                 required
               />
             </div>
@@ -302,11 +313,14 @@ function LoginForm() {
                       First Name
                     </label>
                     <input
-                      className="w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none"
+                      className={`w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none ${errors.firstName ? 'ring-2 ring-red-500/50' : ''}`}
                       type="text"
                       placeholder="First name"
                       value={signupData.firstName}
-                      onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })}
+                      onChange={(e) => {
+                        setSignupData({ ...signupData, firstName: e.target.value })
+                        if (errors.firstName) setErrors({ ...errors, firstName: false })
+                      }}
                       required
                     />
                   </div>
@@ -315,11 +329,14 @@ function LoginForm() {
                       Last Name
                     </label>
                     <input
-                      className="w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none"
+                      className={`w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none ${errors.lastName ? 'ring-2 ring-red-500/50' : ''}`}
                       type="text"
                       placeholder="Last name"
                       value={signupData.lastName}
-                      onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })}
+                      onChange={(e) => {
+                        setSignupData({ ...signupData, lastName: e.target.value })
+                        if (errors.lastName) setErrors({ ...errors, lastName: false })
+                      }}
                       required
                     />
                   </div>
@@ -331,15 +348,18 @@ function LoginForm() {
                   Email
                 </label>
                 <input
-                  className="w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none"
+                  className={`w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none ${errors.email ? 'ring-2 ring-red-500/50' : ''}`}
                   type="email"
                   placeholder="email@example.com"
                   value={activeTab === 'login' ? loginData.email : signupData.email}
-                  onChange={(e) =>
-                    activeTab === 'login'
-                      ? setLoginData({ ...loginData, email: e.target.value })
-                      : setSignupData({ ...signupData, email: e.target.value })
-                  }
+                  onChange={(e) => {
+                    if (activeTab === 'login') {
+                      setLoginData({ ...loginData, email: e.target.value })
+                    } else {
+                      setSignupData({ ...signupData, email: e.target.value })
+                    }
+                    if (errors.email) setErrors({ ...errors, email: false })
+                  }}
                   required
                 />
               </div>
@@ -361,15 +381,18 @@ function LoginForm() {
                 </div>
                 <div className="relative group/pass">
                   <input
-                    className="w-full px-8 pr-14 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none"
+                    className={`w-full px-8 pr-14 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none ${errors.password ? 'ring-2 ring-red-500/50' : ''}`}
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={activeTab === 'login' ? loginData.password : signupData.password}
-                    onChange={(e) =>
-                      activeTab === 'login'
-                        ? setLoginData({ ...loginData, password: e.target.value })
-                        : setSignupData({ ...signupData, password: e.target.value })
-                    }
+                    onChange={(e) => {
+                      if (activeTab === 'login') {
+                        setLoginData({ ...loginData, password: e.target.value })
+                      } else {
+                        setSignupData({ ...signupData, password: e.target.value })
+                      }
+                      if (errors.password) setErrors({ ...errors, password: false })
+                    }}
                     required
                   />
                   <button
@@ -391,11 +414,14 @@ function LoginForm() {
                     Confirm Password
                   </label>
                   <input
-                    className="w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none"
+                    className={`w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none ${errors.password_confirmation ? 'ring-2 ring-red-500/50' : ''}`}
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={signupData.password_confirmation}
-                    onChange={(e) => setSignupData({ ...signupData, password_confirmation: e.target.value })}
+                    onChange={(e) => {
+                      setSignupData({ ...signupData, password_confirmation: e.target.value })
+                      if (errors.password_confirmation) setErrors({ ...errors, password_confirmation: false })
+                    }}
                     required
                   />
                 </div>
