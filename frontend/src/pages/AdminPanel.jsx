@@ -537,6 +537,12 @@ function AdminPanel() {
                         key={idx}
                         onClick={() => {
                           setSelectedUser(u)
+                          setEditUserForm({
+                            first_name: u.first_name || '',
+                            last_name: u.last_name || '',
+                            email: u.email || '',
+                          })
+                          fetchUserRedemptions(u.id)
                           setViewMode('user-details')
                         }}
                         className="hover:bg-surface-container-highest/10 cursor-pointer transition-all"
@@ -1101,6 +1107,8 @@ function AdminPanel() {
                   onDelete={handleDeleteRedemption}
                   selectedUserRedemptions={selectedUserRedemptions}
                   setLoading={setLoading}
+                  errors={errors}
+                  setErrors={setErrors}
                 />
               )}
             </>
@@ -1249,6 +1257,8 @@ const UserDetailsView = ({
   onUpdate,
   onDelete,
   selectedUserRedemptions,
+  errors,
+  setErrors,
 }) => {
   const [detailTab, setDetailTab] = useState('details') // details, points
   const [confirmFulfill, setConfirmFulfill] = useState({
