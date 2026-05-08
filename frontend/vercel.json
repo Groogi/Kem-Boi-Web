@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://notework.onrender.com/:path*"
+      "destination": "https://your-backend-api-url-here.onrender.com/:path*"
     },
     {
       "source": "/(.*)",

@@ -51,13 +51,25 @@ npm run dev
 
 ---
 
-## Deployment Configuration
+## Deployment & Environment Configuration
 
-When deploying to production (e.g., Render), ensure the following environment variables are set:
+To run this project in production or a new environment, you must configure the following Environment Variables:
 
-- `FRONTEND_URL`: `https://demokemboi.com` (Used for mailer links)
-- `SMTP_DOMAIN`: Your Mailgun/SendGrid domain
-- `DATABASE_URL`: Your production PostgreSQL URI
+### Backend Variables (Render/Production)
+- `RAILS_MASTER_KEY`: **CRITICAL** - Key to unlock encrypted credentials.
+- `DATABASE_URL`: Production PostgreSQL connection string.
+- `APP_DOMAIN`: The main domain where the app is hosted (e.g., `clientdomain.com`).
+- `MAILER_DOMAIN`: Your verified email sending domain (e.g., `mg.clientdomain.com`).
+- `MAILER_FROM`: The sender email address (e.g., `noreply@clientdomain.com`).
+- `MAILGUN_SMTP_LOGIN`: Your Mailgun SMTP username.
+- `MAILGUN_SMTP_PASSWORD`: Your Mailgun SMTP password.
+
+### Frontend Variables (Vercel/Static Hosting)
+- `VITE_GOOGLE_CLIENT_ID`: Your Google OAuth 2.0 Client ID.
+- `VITE_API_URL`: The full URL of your backend API service.
+
+### Deployment Note
+In `frontend/vercel.json`, ensure the `destination` field in the `rewrites` section is updated to point to your actual backend API URL.
 
 ---
 
