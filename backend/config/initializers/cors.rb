@@ -7,8 +7,12 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    # Allow frontend URL from environment variable, or default to local dev server
-    origins ENV.fetch("FRONTEND_URL", "http://localhost:5173")
+    # Allow frontend URL from environment variable
+    origins do |source, env|
+      app_domain = ENV.fetch("APP_DOMAIN", "localhost:5173")
+      # Match if the source is the app domain (with or without https)
+      source.include?(app_domain) || source.include?("localhost:5173")
+    end
 
     resource "*",
       headers: :any,

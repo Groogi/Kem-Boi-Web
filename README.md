@@ -58,23 +58,20 @@ To run this project in production or a new environment, you must configure the f
 ### Backend Variables (Render/Production)
 - `RAILS_MASTER_KEY`: **CRITICAL** - Key to unlock encrypted credentials.
 - `DATABASE_URL`: Production PostgreSQL connection string.
-- `APP_DOMAIN`: The main domain where the app is hosted (e.g., `clientdomain.com`).
-- `MAILER_DOMAIN`: Your verified email sending domain (e.g., `mg.clientdomain.com`).
-- `MAILER_FROM`: The sender email address (e.g., `noreply@clientdomain.com`).
+- `APP_DOMAIN`: Your main domain (e.g., `demokemboi.com`). This handles CORS and mailer links.
+- `MAILER_DOMAIN`: Your verified email sending domain (e.g., `mg.demokemboi.com`).
+- `MAILER_FROM`: The sender email address (e.g., `noreply@demokemboi.com`).
 - `MAILGUN_SMTP_LOGIN`: Your Mailgun SMTP username.
 - `MAILGUN_SMTP_PASSWORD`: Your Mailgun SMTP password.
 
 ### Frontend Variables (Vercel/Static Hosting)
 - `VITE_GOOGLE_CLIENT_ID`: Your Google OAuth 2.0 Client ID.
-- `VITE_API_URL`: The full URL of your backend API service.
-
-### Deployment Note
-In `frontend/vercel.json`, ensure the `destination` field in the `rewrites` section is updated to point to your actual backend API URL.
+- `VITE_API_URL`: The full URL of your backend API service (e.g., `https://notework.onrender.com`).
 
 ---
 
-### __Troubleshooting__
+### __Final Handoff Checklist__
 
-- **Database Connection**: Ensure your PostgreSQL service is running on port 5432.
-- **ID Format**: If IDs aren't showing as `kb-xxxx`, run `rails db:migrate` to trigger the `RefreshUserAccountIds` migration.
-- **Emails**: Check `backend/config/environments/production.rb` for correct ActionMailer host settings.
+1.  **Environment Variables**: Ensure all keys above are set in your hosting dashboards (Render & Vercel).
+2.  **Google OAuth**: Add your production domain (`APP_DOMAIN`) to the "Authorized redirect URIs" in your Google Cloud Console.
+3.  **Mailgun**: Verify your `MAILER_DOMAIN` and update the SMTP credentials.

@@ -1,5 +1,8 @@
+import { API_BASE } from './config'
+
 export const fetcher = async ([url, token]) => {
-  const res = await fetch(url, {
+  const fullUrl = url.startsWith('http') ? url : `${API_BASE}${url.startsWith('/') ? url : `/${url}`}`
+  const res = await fetch(fullUrl, {
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
