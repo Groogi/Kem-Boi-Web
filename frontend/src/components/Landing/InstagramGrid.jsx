@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { API_BASE } from '../../api/config'
 
 function InstagramGrid() {
   const desktopTiles = [
@@ -60,7 +61,7 @@ function InstagramGrid() {
   useEffect(() => {
     const fetchLinks = async () => {
       try {
-        const res = await fetch('/api/social_links')
+        const res = await fetch(`${API_BASE}/social_links`)
         if (res.ok) {
           const data = await res.json()
           setSocialLinks(data)

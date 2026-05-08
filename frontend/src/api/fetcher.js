@@ -1,7 +1,11 @@
 import { API_BASE } from './config'
 
 export const fetcher = async ([url, token]) => {
-  const fullUrl = url.startsWith('http') ? url : `${API_BASE}${url.startsWith('/') ? url : `/${url}`}`
+  let processedUrl = url
+  if (API_BASE.startsWith('http') && url.startsWith('/api')) {
+    processedUrl = url.replace(/^\/api/, '')
+  }
+  const fullUrl = processedUrl.startsWith('http') ? processedUrl : `${API_BASE}${processedUrl.startsWith('/') ? processedUrl : `/${processedUrl}`}`
   const res = await fetch(fullUrl, {
     headers: {
       Authorization: `Bearer ${token}`,

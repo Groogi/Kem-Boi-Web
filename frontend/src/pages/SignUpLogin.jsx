@@ -4,6 +4,7 @@ import LoginForm from '../components/SignUpLogin/LoginForm'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
 import { useState } from 'react'
+import { API_BASE } from '../api/config'
 
 function SignUpLogin() {
   const { isAuthenticated, user } = useAuth()
@@ -17,7 +18,7 @@ function SignUpLogin() {
   useEffect(() => {
     const fetchLinks = async () => {
       try {
-        const res = await fetch('/api/social_links')
+        const res = await fetch(`${API_BASE}/social_links`)
         if (res.ok) {
           const data = await res.json()
           setSocialLinks(data)

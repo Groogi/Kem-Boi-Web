@@ -8,6 +8,7 @@ import WebsiteLinksForm from '../components/Admin/WebsiteLinksForm'
 import LocationEditor from '../components/Admin/LocationEditor'
 import RewardsManager from '../components/Admin/RewardsManager'
 import { ModernAlert, ModernConfirm } from '../components/Common/SharedUI'
+import { API_BASE } from '../api/config'
 
 function AdminPanel() {
   const { user, token, logout } = useAuth()
@@ -60,7 +61,7 @@ function AdminPanel() {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await fetch('/api/users_list', {
+      const res = await fetch(`${API_BASE}/users_list`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
@@ -73,7 +74,7 @@ function AdminPanel() {
 
   const fetchRewards = useCallback(async () => {
     try {
-      const res = await fetch('/api/rewards', {
+      const res = await fetch(`${API_BASE}/rewards`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
@@ -86,7 +87,7 @@ function AdminPanel() {
 
   const fetchRedemptions = useCallback(async () => {
     try {
-      const res = await fetch('/api/redemptions', {
+      const res = await fetch(`${API_BASE}/redemptions`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
@@ -99,7 +100,7 @@ function AdminPanel() {
 
   const fetchLocations = useCallback(async () => {
     try {
-      const res = await fetch('/api/locations', {
+      const res = await fetch(`${API_BASE}/locations`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
@@ -128,7 +129,7 @@ function AdminPanel() {
 
   const handleUpdateRedemptionStatus = async (redId, newStatus) => {
     try {
-      const res = await fetch(`/api/redemptions/${redId}`, {
+      const res = await fetch(`${API_BASE}/redemptions/${redId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -198,7 +199,7 @@ function AdminPanel() {
     if (!targetEmail || !targetPoints) return
     setLoading(true)
     try {
-      const res = await fetch('/api/transactions/quick_add', {
+      const res = await fetch(`${API_BASE}/transactions/quick_add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ email: targetEmail.toString().trim().toLowerCase(), points: targetPoints }),
@@ -227,7 +228,7 @@ function AdminPanel() {
     setErrors({})
     setLoading(true)
     try {
-      const res = await fetch(`/api/users/${selectedUser.id}/add_points`, {
+      const res = await fetch(`${API_BASE}/users/${selectedUser.id}/add_points`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ points: manualPointsAmount, notes: 'Admin Manual Addition' }),
@@ -257,7 +258,7 @@ function AdminPanel() {
     if (!selectedUser) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/users/${selectedUser.id}`, {
+      const res = await fetch(`${API_BASE}/users/${selectedUser.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -293,7 +294,7 @@ function AdminPanel() {
     setErrors({})
     setLoading(true)
     try {
-      const res = await fetch('/api/register', {
+      const res = await fetch(`${API_BASE}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }, // Registration is usually public
         body: JSON.stringify({

@@ -7,11 +7,13 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    # Allow frontend URL from environment variable
+    # Allow frontend URL from environment variable, including subdomains for Vercel previews
     origins do |source, env|
       app_domain = ENV.fetch("APP_DOMAIN", "localhost:5173")
-      # Match if the source is the app domain (with or without https)
-      source.include?(app_domain) || source.include?("localhost:5173")
+      # Allow local dev, exact domain, and Vercel preview subdomains
+      source.include?(app_domain) || 
+      source.include?("localhost:5173") || 
+      source.end_with?(".vercel.app")
     end
 
     resource "*",

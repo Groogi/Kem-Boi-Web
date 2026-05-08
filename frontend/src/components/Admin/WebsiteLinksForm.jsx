@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useToast } from '../../context/ToastContext'
 import { useAuth } from '../../context/AuthContext'
+import { API_BASE } from '../../api/config'
 
 function WebsiteLinksForm() {
   const [socialLinks, setSocialLinks] = useState({ instagram: '', facebook: '', website: '' })
@@ -11,7 +12,7 @@ function WebsiteLinksForm() {
   useEffect(() => {
     const fetchLinks = async () => {
       try {
-        const res = await fetch('/api/social_links')
+        const res = await fetch(`${API_BASE}/social_links`)
         if (res.ok) {
           const data = await res.json()
           setSocialLinks(data)
@@ -26,7 +27,7 @@ function WebsiteLinksForm() {
   const handleUpdate = async (field) => {
     setLoading(true)
     try {
-      const res = await fetch('/api/social_links', {
+      const res = await fetch(`${API_BASE}/social_links`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

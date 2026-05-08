@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { API_BASE } from '../../api/config'
 
 function Locations() {
   const [locations, setLocations] = useState([])
@@ -6,7 +7,7 @@ function Locations() {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const res = await fetch('/api/locations')
+        const res = await fetch(`${API_BASE}/locations`)
         if (res.ok) {
           const data = await res.json()
           if (data && data.length > 0) {

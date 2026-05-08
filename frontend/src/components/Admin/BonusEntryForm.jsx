@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useToast } from '../../context/ToastContext'
+import { API_BASE } from '../../api/config'
 
 function BonusEntryForm({ users, onQuickAdd, loading, token }) {
   const [bonusUser, setBonusUser] = useState(null)
@@ -26,7 +27,7 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
     async (userId, email = null) => {
       try {
         const query = email ? `email=${encodeURIComponent(email)}` : `user_id=${userId}`
-        const res = await fetch(`/api/transactions?${query}`, {
+        const res = await fetch(`${API_BASE}/transactions?${query}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (res.ok) {

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback } from 'react'
 import { login as apiLogin, register as apiRegister, googleLogin as apiGoogleLogin } from '../api/auth'
+import { API_BASE } from '../api/config'
 
 const AuthContext = createContext(null)
 
@@ -65,7 +66,7 @@ export function AuthProvider({ children }) {
   const refreshProfile = useCallback(async () => {
     if (!token) return
     try {
-      const res = await fetch('/api/profile', {
+      const res = await fetch(`${API_BASE}/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {

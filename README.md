@@ -73,5 +73,5 @@ To run this project in production or a new environment, you must configure the f
 ### __Final Handoff Checklist__
 
 1.  **Environment Variables**: Ensure all keys above are set in your hosting dashboards (Render & Vercel).
-2.  **Google OAuth**: Add your production domain (`APP_DOMAIN`) to the "Authorized redirect URIs" in your Google Cloud Console.
+2.  **Google OAuth**: Add your production domain (`APP_DOMAIN`) to the "Authorized redirect URIs" and "Authorized JavaScript origins" in your Google Cloud Console. **Failure to do this will break Google Login.**
 3.  **Mailgun**: Verify your `MAILER_DOMAIN` and update the SMTP credentials.

@@ -6,6 +6,7 @@ import { updateProfile } from '../api/auth'
 import { CustomDatePicker, ModernConfirm } from '../components/Common/SharedUI'
 import useSWR, { useSWRConfig } from 'swr'
 import { fetcher } from '../api/fetcher'
+import { API_BASE } from '../api/config'
 
 const APP_NAME = 'Kemboi'
 
@@ -79,7 +80,7 @@ function FamilyBonusDashboard() {
   const executeClaimReward = async (reward) => {
     setConfirmData({ isOpen: false, reward: null })
     try {
-      const res = await fetch(`/api/rewards/${reward.id}/claim`, {
+      const res = await fetch(`${API_BASE}/rewards/${reward.id}/claim`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
       })

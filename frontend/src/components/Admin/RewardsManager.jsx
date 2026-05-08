@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { CustomDatePicker, ModernConfirm } from '../Common/SharedUI'
+import { API_BASE } from '../../api/config'
 
 function RewardsManager({ onRewardsChange }) {
   const { token } = useAuth()
@@ -32,7 +33,7 @@ function RewardsManager({ onRewardsChange }) {
 
   const fetchRewards = useCallback(async () => {
     try {
-      const res = await fetch('/api/rewards', {
+      const res = await fetch(`${API_BASE}/rewards`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
@@ -60,7 +61,7 @@ function RewardsManager({ onRewardsChange }) {
   const executeSave = async () => {
     setLoading(true)
     setShowSaveConfirm(false)
-    const url = editingReward ? `/api/rewards/${editingReward.id}` : '/api/rewards'
+    const url = editingReward ? `${API_BASE}/rewards/${editingReward.id}` : `${API_BASE}/rewards`
     const method = editingReward ? 'PUT' : 'POST'
 
     try {
@@ -110,7 +111,7 @@ function RewardsManager({ onRewardsChange }) {
     if (!rewardToDelete) return
 
     try {
-      const res = await fetch(`/api/rewards/${rewardToDelete}`, {
+      const res = await fetch(`${API_BASE}/rewards/${rewardToDelete}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       })
