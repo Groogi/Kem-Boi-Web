@@ -293,38 +293,28 @@ function AdminPanel() {
 
     setErrors({})
     setLoading(true)
+
+    // Name Splitting Logic
+    const nameParts = addUserForm.full_name.trim().split(/\s+/)
+    const firstName = nameParts[0]
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : ''
+
     try {
-      const res = await fetch(`${API_BASE}/register`, {
+      const res = await fetch(`${API_BASE}/transactions/quick_add`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, // Registration is usually public
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}` 
+        },
         body: JSON.stringify({
           email: addUserForm.email.trim().toLowerCase(),
-          first_name: (addUserForm.full_name.trim().split(' ')[0] || addUserForm.full_name.trim()).toLowerCase(),
-          last_name: (addUserForm.full_name.trim().split(' ').slice(1).join(' ') || '.').toLowerCase(),
-          password: 'Password123!', // Default password for invitations
-          role: 'customer',
+          points: addUserForm.points || 0,
+          first_name: firstName,
+          last_name: lastName
         }),
       })
+
       if (res.ok) {
-        const userData = await res.json()
-        // If points were specified, add them now
-        if (addUserForm.points && Number(addUserForm.points) !== 0) {
-          const userId = userData.id || userData.user?.id
-          if (userId) {
-            try {
-              await fetch(`${API_BASE}/users/${userId}/add_points`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify({
-                  points: addUserForm.points,
-                  notes: 'Initial Sign-up Bonus',
-                }),
-              })
-            } catch (pointErr) {
-              console.error('Failed to add initial points:', pointErr)
-            }
-          }
-        }
         showToast(`Invitation sent to ${addUserForm.email}!`, 'success')
         setAddUserForm({ full_name: '', email: '', points: '' })
         setViewMode('list')
@@ -332,13 +322,13 @@ function AdminPanel() {
       } else {
         const errorData = await res.json()
         showToast(
-          errorData.error || errorData.errors?.join(', ') || 'Failed to create user',
+          errorData.error || errorData.errors?.join(', ') || 'Failed to send invitation',
           'error'
         )
       }
     } catch (err) {
       console.error(err)
-      showToast('Network error occurred while creating user.', 'error')
+      showToast('Network error occurred while sending invitation.', 'error')
     } finally {
       setLoading(false)
     }
@@ -650,11 +640,12 @@ function AdminPanel() {
         </div>
 
         <div>
-          <label className="block text-sm font-bold text-[#4A6B10] mb-3 px-1">Add Points</label>
+          <label className="block text-sm font-bold text-[#4A6B10] mb-3 px-1">Initial Points Reward (Optional)</label>
           <div className="flex items-center gap-6">
-            <div className="relative group w-48">
+            <div className="relative group w-full">
               <input
                 type="number"
+                placeholder="0"
                 value={addUserForm.points}
                 onChange={(e) => setAddUserForm({ ...addUserForm, points: e.target.value })}
                 className="w-full bg-[#EBECE4] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none"
@@ -664,18 +655,6 @@ function AdminPanel() {
                 <span className="text-[9px] font-bold uppercase mt-0.5 tracking-wider">Edit</span>
               </div>
             </div>
-            <button 
-              onClick={() => {
-                if (addUserForm.points && Number(addUserForm.points) > 0) {
-                  showToast(`${addUserForm.points} points queued for this invitation!`, 'info');
-                } else {
-                  showToast('Enter a point amount first', 'warning');
-                }
-              }}
-              className="bg-[#5c8b16] text-white font-bold py-3.5 px-8 text-sm tracking-wide rounded-full shadow-md hover:bg-[#4a6b10] transition-all"
-            >
-              Add Points
-            </button>
           </div>
         </div>
       </div>

@@ -35,6 +35,18 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
           // Sort by created_at descending (newest first)
           const sorted = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
           setHistory(sorted)
+
+          // If we found a name in any of the pending records, use it for the display
+          if (email && sorted.length > 0) {
+            const namedRecord = sorted.find(r => r.first_name);
+            if (namedRecord) {
+              setBonusUser(prev => ({
+                ...prev,
+                first_name: namedRecord.first_name,
+                last_name: namedRecord.last_name
+              }));
+            }
+          }
         }
       } catch (err) {
         console.error(err)

@@ -13,6 +13,8 @@ class TransactionsController < ApplicationController
         { 
           id: pb.id, 
           points: pb.points_amount, 
+          first_name: pb.first_name,
+          last_name: pb.last_name,
           created_at: pb.created_at, 
           transaction_type: "pending", 
           notes: "Pending registration" 
@@ -33,9 +35,17 @@ class TransactionsController < ApplicationController
         render json: { errors: transaction.errors.full_messages }, status: :unprocessable_entity
       end
     else
-      # User doesn't exist, create a pending bonus
-      pb = PendingBonus.create(email: params[:email], points_amount: params[:points].to_i)
-      UserMailer.pending_bonus_notification(params[:email], params[:points].to_i).deliver_now
+      # User doesn't exist, create a pending bonus with optional names
+      pb = PendingBonus.create(
+        email: params[:email], 
+        points_amount: params[:points].to_i,
+        first_name: params[:first_name],
+        last_name: params[:last_name]
+      )
+      
+      # Pass the first_name to the mailer for a personalized greeting
+      UserMailer.pending_bonus_notification(params[:email], params[:points].to_i, params[:first_name]).deliver_now
+      
       render json: { message: "User not found. Points saved as pending bonus.", pending: pb }
     end
   end
