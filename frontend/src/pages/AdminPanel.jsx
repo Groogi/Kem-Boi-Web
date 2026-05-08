@@ -300,7 +300,7 @@ function AdminPanel() {
         body: JSON.stringify({
           email: addUserForm.email.trim().toLowerCase(),
           first_name: (addUserForm.full_name.trim().split(' ')[0] || addUserForm.full_name.trim()).toLowerCase(),
-          last_name: (addUserForm.full_name.trim().split(' ').slice(1).join(' ') || '').toLowerCase(),
+          last_name: (addUserForm.full_name.trim().split(' ').slice(1).join(' ') || '.').toLowerCase(),
           password: 'Password123!', // Default password for invitations
           role: 'customer',
         }),
@@ -312,7 +312,7 @@ function AdminPanel() {
           const userId = userData.id || userData.user?.id
           if (userId) {
             try {
-              await fetch(`/api/users/${userId}/add_points`, {
+              await fetch(`${API_BASE}/users/${userId}/add_points`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                 body: JSON.stringify({
@@ -664,7 +664,16 @@ function AdminPanel() {
                 <span className="text-[9px] font-bold uppercase mt-0.5 tracking-wider">Edit</span>
               </div>
             </div>
-            <button className="bg-[#5c8b16] text-white font-bold py-3.5 px-8 text-sm tracking-wide rounded-full shadow-md hover:bg-[#4a6b10] transition-all">
+            <button 
+              onClick={() => {
+                if (addUserForm.points && Number(addUserForm.points) > 0) {
+                  showToast(`${addUserForm.points} points queued for this invitation!`, 'info');
+                } else {
+                  showToast('Enter a point amount first', 'warning');
+                }
+              }}
+              className="bg-[#5c8b16] text-white font-bold py-3.5 px-8 text-sm tracking-wide rounded-full shadow-md hover:bg-[#4a6b10] transition-all"
+            >
               Add Points
             </button>
           </div>
