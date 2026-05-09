@@ -98,26 +98,18 @@ class UsersController < ApplicationController
   end
 
   def admin_update
-    if @current_user.admin?
-      @user = User.find(params[:id])
-      if @user.update(user_params)
-        render json: @user.as_json(methods: :points_balance)
-      else
-        render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
-      end
+    @user = User.find(params[:id])
+    if @user.update(user_params)
+      render json: @user.as_json(methods: :points_balance)
     else
-      render json: { error: "Not authorized" }, status: :unauthorized
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   def destroy
-    if @current_user.admin?
-      @user = User.find(params[:id])
-      @user.destroy
-      render json: { message: "User deleted" }
-    else
-      render json: { error: "Not authorized" }, status: :unauthorized
-    end
+    @user = User.find(params[:id])
+    @user.destroy
+    render json: { message: "User deleted" }
   end
 
   def add_points

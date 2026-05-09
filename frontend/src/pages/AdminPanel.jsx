@@ -151,7 +151,7 @@ function AdminPanel() {
     if (!id) return
 
     try {
-      const res = await fetch(`/api/redemptions/${id}`, {
+      const res = await fetch(`${API_BASE}/redemptions/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -168,7 +168,7 @@ function AdminPanel() {
   const fetchUserRedemptions = useCallback(
     async (userId) => {
       try {
-        const res = await fetch(`/api/redemptions?user_id=${userId}`, {
+        const res = await fetch(`${API_BASE}/redemptions?user_id=${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (res.ok) {
@@ -356,7 +356,7 @@ function AdminPanel() {
   const handleDeleteLocation = async (id) => {
     setLoading(true)
     try {
-      await fetch(`/api/locations/${id}`, {
+      await fetch(`${API_BASE}/locations/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -693,7 +693,7 @@ function AdminPanel() {
     setErrors({})
     setLoading(true)
     try {
-      const res = await fetch(`/api/users/${selectedUser.id}`, {
+      const res = await fetch(`${API_BASE}/users/${selectedUser.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
@@ -1566,7 +1566,7 @@ const UserDetailsView = ({
                 ])
               } else {
                 // Create new redemption (Direct Fulfill)
-                const res = await fetch(`/api/redemptions/direct_fulfill`, {
+                const res = await fetch(`${API_BASE}/redemptions/direct_fulfill`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                   body: JSON.stringify({ user_id: selectedUser.id, reward_id: reward.id }),

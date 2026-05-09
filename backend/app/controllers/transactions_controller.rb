@@ -55,10 +55,4 @@ class TransactionsController < ApplicationController
     render json: user.transactions.order(created_at: :desc)
   end
 
-  private
-
-  def transaction_params
-    # We permit points (should be negative for redemption) and transaction_type
-    params.require(:transaction).permit(:points, :transaction_type, :notes)
-  end
 end
