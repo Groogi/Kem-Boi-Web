@@ -3,11 +3,11 @@
 one:
   user: one
   reward: one
-  voucher_code: MyString
-  status: MyString
+  voucher_code: VOUCHER001
+  status: pending
 
 two:
   user: two
   reward: two
-  voucher_code: MyString
-  status: MyString
+  voucher_code: VOUCHER002
+  status: used
