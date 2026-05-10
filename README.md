@@ -12,11 +12,40 @@ Kemboi is a premium avocado dessert brand based on the Gold Coast, Australia. Re
 
 ### __Key Features__
 
-- **Loyalty Card System**: Integrated punch-card logic where points translate directly to physical "punches" on a digital member card.
-- **Premium Member IDs**: Clean, lowercase `kb-xxxx` format for all users.
-- **Dynamic Rewards Engine**: Support for global stock limits, personal claim limits, and "Never Expires" permanent offers.
-- **Admin Command Center**: Real-time customer search (by Name, Email, or ID), location management, and safe reward deletion logic.
-- **Automated Notifications**: Transactional emails for welcome points, pending bonuses, and password resets.
+### 🥑 **Core Customer Experience & Loyalty Engine**
+*   **Digital Punch-Card System:** A modern visual recreation of traditional café punch cards. The UI automatically translates raw points into physical "punches" (**200 points = 1 Punch**), giving users immediate, gamified feedback on their progress toward free items.
+*   **Tiered Status Badges:** Customers automatically graduate through visual loyalty tiers based on their total point balance. Badges are displayed prominently on both their dashboard and the admin directory:
+    *   **Bronze:** 0 - 199 points
+    *   **Silver:** 200 - 499 points
+    *   **Gold:** 500 - 999 points
+    *   **Platinum:** 1,000+ points
+*   **Live Rewards Marketplace:** Customers can browse a dynamic catalog of available rewards. The system actively checks their point balance and disables claiming if they have insufficient funds.
+*   **Redemption Tracking Wallet:** Once a reward is claimed, users receive a digital redemption ticket with a live status tracker (Pending, Used, Fulfilled) so they know exactly when to pick up their item.
+*   **Referral Loop Integration:** New users can enter a referral code during registration. The backend securely uses PostgreSQL row-locking (`FOR UPDATE`) to validate the code, automatically issuing a 100-point bonus to the referrer and a 50-point welcome gift to the new member.
+
+### 🛡️ **Advanced Authentication & Security**
+*   **Omnichannel Login:** Supports both traditional encrypted Email/Password registration (using bcrypt) and seamless Google OAuth 2.0 integration via JWT (JSON Web Tokens).
+*   **Premium Member Identity:** The database automatically assigns clean, branded account IDs (e.g., `kb-1234`) upon registration to maintain a premium feel.
+*   **Secure Password Recovery:** A fully functioning "Forgot Password" flow that generates time-sensitive, secure reset tokens delivered via automated email.
+*   **Robust Data Validation:** Custom toast notifications and inline UI highlights (red rings) guide users through input errors without relying on ugly default browser alerts.
+
+### 👑 **Admin Command Center (Staff Workflow)**
+*   **Customer Directory:** A real-time data table allowing staff to search the entire customer base by Name, Email, or custom `kb-id`.
+*   **Dual-Logic Onboarding:** A massive workflow optimization. Instead of separate processes for adding users and issuing points, staff can use the "Add Points" tool on an unregistered email. The system intelligently detects they aren't registered, safely stores the points in a `PendingBonus` table, and automatically emails the user an invitation to claim their waiting points.
+*   **Advanced Rewards Manager:** Admins have granular control over reward physics:
+    *   *Global Inventory Limits:* Restrict a highly-coveted item (like a plushie) to only 50 total claims globally.
+    *   *Personal Claim Limits:* Restrict users from claiming the same reward more than once.
+    *   *Lifecycle Management:* Set precise start/end dates, or mark items as "Never Expires."
+*   **Redemption Fulfillment Pipeline:** Staff can view all incoming reward claims, safely update their statuses to complete the transaction, or use "Direct Fulfill" to bypass the customer flow and issue a reward manually.
+
+### 🌐 **Dynamic Content Management (CMS)**
+*   **Live Store Locations Editor:** Instead of hardcoding HTML, the Landing Page fetches store locations directly from the database. Admins can add new pop-up stalls, update addresses, attach Google Maps URLs, and toggle locations to "Inactive" instantly via the dashboard.
+*   **Centralized Social Links:** Instagram, Facebook, and Website links are managed via the Admin Panel, automatically cascading updates down to the public-facing footer.
+
+### ✉️ **Automated Transactional Notifications**
+*   **Mailgun SMTP Integration:** Reliable, automated background email delivery.
+*   **Personalized "Pending Bonus" Emails:** When an admin uses the onboarding feature, the system sends a beautifully formatted email using the customer's first name, notifying them that points have been securely vaulted for them, driving instant conversions.
+*   **Security Emails:** Automated password reset delivery.
 
 ### __Prerequisites__
 
