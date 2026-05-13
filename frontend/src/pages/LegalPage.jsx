@@ -10,7 +10,6 @@ function LegalPage({ title, lastUpdated, sections }) {
 
   return (
     <div className="min-h-screen bg-[#f7f7f2] pb-20 pt-32">
-      {/* Simple header */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 mb-16">
         <button
           onClick={() => navigate(-1)}
@@ -28,7 +27,6 @@ function LegalPage({ title, lastUpdated, sections }) {
         </p>
       </div>
 
-      {/* Content */}
       <div className="max-w-[1440px] mx-auto px-6 md:px-12">
         <div className="bg-white rounded-[40px] p-8 md:p-16 shadow-sm border border-black/[0.03] max-w-4xl">
           <div className="space-y-12">
