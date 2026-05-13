@@ -2,7 +2,6 @@
 puts "🧹 Cleaning database..."
 Transaction.destroy_all
 Location.destroy_all
-Giveaway.destroy_all
 Link.destroy_all
 Reward.destroy_all
 Redemption.destroy_all
@@ -81,6 +80,8 @@ Reward.create!([
     name: "Refer A Friend",
     description: "Sweet Treats are better with a friend.",
     point_cost: 0,
+    start_date: Date.today - 7,
+    end_date: Date.today + 365,
     active: true,
     reward_type: "referral"
   },
@@ -88,19 +89,22 @@ Reward.create!([
     name: "Loyalty Level Up",
     description: "Loyalty hits different when its sweet.",
     point_cost: 500,
+    start_date: Date.today - 7,
+    end_date: Date.today + 365,
     active: true
   },
   {
     name: "Birthday Surprise",
     description: "A special treat for your special day.",
     point_cost: 0,
+    start_date: Date.today - 7,
+    end_date: Date.today + 365,
     active: false
   }
 ])
 
 # 6. Create Transactions for Tester (to show Points & Punch Card)
 puts "💰 Seeding Transaction History (800 points total)..."
-# Each 'earn' of 200 points corresponds to 1 punch in our UI logic
 4.times do |i|
   Transaction.create!(
     user: tester,

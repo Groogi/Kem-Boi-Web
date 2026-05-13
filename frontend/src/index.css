@@ -76,16 +76,6 @@ html {
   transform: scale(1);
 }
 
-.embla_slide_float {
-  height: 100%;
-  width: 100%;
-  animation: float 6s ease-in-out infinite;
-}
-
-/* Stagger the animations so they don't move in perfect sync */
-.embla_slide:nth-child(even) .embla_slide_float {
-  animation-delay: -3s;
-}
 
 .embla_slide img {
   display: block;
@@ -95,7 +85,6 @@ html {
   transition: transform 0.7s ease-out;
   transform-origin: center;
   border-radius: 80px;
-  /* Now the image itself is rounded! */
 }
 
 .embla_slide:hover img {
@@ -108,7 +97,6 @@ html {
   font-weight: 600;
   color: #426500;
   border-radius: 80px;
-  /* Round the placeholder backgrounds too */
 }
 
 .embla_controls {
@@ -225,21 +213,6 @@ input[type='number'] {
   animation: fade-in 0.4s ease-out forwards;
 }
 
-@keyframes bounce-short {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-.animate-bounce-short {
-  animation: bounce-short 1s ease-in-out infinite;
-}
 
 .custom-scrollbar::-webkit-scrollbar {
   width: 5px;
@@ -274,21 +247,6 @@ input[type='number'] {
   animation: scale-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-
-  50% {
-    transform: translateY(-18px) rotate(1deg);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
 
 @keyframes shine {
   0% {
