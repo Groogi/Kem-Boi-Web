@@ -10,7 +10,6 @@ function FamilyBonusDashboard() {
   const { showToast } = useToast()
   const navigate = useNavigate()
 
-  // View state: 'dashboard', 'rewards', 'reward-details', 'edit-account'
   const [activeTab, setActiveTab] = useState('dashboard')
   const [loading, setLoading] = useState(false)
   const [saveStatus, setSaveStatus] = useState('')
@@ -119,7 +118,6 @@ function FamilyBonusDashboard() {
 
   const status = getStatusBadge(user?.points_balance || 0)
 
-  // Form state
   const [formData, setFormData] = useState({
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
@@ -152,7 +150,6 @@ function FamilyBonusDashboard() {
     }
   }
 
-  // Reusable header navigation
   const renderHeader = () => (
     <header
       className={`hidden md:flex justify-between items-center py-6 md:py-8 mb-6 border-outline-variant/10 gap-4 md:gap-10 ${activeTab === 'edit-account' ? 'border-b-0' : 'border-b'}`}
@@ -260,7 +257,6 @@ function FamilyBonusDashboard() {
 
   const renderDashboard = () => (
     <div className="space-y-6 animate-fade-in">
-      {/* Welcome Banner */}
       <div className="bg-[#DFEECA] rounded-[1.5rem] p-8 md:p-10 shadow-sm border border-white/40">
         <h2 className="text-2xl md:text-3xl font-headline font-bold text-[#4A6B10] mb-2">
           Welcome to your Kem Boi Dashboard, {user?.first_name || 'Kem Boi'}!
@@ -270,9 +266,7 @@ function FamilyBonusDashboard() {
         </p>
       </div>
 
-      {/* Main Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Points Balance */}
         <div className="bg-primary rounded-[2.5rem] p-8 md:p-10 text-white shadow-xl flex flex-col justify-between relative overflow-hidden group">
           <div className="relative z-10">
             <div className="flex justify-between items-start mb-4">
@@ -297,11 +291,9 @@ function FamilyBonusDashboard() {
             away from the next tier!"
           </p>
 
-          {/* Subtle background decoration */}
           <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors"></div>
         </div>
 
-        {/* Punch Card Tracker */}
         <div className="bg-primary rounded-[1.5rem] p-8 md:p-10 text-white shadow-md flex flex-col justify-between">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold font-headline mb-2">Buy 5, Get 1 Free</h2>
@@ -333,7 +325,6 @@ function FamilyBonusDashboard() {
         </div>
       </div>
 
-      {/* Action Links Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
         <div
           onClick={() => setActiveTab('rewards')}
@@ -427,11 +418,10 @@ function FamilyBonusDashboard() {
                             if (!isReached && !isSoldOut) handleClaimReward(r)
                           }}
                           disabled={isReached || isSoldOut}
-                          className={`font-bold py-2 px-8 text-[11px] tracking-wider rounded-full transition-all shadow-sm ${
-                            isReached || isSoldOut
-                              ? 'bg-[#A8BFA0] text-primary/40 cursor-not-allowed'
-                              : 'bg-primary text-white hover:bg-[#395800]'
-                          }`}
+                          className={`font-bold py-2 px-8 text-[11px] tracking-wider rounded-full transition-all shadow-sm ${isReached || isSoldOut
+                            ? 'bg-[#A8BFA0] text-primary/40 cursor-not-allowed'
+                            : 'bg-primary text-white hover:bg-[#395800]'
+                            }`}
                         >
                           {isSoldOut ? 'SOLD OUT' : isReached ? 'CLAIMED' : 'CLAIM'}
                         </button>
@@ -522,14 +512,12 @@ function FamilyBonusDashboard() {
               key={red.id}
               className="bg-white rounded-[2rem] p-8 shadow-sm border border-outline-variant/10 flex flex-col relative group overflow-hidden"
             >
-              {/* Status Badge */}
               <div className="absolute top-6 right-6">
                 <span
-                  className={`text-[9px] font-black tracking-[0.15em] uppercase px-3 py-1 rounded-full border ${
-                    red.status === 'used'
-                      ? 'bg-red-50 text-red-500 border-red-100'
-                      : 'bg-green-50 text-green-600 border-green-100'
-                  }`}
+                  className={`text-[9px] font-black tracking-[0.15em] uppercase px-3 py-1 rounded-full border ${red.status === 'used'
+                    ? 'bg-red-50 text-red-500 border-red-100'
+                    : 'bg-green-50 text-green-600 border-green-100'
+                    }`}
                 >
                   {red.status}
                 </span>
@@ -663,11 +651,10 @@ function FamilyBonusDashboard() {
                 <button
                   onClick={() => handleClaimReward(selectedReward)}
                   disabled={isLimitReached || isSoldOut}
-                  className={`w-full md:w-auto font-bold py-4 px-14 text-sm tracking-[0.1em] rounded-full transition-all shadow-xl uppercase ${
-                    isLimitReached || isSoldOut
-                      ? 'bg-on-surface-variant/20 text-on-surface-variant/40 cursor-not-allowed'
-                      : 'bg-primary text-white hover:bg-[#395800] hover:scale-105 active:scale-95'
-                  }`}
+                  className={`w-full md:w-auto font-bold py-4 px-14 text-sm tracking-[0.1em] rounded-full transition-all shadow-xl uppercase ${isLimitReached || isSoldOut
+                    ? 'bg-on-surface-variant/20 text-on-surface-variant/40 cursor-not-allowed'
+                    : 'bg-primary text-white hover:bg-[#395800] hover:scale-105 active:scale-95'
+                    }`}
                 >
                   {isSoldOut ? 'Sold Out' : isLimitReached ? 'Limit Reached' : 'Claim Offer'}
                 </button>
@@ -681,10 +668,8 @@ function FamilyBonusDashboard() {
 
   const renderEditAccount = () => (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in pb-12 pt-2">
-      {/* Left Panel */}
       <div className="col-span-1 flex flex-col h-full">
         <div className="bg-[#fcfdf9] rounded-[1.5rem] p-6 shadow-sm border border-outline-variant/30 flex-grow">
-          {/* Profile Box */}
           <div className="flex items-center gap-4 mb-8">
             <div className="w-16 h-16 rounded-full bg-[#426500] flex flex-col justify-center items-center text-white text-3xl font-bold border-4 border-white shadow-sm">
               <span className="material-symbols-outlined text-[2.5rem]">person</span>
@@ -699,7 +684,6 @@ function FamilyBonusDashboard() {
             </div>
           </div>
 
-          {/* Nav selector */}
           <div className="bg-white border-2 border-[#e5e7e1] rounded-full px-5 py-3 flex items-center gap-3 text-[#426500] font-bold shadow-sm cursor-pointer shadow-black/5">
             <span className="material-symbols-outlined font-bold text-xl">account_circle</span>
             <span className="text-base text-[#4a6b10]">Personal Details</span>
@@ -716,7 +700,6 @@ function FamilyBonusDashboard() {
         </div>
       </div>
 
-      {/* Right Panel (Form) */}
       <div className="col-span-1 lg:col-span-2 bg-[#fcfdf9] rounded-[1.5rem] p-8 md:p-10 shadow-sm border border-outline-variant/30 flex flex-col h-full min-h-[460px]">
         <div className="flex items-center gap-4 mb-8">
           <h2 className="text-3xl font-bold text-[#426500] font-headline">Personal Details</h2>
@@ -726,7 +709,6 @@ function FamilyBonusDashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 flex-grow">
-          {/* First Name */}
           <div className="col-span-1">
             <label className="block text-[14px] font-bold text-[#63665e] mb-2 ml-[2px]">
               First Name
@@ -744,7 +726,6 @@ function FamilyBonusDashboard() {
             </div>
           </div>
 
-          {/* Last Name */}
           <div className="col-span-1">
             <label className="block text-[14px] font-bold text-[#63665e] mb-2 ml-[2px]">
               Last Name
@@ -762,7 +743,6 @@ function FamilyBonusDashboard() {
             </div>
           </div>
 
-          {/* Email Address */}
           <div className="col-span-1 md:col-span-2">
             <label className="block text-[14px] font-bold text-[#63665e] mb-2 ml-[2px]">
               Email Address
@@ -780,7 +760,6 @@ function FamilyBonusDashboard() {
             </div>
           </div>
 
-          {/* Phone */}
           <div className="col-span-1">
             <label className="block text-[14px] font-bold text-[#63665e] mb-2 ml-[2px]">
               Phone Number(Optional)
@@ -798,7 +777,6 @@ function FamilyBonusDashboard() {
             </div>
           </div>
 
-          {/* D.O.B. */}
           <div className="col-span-1">
             <CustomDatePicker
               label="D.O.B. (Optional)"
@@ -898,5 +876,4 @@ function FamilyBonusDashboard() {
     </div>
   )
 }
-
 export default FamilyBonusDashboard

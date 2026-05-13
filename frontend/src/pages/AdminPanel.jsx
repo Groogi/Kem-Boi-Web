@@ -13,14 +13,13 @@ function AdminPanel() {
   const { user, token, logout } = useAuth()
   const { showToast } = useToast()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('dashboard') // dashboard, bonus-entry, giveaways, locations
+  const [activeTab, setActiveTab] = useState('dashboard')
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [viewMode, setViewMode] = useState('list') // list, add-user, user-details
+  const [viewMode, setViewMode] = useState('list')
   const [selectedUser, setSelectedUser] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
 
-  // Locations State
   const [locations, setLocations] = useState([])
   const [locationMode, setLocationMode] = useState('grid')
   const [editingLocation, setEditingLocation] = useState(null)
@@ -41,7 +40,7 @@ function AdminPanel() {
     const query = searchQuery.toLowerCase()
     return fullName.includes(query) || email.includes(query) || accId.includes(query)
   })
-  // New states for interactive features
+
   const [quickEmail, setQuickEmail] = useState('')
   const [quickPoints, setQuickPoints] = useState('')
   const [selectedUserRedemptions, setSelectedUserRedemptions] = useState([])
@@ -102,7 +101,6 @@ function AdminPanel() {
   }, [token])
 
   useEffect(() => {
-    // Only redirect if we definitely have a user object and can confirm they are NOT an admin
     if (token && user && user.role && user.role !== 'admin') {
       navigate('/')
     }
@@ -359,7 +357,6 @@ function AdminPanel() {
     return { label: 'BRONZE', class: 'bg-[#B8BAAF] text-white' }
   }
 
-  // Sidebar navigation
   const navItems = [
     { id: 'dashboard', label: 'Customers', icon: 'group' },
     { id: 'bonus-entry', label: 'Staff Service Hub', icon: 'point_of_sale' },
@@ -371,7 +368,6 @@ function AdminPanel() {
 
   const renderSidebar = () => (
     <>
-      {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[60] lg:hidden animate-fade-in"
@@ -411,11 +407,10 @@ function AdminPanel() {
                 if (item.id === 'locations') setLocationMode('grid')
                 setIsSidebarOpen(false)
               }}
-              className={`flex items-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 group ${
-                activeTab === item.id
+              className={`flex items-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 group ${activeTab === item.id
                   ? 'bg-white border-2 border-[#E5E7E1] text-primary shadow-sm shadow-black/5'
                   : 'text-on-surface-variant hover:bg-surface-container-highest/30'
-              }`}
+                }`}
             >
               <span
                 className={`material-symbols-outlined text-[22px] ${activeTab === item.id ? 'font-bold' : 'font-light'}`}
@@ -504,61 +499,61 @@ function AdminPanel() {
             <tbody>
               {filteredUsers.length > 0
                 ? filteredUsers.map((u, idx) => {
-                    const status = getStatusBadge(u.points_balance)
-                    return (
-                      <tr
-                        key={idx}
-                        onClick={() => {
-                          setSelectedUser(u)
-                          setViewMode('user-details')
-                        }}
-                        className="hover:bg-surface-container-highest/10 cursor-pointer transition-all"
-                      >
-                        <td className="px-8 py-5 text-[11px] font-black text-[#5C5F57]">
-                          #{u.account_id || u.id}
-                        </td>
-                        <td className="px-8 py-5 text-sm font-bold text-on-surface">
-                          {u.first_name} {u.last_name}
-                        </td>
-                        <td className="px-8 py-5 text-sm font-bold text-[#5C5F57] italic">
-                          {u.email}
-                        </td>
-                        <td className="px-8 py-5 text-sm font-bold text-[#4A6B10] text-center font-headline">
-                          {u.points_balance} pts
-                        </td>
-                        <td className="px-8 py-5 text-center">
-                          <span
-                            className={`inline-block px-4 py-1 rounded-full text-[9px] font-bold tracking-widest ${status.class}`}
-                          >
-                            {status.label}
-                          </span>
-                        </td>
-                        <td className="px-8 py-6 text-right">
-                          <span className="bg-[#426500]/10 text-[#426500] font-bold text-[10px] tracking-widest px-6 py-2.5 rounded-full hover:bg-[#426500] hover:text-white transition-all uppercase border border-[#426500]/10">
-                            View
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  })
-                : [1, 2, 3, 4, 5].map((idx) => (
-                    <tr key={idx} className="opacity-10">
-                      <td className="px-8 py-5 text-[10px] font-black">#000</td>
-                      <td className="px-8 py-5 text-sm font-bold text-on-surface">Member Name</td>
-                      <td className="px-8 py-5 text-sm font-medium italic">member@email.com</td>
-                      <td className="px-8 py-5 text-sm font-bold text-center">0 pts</td>
+                  const status = getStatusBadge(u.points_balance)
+                  return (
+                    <tr
+                      key={idx}
+                      onClick={() => {
+                        setSelectedUser(u)
+                        setViewMode('user-details')
+                      }}
+                      className="hover:bg-surface-container-highest/10 cursor-pointer transition-all"
+                    >
+                      <td className="px-8 py-5 text-[11px] font-black text-[#5C5F57]">
+                        #{u.account_id || u.id}
+                      </td>
+                      <td className="px-8 py-5 text-sm font-bold text-on-surface">
+                        {u.first_name} {u.last_name}
+                      </td>
+                      <td className="px-8 py-5 text-sm font-bold text-[#5C5F57] italic">
+                        {u.email}
+                      </td>
+                      <td className="px-8 py-5 text-sm font-bold text-[#4A6B10] text-center font-headline">
+                        {u.points_balance} pts
+                      </td>
                       <td className="px-8 py-5 text-center">
-                        <span className="inline-block px-4 py-1 rounded-full text-[9px] font-bold bg-[#D1D3C8] text-white">
-                          BRONZE
+                        <span
+                          className={`inline-block px-4 py-1 rounded-full text-[9px] font-bold tracking-widest ${status.class}`}
+                        >
+                          {status.label}
                         </span>
                       </td>
-                      <td className="px-8 py-5 text-right">
-                        <span className="bg-[#426500]/5 text-[#426500] font-bold text-[10px] px-4 py-1.5 rounded-full uppercase">
+                      <td className="px-8 py-6 text-right">
+                        <span className="bg-[#426500]/10 text-[#426500] font-bold text-[10px] tracking-widest px-6 py-2.5 rounded-full hover:bg-[#426500] hover:text-white transition-all uppercase border border-[#426500]/10">
                           View
                         </span>
                       </td>
                     </tr>
-                  ))}
+                  )
+                })
+                : [1, 2, 3, 4, 5].map((idx) => (
+                  <tr key={idx} className="opacity-10">
+                    <td className="px-8 py-5 text-[10px] font-black">#000</td>
+                    <td className="px-8 py-5 text-sm font-bold text-on-surface">Member Name</td>
+                    <td className="px-8 py-5 text-sm font-medium italic">member@email.com</td>
+                    <td className="px-8 py-5 text-sm font-bold text-center">0 pts</td>
+                    <td className="px-8 py-5 text-center">
+                      <span className="inline-block px-4 py-1 rounded-full text-[9px] font-bold bg-[#D1D3C8] text-white">
+                        BRONZE
+                      </span>
+                    </td>
+                    <td className="px-8 py-5 text-right">
+                      <span className="bg-[#426500]/5 text-[#426500] font-bold text-[10px] px-4 py-1.5 rounded-full uppercase">
+                        View
+                      </span>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -937,7 +932,6 @@ function AdminPanel() {
     <div className="min-h-screen bg-[#FBFBF5] font-body text-on-surface selection:bg-[#c7fc79] selection:text-[#304c00]">
       {renderSidebar()}
 
-      {/* Mobile Header */}
       <div className="lg:hidden bg-[#F2F3EB] border-b border-outline-variant/10 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <button
@@ -1092,11 +1086,10 @@ const RedemptionRow = ({ red, onUpdate, onDelete }) => {
       </td>
       <td className="px-8 py-6 text-center">
         <span
-          className={`text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border ${
-            red.status === 'used' || red.status === 'fulfilled'
+          className={`text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border ${red.status === 'used' || red.status === 'fulfilled'
               ? 'bg-red-50 text-red-500 border-red-200'
               : 'bg-[#F2F3EB] text-[#4A6B10] border-[#D1D3C8]'
-          }`}
+            }`}
         >
           {red.status}
         </span>
