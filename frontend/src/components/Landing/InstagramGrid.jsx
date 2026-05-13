@@ -4,7 +4,6 @@ function InstagramGrid() {
   return (
     <section className="pt-24 pb-20 md:pt-32 md:pb-24 bg-[#f7f7f2]">
       <div className="max-w-[1440px] px-6 md:px-12 mx-auto">
-        {/* Header Section */}
         <div className="mb-10 md:mb-14 relative">
           <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 mb-4">
             <h2 className="text-[36px] md:text-[60px] font-bold font-headline text-[#426500] tracking-[-1px] md:tracking-[-1.5px] leading-tight">
@@ -44,7 +43,6 @@ function InstagramGrid() {
           </p>
         </div>
 
-        {/* Masonry Scatter Grid (Images with shadows, no white border padding) */}
         <div className="relative w-full h-[750px] lg:h-[709px] hidden lg:block">
           <div className="absolute left-0 top-0 w-[342px] h-[278px] rounded-[24px] shadow-[15px_20px_45px_rgba(0,0,0,0.15)] overflow-hidden">
             <img
@@ -104,7 +102,6 @@ function InstagramGrid() {
           </div>
         </div>
 
-        {/* Mobile Grid */}
         <div className="grid grid-cols-2 gap-4 lg:hidden px-2">
           <div className="rounded-[20px] shadow-lg overflow-hidden h-[240px]">
             <img

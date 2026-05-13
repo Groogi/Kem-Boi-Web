@@ -8,12 +8,10 @@ function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Check for background change on scroll
       setIsScrolled(window.scrollY > 20)
 
-      // ScrollSpy logic
       const sections = ['products', 'story', 'locations']
-      const scrollPosition = window.scrollY + 200 // Better offset for active detection
+      const scrollPosition = window.scrollY + 200
 
       let currentSection = ''
       for (const section of sections) {
@@ -48,7 +46,6 @@ function Navbar() {
   }, [isOpen])
 
   const getLinkClass = (sectionId) => {
-    // Map 'menu' and 'our-products' both to the 'products' section
     const targetSection =
       sectionId === 'menu' || sectionId === 'our-products' ? 'products' : sectionId
     const isActive = activeSection === targetSection
@@ -64,7 +61,6 @@ function Navbar() {
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-[#f7f7f2]/95 backdrop-blur-md py-1 shadow-sm' : 'bg-transparent py-4'}`}
     >
-      {/* Desktop Header */}
       <div className="flex justify-between items-center px-6 md:px-12 max-w-[1440px] mx-auto">
         <div className="flex-shrink-0">
           <Link to="/" onClick={() => window.scrollTo(0, 0)}>
@@ -76,7 +72,6 @@ function Navbar() {
           </Link>
         </div>
 
-        {/* Desktop Links */}
         <div className="hidden lg:flex items-center gap-10 font-bold text-[16px] font-headline">
           <a className={getLinkClass('menu')} href="#products">
             Menu
@@ -109,7 +104,6 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Menu Drawer */}
       <div
         className={`fixed top-0 left-0 w-full h-screen bg-[#f7f7f2] z-[100] transition-all duration-500 lg:hidden ${
           isOpen

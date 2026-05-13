@@ -5,7 +5,6 @@ function VisualLayers() {
   const slides = [{ src: '/socials-holding.png', alt: 'Avocado Desert' }, { src: '/socials-dessert.png', alt: 'Avocado Desert' }, { src: '/socials-store-front.png', alt: 'Avocado Desert' }]
   return (
     <div className="bg-[#f7f7f2]">
-      {/* Our Products Section */}
       <section className="py-20 md:py-24 bg-[#f7f7f2]" id="products">
         <div className="max-w-[1440px] px-6 md:px-12 mx-auto text-center flex flex-col items-center">
           <h2 className="text-[40px] md:text-[60px] font-bold font-headline text-[#426500] mb-6 tracking-[-0.02em] leading-tight">
@@ -22,7 +21,6 @@ function VisualLayers() {
         </div>
       </section>
 
-      {/* Our Story Section */}
       <section className="py-24 md:py-40 bg-[#f7f7f2]" id="story">
         <div className="max-w-[1440px] px-6 md:px-12 mx-auto flex flex-col lg:flex-row items-center gap-16 md:gap-24">
           <div className="lg:w-1/2 flex flex-col items-center lg:items-start">
@@ -43,7 +41,6 @@ function VisualLayers() {
               alt="Kem Bo Heritage"
               className="w-full h-full object-cover transition-transform duration-700 ease-out hover:scale-[1.08]"
             />
-            {/* Glossy Overlay/Shine Effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent w-full h-full animate-shine pointer-events-none" />
           </div>
         </div>

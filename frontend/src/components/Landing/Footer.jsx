@@ -33,13 +33,11 @@ function Footer() {
     <footer className="w-full bg-[#f7f7f2] py-14 border-t border-black/[0.03]">
       <div className="max-w-[1440px] mx-auto px-6 md:px-12">
         <div className="flex flex-col md:flex-row justify-between items-center text-[13px] text-[#5B5C59] font-medium font-body gap-10">
-          {/* Left: Brand & Copyright */}
           <div className="flex flex-col items-center md:items-start">
             <div className="font-bold text-[#426500] text-[20px] font-headline mb-1">Kem Boi</div>
             <div className="opacity-50 text-[11px]">© 2026 Kem Boi Digital Editorial</div>
           </div>
 
-          {/* Center: Navigation */}
           <div className="flex gap-12 font-medium">
             <a href="/#locations" className="hover:text-[#426500] transition-colors">
               Location
@@ -52,7 +50,6 @@ function Footer() {
             </Link>
           </div>
 
-          {/* Right: Socials */}
           <div className="flex gap-5 items-center">
             <a
               href={ensureHttps(socialLinks.facebook)}
