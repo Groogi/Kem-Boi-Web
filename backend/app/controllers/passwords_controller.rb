@@ -4,7 +4,7 @@ class PasswordsController < ApplicationController
       return render json: { error: "Email not present" }, status: :unprocessable_entity
     end
 
-    user = User.find_by(email: params[:email])
+    user = User.find_by(email: params[:email].to_s.downcase)
 
     if user.present?
       user.generate_password_reset_token!
@@ -23,7 +23,7 @@ class PasswordsController < ApplicationController
       return render json: { error: "Email not present" }, status: :unprocessable_entity
     end
 
-    user = User.find_by(email: params[:email])
+    user = User.find_by(email: params[:email].to_s.downcase)
 
     if user.present? && ActiveSupport::SecurityUtils.secure_compare(user.reset_password_token, token) && user.password_reset_valid?
       if user.reset_password!(params[:password])
