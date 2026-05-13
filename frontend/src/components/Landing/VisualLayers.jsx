@@ -40,7 +40,7 @@ function VisualLayers() {
           <div className="lg:w-1/2 w-full aspect-[4/3] max-w-[650px] overflow-hidden rounded-[40px] md:rounded-[50px] shadow-[30px_30px_90px_rgba(0,0,0,0.05)] border-2 border-white/60 relative">
             <img
               src="/placeholder-heritage.png"
-              alt="Kem Bo Heritage"
+              alt="Kem Boi Heritage"
               className="w-full h-full object-cover transition-transform duration-700 ease-out hover:scale-[1.08]"
             />
             {/* Glossy Overlay/Shine Effect */}
