@@ -3,12 +3,10 @@ import FamilyBonusDashboard from '../../pages/FamilyBonusDashboard';
 import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 
-// Mock AuthContext
 vi.mock('../../context/AuthContext', () => ({
   useAuth: vi.fn(),
 }));
 
-// Mock ToastContext
 vi.mock('../../context/ToastContext', () => ({
   useToast: () => ({
     showToast: vi.fn(),
@@ -21,7 +19,7 @@ describe('FamilyBonusDashboard Page', () => {
   const mockUser = {
     first_name: 'Timmy',
     last_name: 'Tester',
-    points_balance: 650, // Should be SILVER
+    points_balance: 650,
     role: 'member',
     email: 'timmy@example.com',
   };
@@ -59,15 +57,11 @@ describe('FamilyBonusDashboard Page', () => {
       </MemoryRouter>
     );
 
-    // Points display
     expect(screen.getByText(/650/i)).toBeInTheDocument();
-    
-    // Status Badge (650 pts = SILVER)
     expect(screen.getByText(/SILVER/i)).toBeInTheDocument();
   });
 
   test('calculates punch card correctly', () => {
-    // 650 points / 200 per punch = 3 punches. 6 - 3 = 3 more to go.
     render(
       <MemoryRouter>
         <FamilyBonusDashboard />
@@ -84,11 +78,9 @@ describe('FamilyBonusDashboard Page', () => {
       </MemoryRouter>
     );
 
-    // Find the Rewards tab button (the one for desktop in the header)
     const rewardsTab = screen.getAllByRole('button', { name: /Rewards/i })[0];
     fireEvent.click(rewardsTab);
 
-    // Check if the "Redeemable Offers" heading appears
     expect(screen.getByText(/Redeemable Offers:/i)).toBeInTheDocument();
   });
 });

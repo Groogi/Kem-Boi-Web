@@ -12,7 +12,6 @@ describe('Locations Component', () => {
   });
 
   test('renders loading/fallback state then location details', async () => {
-    // Mock a successful fetch
     const mockLocation = [{
       id: 1,
       name: 'Test Store',
@@ -30,7 +29,6 @@ describe('Locations Component', () => {
 
     render(<Locations />);
 
-    // Check if the store name appears after fetch
     await waitFor(() => {
       expect(screen.getByText('Test Store')).toBeInTheDocument();
     });
@@ -43,7 +41,6 @@ describe('Locations Component', () => {
 
     render(<Locations />);
 
-    // Should show the fallback "Flagship Stall"
     await waitFor(() => {
       expect(screen.getByText(/The Flagship Stall/i)).toBeInTheDocument();
     });

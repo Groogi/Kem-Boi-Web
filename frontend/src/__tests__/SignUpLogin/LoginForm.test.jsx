@@ -3,7 +3,6 @@ import LoginForm from '../../components/SignUpLogin/LoginForm';
 import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 
-// Mock Contexts
 vi.mock('../../context/AuthContext', () => ({
   useAuth: () => ({
     login: vi.fn(),
@@ -26,10 +25,8 @@ describe('LoginForm Component', () => {
       </MemoryRouter>
     );
 
-    // Initial state should be Login
     expect(screen.getByText(/Welcome Back to the World of Kem Boi/i)).toBeInTheDocument();
 
-    // Switch to Sign Up
     const signUpTab = screen.getByText(/Join The Family/i);
     fireEvent.click(signUpTab);
 
@@ -57,22 +54,18 @@ describe('LoginForm Component', () => {
       </MemoryRouter>
     );
 
-    // Switch to Sign Up
     fireEvent.click(screen.getByText(/Join The Family/i));
 
-    // Fill all required fields
     fireEvent.change(screen.getByPlaceholderText(/First name/i), { target: { value: 'Timmy' } });
     fireEvent.change(screen.getByPlaceholderText(/Last name/i), { target: { value: 'Tester' } });
     fireEvent.change(screen.getByPlaceholderText(/email@example.com/i), { target: { value: 'test@example.com' } });
 
-    // Fill form with mismatching passwords
     const passwordInput = screen.getAllByPlaceholderText(/••••••••/i)[0];
     const confirmInput = screen.getAllByPlaceholderText(/••••••••/i)[1];
 
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.change(confirmInput, { target: { value: 'different123' } });
 
-    // 3. Submit the FORM directly
     const form = container.querySelector('form');
     fireEvent.submit(form);
 

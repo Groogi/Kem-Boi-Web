@@ -3,7 +3,6 @@ import ResetPassword from '../../pages/ResetPassword';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { vi } from 'vitest';
 
-// Mock API and Contexts
 vi.mock('../../api/auth', () => ({
   resetPassword: vi.fn(),
 }));

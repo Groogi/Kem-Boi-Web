@@ -3,19 +3,16 @@ import AdminPanel from '../../pages/AdminPanel';
 import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 
-// Mock AuthContext
 vi.mock('../../context/AuthContext', () => ({
   useAuth: vi.fn(),
 }));
 
-// Mock ToastContext
 vi.mock('../../context/ToastContext', () => ({
   useToast: () => ({
     showToast: vi.fn(),
   }),
 }));
 
-// Mock child components to keep tests focused
 vi.mock('../../components/Admin/BonusEntryForm', () => ({ default: () => <div>BonusEntryForm</div> }));
 vi.mock('../../components/Admin/WebsiteLinksForm', () => ({ default: () => <div>WebsiteLinksForm</div> }));
 vi.mock('../../components/Admin/LocationEditor', () => ({ default: () => <div>LocationEditor</div> }));
@@ -81,9 +78,7 @@ describe('AdminPanel Page', () => {
     const staffHubBtn = screen.getByText(/Staff Service Hub/i);
     fireEvent.click(staffHubBtn);
 
-    // Header title should update
     expect(screen.getAllByText(/Staff Service Hub/i).length).toBeGreaterThan(1);
-    // Sub-component should render
     expect(screen.getByText(/BonusEntryForm/i)).toBeInTheDocument();
   });
 
@@ -106,17 +101,14 @@ describe('AdminPanel Page', () => {
       </MemoryRouter>
     );
 
-    // Wait for users to load
     await waitFor(() => {
       expect(screen.getAllByText(/Alice/i)[0]).toBeInTheDocument();
       expect(screen.getAllByText(/Bob/i)[0]).toBeInTheDocument();
     });
 
-    // Type into search
     const searchInput = screen.getByPlaceholderText(/Search membership/i);
     fireEvent.change(searchInput, { target: { value: 'Alice' } });
 
-    // Bob should be filtered out
     expect(screen.getAllByText(/Alice/i)[0]).toBeInTheDocument();
     expect(screen.queryByText(/Bob/i)).not.toBeInTheDocument();
   });
