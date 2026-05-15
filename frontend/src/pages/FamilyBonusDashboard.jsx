@@ -35,16 +35,6 @@ function FamilyBonusDashboard() {
   const myRedemptions = redemptionsData || []
   const displayUser = profileData || user
 
-  if (!displayUser && (profileLoading || rewardsLoading)) {
-    return (
-      <div className="min-h-screen bg-[#EBECE4] flex items-center justify-center font-headline font-bold text-primary">
-        <div className="flex flex-col items-center gap-4">
-           <span className="material-symbols-outlined text-5xl animate-spin">refresh</span>
-           <p className="text-xl">Loading your avocado goodness...</p>
-        </div>
-      </div>
-    )
-  }
 
   const refreshAllData = async () => {
     setLoading(true)
@@ -142,6 +132,17 @@ function FamilyBonusDashboard() {
       })
     }
   }, [displayUser])
+
+  if (!displayUser && (profileLoading || rewardsLoading)) {
+    return (
+      <div className="min-h-screen bg-[#EBECE4] flex items-center justify-center font-headline font-bold text-primary">
+        <div className="flex flex-col items-center gap-4">
+           <span className="material-symbols-outlined text-5xl animate-spin">refresh</span>
+           <p className="text-xl">Loading your avocado goodness...</p>
+        </div>
+      </div>
+    )
+  }
 
   // Punch Card Logic: 1 punch per 100 points, 5 punches = reward
   const POINTS_PER_PUNCH = 100
@@ -326,13 +327,17 @@ function FamilyBonusDashboard() {
             </div>
           </div>
           <p className="text-base font-semibold leading-relaxed opacity-90 mt-4 max-w-[280px] relative z-10 italic">
-            "Keep sipping, you're only{' '}
-            {status.label === 'PLATINUM'
-              ? 'mastering the art'
-              : status.label === 'GOLD'
-                ? '500 pts'
-                : 'a few drinks'}{' '}
-            away from the next tier!"
+            {status.label === 'PLATINUM' ? (
+              `"You've mastered the art! Enjoy the Platinum life!"`
+            ) : (
+              `"Keep sipping, you're only ${
+                status.label === 'GOLD'
+                  ? 1500 - (displayUser?.points_balance || 0)
+                  : status.label === 'SILVER'
+                  ? 1000 - (displayUser?.points_balance || 0)
+                  : 500 - (displayUser?.points_balance || 0)
+              } pts away from the next tier!"`
+            )}
           </p>
 
           {/* Subtle background decoration */}

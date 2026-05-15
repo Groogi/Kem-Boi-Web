@@ -15,7 +15,7 @@ function AdminPanel() {
   const { showToast } = useToast()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState(() => localStorage.getItem('adminActiveTab') || 'dashboard') // dashboard, bonus-entry, giveaways, locations
-  
+
   useEffect(() => {
     localStorage.setItem('adminActiveTab', activeTab)
   }, [activeTab])
@@ -218,20 +218,25 @@ function AdminPanel() {
     }
   }
 
-  const handleManualAddPoints = async () => {
+  const handleManualAddPoints = async (actionType = 'add') => {
     if (!selectedUser) return
-    if (!manualPointsAmount || isNaN(manualPointsAmount) || Number(manualPointsAmount) <= 0) {
+    const amount = Number(manualPointsAmount)
+    if (!manualPointsAmount || isNaN(amount) || amount <= 0) {
       setErrors({ manualPoints: true })
       showToast('Please enter a valid numeric point amount.', 'error')
       return
     }
     setErrors({})
     setLoading(true)
+    
+    const finalPoints = actionType === 'subtract' ? -amount : amount;
+    const notes = actionType === 'subtract' ? 'Admin Manual Deduction' : 'Admin Manual Addition';
+
     try {
       const res = await fetch(`${API_BASE}/users/${selectedUser.id}/add_points`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ points: manualPointsAmount, notes: 'Admin Manual Addition' }),
+        body: JSON.stringify({ points: finalPoints, notes }),
       })
       if (res.ok) {
         const data = await res.json()
@@ -302,9 +307,9 @@ function AdminPanel() {
     try {
       const res = await fetch(`${API_BASE}/transactions/quick_add`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}` 
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
           email: addUserForm.email.trim().toLowerCase(),
@@ -337,7 +342,7 @@ function AdminPanel() {
   const handleSaveLocation = async (locationData) => {
     setLoading(true)
     try {
-      const url = locationData.id ? `/api/locations/${locationData.id}` : '/api/locations'
+      const url = locationData.id ? `${API_BASE}/locations/${locationData.id}` : `${API_BASE}/locations`
       const method = locationData.id ? 'PUT' : 'POST'
       await fetch(url, {
         method,
@@ -428,11 +433,10 @@ function AdminPanel() {
                 if (item.id === 'locations') setLocationMode('grid')
                 setIsSidebarOpen(false)
               }}
-              className={`flex items-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 group ${
-                activeTab === item.id
+              className={`flex items-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 group ${activeTab === item.id
                   ? 'bg-[#EEF4E4] border-2 border-[#E5E7E1] text-primary shadow-sm shadow-black/5'
                   : 'text-on-surface-variant hover:bg-surface-container-highest/30'
-              }`}
+                }`}
             >
               <span
                 className={`material-symbols-outlined text-[22px] ${activeTab === item.id ? 'font-bold' : 'font-light'}`}
@@ -522,67 +526,67 @@ function AdminPanel() {
             <tbody>
               {filteredUsers.length > 0
                 ? filteredUsers.map((u, idx) => {
-                    const status = getStatusBadge(u.points_balance)
-                    return (
-                      <tr
-                        key={idx}
-                        onClick={() => {
-                          setSelectedUser(u)
-                          setEditUserForm({
-                            first_name: u.first_name || '',
-                            last_name: u.last_name || '',
-                            email: u.email || '',
-                          })
-                          fetchUserRedemptions(u.id)
-                          setViewMode('user-details')
-                        }}
-                        className="hover:bg-surface-container-highest/10 cursor-pointer transition-all"
-                      >
-                        <td className="px-8 py-5 text-sm font-bold text-[#5C5F57] whitespace-nowrap tracking-tighter">
-                          {u.account_id?.toLowerCase()}
-                        </td>
-                        <td className="px-8 py-5 text-sm font-bold text-on-surface capitalize">
-                          {u.first_name} {u.last_name}
-                        </td>
-                        <td className="px-8 py-5 text-sm font-bold text-[#5C5F57] italic">
-                          {u.email}
-                        </td>
-                        <td className="px-8 py-5 text-sm font-bold text-[#4A6B10] text-center font-headline">
-                          {u.points_balance} pts
-                        </td>
-                        <td className="px-8 py-5 text-center">
-                          <span
-                            className={`inline-block px-4 py-1 rounded-full text-[9px] font-bold tracking-widest ${status.class}`}
-                          >
-                            {status.label}
-                          </span>
-                        </td>
-                        <td className="px-8 py-6 text-center">
-                          <span className="bg-[#426500]/10 text-[#426500] font-bold text-[10px] tracking-widest px-6 py-2.5 rounded-full hover:bg-[#426500] hover:text-white transition-all uppercase border border-[#426500]/10">
-                            View
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  })
-                : [1, 2, 3, 4, 5].map((idx) => (
-                    <tr key={idx} className="opacity-10">
-                      <td className="px-8 py-5 text-[10px] font-black">#000</td>
-                      <td className="px-8 py-5 text-sm font-bold text-on-surface">Member Name</td>
-                      <td className="px-8 py-5 text-sm font-medium italic">member@email.com</td>
-                      <td className="px-8 py-5 text-sm font-bold text-center">0 pts</td>
+                  const status = getStatusBadge(u.points_balance)
+                  return (
+                    <tr
+                      key={idx}
+                      onClick={() => {
+                        setSelectedUser(u)
+                        setEditUserForm({
+                          first_name: u.first_name || '',
+                          last_name: u.last_name || '',
+                          email: u.email || '',
+                        })
+                        fetchUserRedemptions(u.id)
+                        setViewMode('user-details')
+                      }}
+                      className="hover:bg-surface-container-highest/10 cursor-pointer transition-all"
+                    >
+                      <td className="px-8 py-5 text-sm font-bold text-[#5C5F57] whitespace-nowrap tracking-tighter">
+                        {u.account_id?.toLowerCase()}
+                      </td>
+                      <td className="px-8 py-5 text-sm font-bold text-on-surface capitalize">
+                        {u.first_name} {u.last_name}
+                      </td>
+                      <td className="px-8 py-5 text-sm font-bold text-[#5C5F57] italic">
+                        {u.email}
+                      </td>
+                      <td className="px-8 py-5 text-sm font-bold text-[#4A6B10] text-center font-headline">
+                        {u.points_balance} pts
+                      </td>
                       <td className="px-8 py-5 text-center">
-                        <span className="inline-block px-4 py-1 rounded-full text-[9px] font-bold bg-[#D1D3C8] text-white">
-                          BRONZE
+                        <span
+                          className={`inline-block px-4 py-1 rounded-full text-[9px] font-bold tracking-widest ${status.class}`}
+                        >
+                          {status.label}
                         </span>
                       </td>
-                      <td className="px-8 py-5 text-right">
-                        <span className="bg-[#426500]/5 text-[#426500] font-bold text-[10px] px-4 py-1.5 rounded-full uppercase">
+                      <td className="px-8 py-6 text-center">
+                        <span className="bg-[#426500]/10 text-[#426500] font-bold text-[10px] tracking-widest px-6 py-2.5 rounded-full hover:bg-[#426500] hover:text-white transition-all uppercase border border-[#426500]/10">
                           View
                         </span>
                       </td>
                     </tr>
-                  ))}
+                  )
+                })
+                : [1, 2, 3, 4, 5].map((idx) => (
+                  <tr key={idx} className="opacity-10">
+                    <td className="px-8 py-5 text-[10px] font-black">#000</td>
+                    <td className="px-8 py-5 text-sm font-bold text-on-surface">Member Name</td>
+                    <td className="px-8 py-5 text-sm font-medium italic">member@email.com</td>
+                    <td className="px-8 py-5 text-sm font-bold text-center">0 pts</td>
+                    <td className="px-8 py-5 text-center">
+                      <span className="inline-block px-4 py-1 rounded-full text-[9px] font-bold bg-[#D1D3C8] text-white">
+                        BRONZE
+                      </span>
+                    </td>
+                    <td className="px-8 py-5 text-right">
+                      <span className="bg-[#426500]/5 text-[#426500] font-bold text-[10px] px-4 py-1.5 rounded-full uppercase">
+                        View
+                      </span>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -841,11 +845,10 @@ function AdminPanel() {
               <button
                 key={status}
                 onClick={() => setLocationStatusFilter(status)}
-                className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                  locationStatusFilter === status
+                className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${locationStatusFilter === status
                     ? 'bg-white text-primary shadow-sm'
                     : 'text-primary/60 hover:text-primary'
-                }`}
+                  }`}
               >
                 {status}
               </button>
@@ -1186,11 +1189,10 @@ const RedemptionRow = ({ red, onUpdate, onDelete }) => {
       </td>
       <td className="px-8 py-6 text-center">
         <span
-          className={`text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border ${
-            red.status === 'used' || red.status === 'fulfilled'
+          className={`text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full border ${red.status === 'used' || red.status === 'fulfilled'
               ? 'bg-red-50 text-red-500 border-red-200'
               : 'bg-[#F2F3EB] text-[#4A6B10] border-[#D1D3C8]'
-          }`}
+            }`}
         >
           {red.status}
         </span>
@@ -1376,13 +1378,22 @@ const UserDetailsView = ({
                   <span className="text-[8px] font-bold uppercase tracking-tighter">Edit</span>
                 </div>
               </div>
-              <button
-                onClick={handleManualAddPoints}
-                disabled={loading}
-                className="bg-[#426500] text-white font-bold px-12 py-3.5 rounded-full text-sm shadow-md shadow-[#426500]/20 disabled:opacity-50 hover:bg-[#395800] transition-all active:scale-95"
-              >
-                {loading ? '...' : 'Add Points'}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleManualAddPoints('add')}
+                  disabled={loading}
+                  className="bg-[#426500] text-white font-bold px-8 py-3.5 rounded-full text-sm shadow-md shadow-[#426500]/20 disabled:opacity-50 hover:bg-[#395800] transition-all active:scale-95 whitespace-nowrap"
+                >
+                  {loading ? '...' : 'Add Points'}
+                </button>
+                <button
+                  onClick={() => handleManualAddPoints('subtract')}
+                  disabled={loading}
+                  className="bg-red-500 text-white font-bold px-8 py-3.5 rounded-full text-sm shadow-md shadow-red-500/20 disabled:opacity-50 hover:bg-red-600 transition-all active:scale-95 whitespace-nowrap"
+                >
+                  Subtract
+                </button>
+              </div>
             </div>
 
             <div className="mt-12 space-y-10">

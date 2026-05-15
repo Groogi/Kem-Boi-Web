@@ -239,28 +239,52 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                       PTS
                     </span>
                   </div>
-                  <button
-                    onClick={async () => {
-                      const points = String(quickPoints).trim()
-                      if (!points || isNaN(points) || Number(points) <= 0) {
-                        setErrors({ quickPoints: true })
-                        showToast('Please enter a valid numeric point amount.', 'error')
-                        return
-                      }
+                  <div className="flex gap-3 mt-2">
+                    <button
+                      onClick={async () => {
+                        const points = String(quickPoints).trim()
+                        if (!points || isNaN(points) || Number(points) <= 0) {
+                          setErrors({ quickPoints: true })
+                          showToast('Please enter a valid numeric point amount.', 'error')
+                          return
+                        }
 
-                      setErrors({})
-                      await onQuickAdd(bonusUser.email, points)
-                      setQuickPoints('')
-                      fetchTransactions(bonusUser.id)
-                    }}
-                    disabled={loading || !quickPoints}
-                    className="w-full bg-primary text-white font-bold py-4 rounded-full shadow-lg shadow-primary/20 hover:bg-[#395800] transition-all active:scale-95 disabled:opacity-20 flex items-center justify-center gap-2 group"
-                  >
-                    <span className="material-symbols-outlined text-[18px] transition-transform group-hover:rotate-12">
-                      add_circle
-                    </span>
-                    <span className="text-xs tracking-widest uppercase">Add Points</span>
-                  </button>
+                        setErrors({})
+                        await onQuickAdd(bonusUser.email, points)
+                        setQuickPoints('')
+                        fetchTransactions(bonusUser.id)
+                      }}
+                      disabled={loading || !quickPoints}
+                      className="flex-1 bg-primary text-white font-bold py-4 rounded-full shadow-lg shadow-primary/20 hover:bg-[#395800] transition-all active:scale-95 disabled:opacity-20 flex items-center justify-center gap-2 group"
+                    >
+                      <span className="material-symbols-outlined text-[18px] transition-transform group-hover:rotate-12">
+                        add_circle
+                      </span>
+                      <span className="text-xs tracking-widest uppercase">Add</span>
+                    </button>
+                    <button
+                      onClick={async () => {
+                        const points = String(quickPoints).trim()
+                        if (!points || isNaN(points) || Number(points) <= 0) {
+                          setErrors({ quickPoints: true })
+                          showToast('Please enter a valid numeric point amount.', 'error')
+                          return
+                        }
+
+                        setErrors({})
+                        await onQuickAdd(bonusUser.email, Number(points) * -1)
+                        setQuickPoints('')
+                        fetchTransactions(bonusUser.id)
+                      }}
+                      disabled={loading || !quickPoints}
+                      className="flex-1 bg-red-500 text-white font-bold py-4 rounded-full shadow-lg shadow-red-500/20 hover:bg-red-600 transition-all active:scale-95 disabled:opacity-20 flex items-center justify-center gap-2 group"
+                    >
+                      <span className="material-symbols-outlined text-[18px] transition-transform group-hover:-rotate-12">
+                        remove_circle
+                      </span>
+                      <span className="text-xs tracking-widest uppercase">Subtract</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
