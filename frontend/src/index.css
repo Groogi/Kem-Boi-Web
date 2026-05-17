@@ -84,16 +84,7 @@ html {
   transform: scale(1);
 }
 
-.embla_slide_float {
-  height: 100%;
-  width: 100%;
-  animation: float 6s ease-in-out infinite;
-}
 
-/* Stagger the animations so they don't move in perfect sync */
-.embla_slide:nth-child(even) .embla_slide_float {
-  animation-delay: -3s;
-}
 
 .embla_slide img {
   display: block;
@@ -302,34 +293,4 @@ input[type='number'] {
 .animate-scale-in {
   animation: scale-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
-
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-
-  50% {
-    transform: translateY(-18px) rotate(1deg);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes shine {
-  0% {
-    transform: translateX(-100%) skewX(-15deg);
-  }
-
-  30%,
-  100% {
-    transform: translateX(200%) skewX(-15deg);
-  }
-}
-
-.animate-shine {
-  animation: shine 5s infinite;
-}
+

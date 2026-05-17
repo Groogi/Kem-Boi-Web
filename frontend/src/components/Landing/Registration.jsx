@@ -6,14 +6,12 @@ function Registration() {
     <section className="min-h-[800px] flex items-center bg-[#fbfcf8] py-24" id="join">
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center w-full">
         <div className="flex justify-center lg:justify-end">
-          <div className="relative w-full max-w-[620px] aspect-[4/3.5] rounded-[3.5rem] overflow-hidden shadow-[0_32px_80px_rgba(45,47,44,0.1)] animate-float">
+          <div className="relative w-full max-w-[620px] aspect-[4/3.5] rounded-[3.5rem] overflow-hidden shadow-[0_32px_80px_rgba(45,47,44,0.1)]">
             <img
               className="w-full h-full object-cover scale-[1.4] transition-transform duration-1000 ease-out hover:scale-[1.45]"
               src="/join-kembo-pic.png"
               alt="Join the Kem Boi Family"
             />
-            {/* Soft Shine Effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-full h-full animate-shine pointer-events-none" />
           </div>
         </div>
         <div className="flex flex-col items-center lg:items-start text-center lg:text-left">

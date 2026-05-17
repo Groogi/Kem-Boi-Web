@@ -41,7 +41,7 @@ const EmblaCarousel = (props) => {
               key={index}
             >
               <div className="embla_slide_inner">
-                <div className="embla_slide_float">
+                <div className="w-full h-full">
                   {typeof slide === 'number' ? (
                     <div className="embla_slide_number">
                       <span>{slide + 1}</span>

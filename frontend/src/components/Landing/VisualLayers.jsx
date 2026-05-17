@@ -43,8 +43,6 @@ function VisualLayers() {
               alt="Kem Boi Heritage"
               className="w-full h-full object-cover transition-transform duration-700 ease-out hover:scale-[1.08]"
             />
-            {/* Glossy Overlay/Shine Effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent w-full h-full animate-shine pointer-events-none" />
           </div>
         </div>
       </section>
