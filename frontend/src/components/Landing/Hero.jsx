@@ -37,7 +37,6 @@ function Hero() {
               src="/intro-product-pic.png"
               alt="Vietnamese Avocado Dessert"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent w-full h-full animate-shine pointer-events-none" />
           </div>
         </div>
       </div>

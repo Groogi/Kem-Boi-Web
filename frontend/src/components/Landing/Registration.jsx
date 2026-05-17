@@ -11,7 +11,6 @@ function Registration() {
               src="/join-kembo-pic.png"
               alt="Join the Kem Boi Family"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent w-full h-full animate-shine pointer-events-none" />
           </div>
         </div>
         <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
