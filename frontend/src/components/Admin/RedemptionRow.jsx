@@ -52,7 +52,7 @@ function RedemptionRow({ red, onUpdate, onDelete }) {
                   await onUpdate(red.id, 'used')
                   await onDelete(red.id)
                 } catch (err) {
-                  console.error(err)
+                  console.error('Failed to update redemption row status:', err)
                 } finally {
                   setLoading(false)
                 }

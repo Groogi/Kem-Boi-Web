@@ -23,7 +23,7 @@ function SignUpLogin() {
           setSocialLinks(data)
         }
       } catch (err) {
-        console.error('Failed to fetch social links', err)
+        console.error('Failed to fetch social links:', err)
       }
     }
     fetchLinks()

@@ -64,7 +64,7 @@ function AdminPanel() {
       const data = await res.json()
       setUsers(Array.isArray(data) ? data : [])
     } catch (err) {
-      console.error('Failed to fetch users', err)
+      console.error('Failed to fetch users:', err)
       setUsers([])
     }
   }, [token])
@@ -77,7 +77,7 @@ function AdminPanel() {
       const data = await res.json()
       setRewards(Array.isArray(data) ? data : [])
     } catch (err) {
-      console.error('Failed to fetch rewards', err)
+      console.error('Failed to fetch rewards:', err)
       setRewards([])
     }
   }, [token])
@@ -90,7 +90,7 @@ function AdminPanel() {
       const data = await res.json()
       setRedemptions(Array.isArray(data) ? data : [])
     } catch (err) {
-      console.error('Failed to fetch redemptions', err)
+      console.error('Failed to fetch redemptions:', err)
       setRedemptions([])
     }
   }, [token])
@@ -103,7 +103,7 @@ function AdminPanel() {
       const data = await res.json()
       setLocations(Array.isArray(data) ? data : [])
     } catch (err) {
-      console.error('Failed to fetch locations', err)
+      console.error('Failed to fetch locations:', err)
       setLocations([])
     }
   }, [token])
@@ -137,7 +137,8 @@ function AdminPanel() {
         showToast(`Redemption marked as ${newStatus}`)
         fetchRedemptions()
       }
-    } catch {
+    } catch (err) {
+      console.error('Failed to update redemption status:', err)
       showToast('Failed to update status', 'error')
     }
   }
@@ -156,7 +157,8 @@ function AdminPanel() {
         setRedemptionToDelete(null)
         fetchRedemptions()
       }
-    } catch {
+    } catch (err) {
+      console.error('Failed to delete redemption:', err)
       showToast('Failed to delete redemption', 'error')
     }
   }
@@ -172,7 +174,7 @@ function AdminPanel() {
           setSelectedUserRedemptions(data)
         }
       } catch (err) {
-        console.error(err)
+        console.error('Failed to fetch user redemptions:', err)
       }
     },
     [token]
@@ -207,7 +209,7 @@ function AdminPanel() {
         showToast('Points added successfully!')
       }
     } catch (err) {
-      console.error(err)
+      console.error('Failed to add quick points:', err)
       showToast('Failed to add points.', 'error')
     } finally {
       setLoading(false)
@@ -237,7 +239,7 @@ function AdminPanel() {
         )
       }
     } catch (err) {
-      console.error(err)
+      console.error('Network error adding points to user:', err)
       showToast('Network error occurred while adding points.', 'error')
     } finally {
       setLoading(false)
@@ -263,7 +265,7 @@ function AdminPanel() {
         showToast(errData.error || errData.errors?.join(', ') || 'Failed to delete user', 'error')
       }
     } catch (err) {
-      console.error(err)
+      console.error('Failed to delete user:', err)
       showToast('An error occurred while deleting user.', 'error')
     } finally {
       setLoading(false)

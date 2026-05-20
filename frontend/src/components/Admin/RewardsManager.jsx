@@ -34,7 +34,7 @@ function RewardsManager({ onRewardsChange }) {
       const data = await res.json()
       setRewards(Array.isArray(data) ? data : [])
     } catch (err) {
-      console.error(err)
+      console.error('Failed to fetch rewards:', err)
     }
   }, [token])
 

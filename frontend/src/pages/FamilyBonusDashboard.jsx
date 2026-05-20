@@ -41,7 +41,7 @@ function FamilyBonusDashboard() {
       const data = await res.json()
       setRewards(Array.isArray(data) ? data : [])
     } catch (err) {
-      console.error('Failed to fetch rewards', err)
+      console.error('Failed to fetch rewards:', err)
     }
   }, [token])
 
@@ -54,7 +54,7 @@ function FamilyBonusDashboard() {
       const data = await res.json()
       setMyRedemptions(Array.isArray(data) ? data : [])
     } catch (err) {
-      console.error('Failed to fetch my redemptions', err)
+      console.error('Failed to fetch my redemptions:', err)
     }
   }, [token])
 
@@ -150,7 +150,7 @@ function FamilyBonusDashboard() {
       showToast('Profile updated successfully!', 'success')
       setTimeout(() => setSaveStatus(''), 3000)
     } catch (err) {
-      console.error(err)
+      console.error('Profile update failed:', err)
       setSaveStatus('error')
       showToast('Update failed. Please check your network.', 'error')
     } finally {
