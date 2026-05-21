@@ -609,17 +609,19 @@ function FamilyBonusDashboard() {
                 <span className="text-[10px] font-black text-on-surface-variant/30 uppercase tracking-[0.2em] mb-2">
                   Voucher Code
                 </span>
-                <span className="text-2xl font-black font-headline text-primary tracking-widest selection:bg-primary selection:text-white uppercase">
+                <span className="text-lg sm:text-xl md:text-2xl font-black font-headline text-primary tracking-wider sm:tracking-widest selection:bg-primary selection:text-white uppercase text-center break-words">
                   {red.voucher_code}
                 </span>
               </div>
 
-              <div className="mt-6 flex items-center gap-2 text-[#426500]/40">
-                <span className="material-symbols-outlined text-sm">info</span>
-                <span className="text-[10px] font-bold uppercase tracking-widest leading-none">
-                  Show this in-store
-                </span>
-              </div>
+              {red.status !== 'fulfilled' && (
+                <div className="mt-6 flex items-center gap-2 text-[#426500]/40">
+                  <span className="material-symbols-outlined text-sm">info</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest leading-none">
+                    Show this in-store
+                  </span>
+                </div>
+              )}
             </div>
           ))
         )}
