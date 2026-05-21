@@ -986,7 +986,6 @@ function AdminPanel() {
             </thead>
             <tbody>
               {redemptions
-                .filter((red) => red.status === 'pending')
                 .filter((red) => {
                   const name = `${red.user?.first_name || ''} ${red.user?.last_name || ''}`.toLowerCase()
                   const email = (red.user?.email || '').toLowerCase()
@@ -995,7 +994,6 @@ function AdminPanel() {
                   return name.includes(query) || accId.includes(query) || email.includes(query)
                 }).length > 0 ? (
                 redemptions
-                  .filter((red) => red.status === 'pending')
                   .filter((red) => {
                     const name = `${red.user?.first_name || ''} ${red.user?.last_name || ''}`.toLowerCase()
                     const email = (red.user?.email || '').toLowerCase()
@@ -1008,7 +1006,7 @@ function AdminPanel() {
                       key={idx}
                       red={red}
                       onUpdate={handleUpdateRedemptionStatus}
-                      onDelete={handleDeleteRedemption}
+                      onDelete={(id) => setRedemptionToDelete({ id })}
                     />
                   ))
               ) : (
@@ -1204,8 +1202,7 @@ const RedemptionRow = ({ red, onUpdate, onDelete }) => {
               onClick={async () => {
                 setLoading(true)
                 try {
-                  await onUpdate(red.id, 'used')
-                  await onDelete(red.id)
+                  await onUpdate(red.id, 'fulfilled')
                 } catch (err) {
                   console.error(err)
                 } finally {
@@ -1215,7 +1212,15 @@ const RedemptionRow = ({ red, onUpdate, onDelete }) => {
               disabled={loading}
               className="bg-[#426500] text-white font-bold text-[10px] tracking-widest px-6 h-[38px] rounded-full hover:bg-[#4a6b10] transition-all uppercase disabled:opacity-50 flex items-center justify-center whitespace-nowrap shadow-md shadow-[#426500]/10"
             >
-              {loading ? 'Confirming...' : 'Confirm & Clear'}
+              {loading ? 'Confirming...' : 'Confirm'}
+            </button>
+          )}
+          {red.status === 'fulfilled' && (
+            <button
+              onClick={() => onDelete(red.id)}
+              className="bg-red-500 text-white font-bold text-[10px] tracking-widest px-6 h-[38px] rounded-full hover:bg-red-600 transition-all uppercase flex items-center justify-center whitespace-nowrap shadow-md shadow-red-500/10"
+            >
+              Delete
             </button>
           )}
         </div>
@@ -1556,18 +1561,17 @@ const UserDetailsView = ({
               ? `Confirm usage of voucher "${confirmFulfill.reward?.name}" for this member?`
               : `Are you sure you want to deduct ${confirmFulfill.reward?.point_cost} points from this user and fulfill the "${confirmFulfill.reward?.name}" reward?`
           }
-          confirmText={confirmFulfill.redemptionId ? 'Mark as Used' : 'Confirm & Deduct'}
+          confirmText={confirmFulfill.redemptionId ? 'Mark as Fulfilled' : 'Confirm & Deduct'}
           onConfirm={async () => {
             const { reward, redemptionId } = confirmFulfill
             setConfirmFulfill({ isOpen: false, reward: null, redemptionId: null })
             setLoading(true)
             try {
               if (redemptionId) {
-                // Mark as used then immediately delete to "clear" from history as requested
-                await onUpdate(redemptionId, 'used')
-                await onDelete(redemptionId)
+                // Mark as fulfilled
+                await onUpdate(redemptionId, 'fulfilled')
 
-                showToast('Voucher fulfilled and cleared!', 'success')
+                showToast('Voucher fulfilled!', 'success')
 
                 // Trigger all refreshes
                 await Promise.all([

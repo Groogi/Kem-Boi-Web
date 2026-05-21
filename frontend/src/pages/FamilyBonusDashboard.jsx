@@ -555,7 +555,7 @@ function FamilyBonusDashboard() {
     )
   }
 
-  const pendingVouchers = myRedemptions.filter((red) => red.status === 'pending')
+  const pendingVouchers = myRedemptions.filter((red) => red.status === 'pending' || red.status === 'fulfilled')
 
   const renderMyVouchers = () => (
     <div className="space-y-8 animate-fade-in pb-20">
@@ -589,7 +589,7 @@ function FamilyBonusDashboard() {
               <div className="absolute top-6 right-6">
                 <span
                   className={`text-[9px] font-black tracking-[0.15em] uppercase px-3 py-1 rounded-full border ${
-                    red.status === 'used'
+                    red.status === 'used' || red.status === 'fulfilled'
                       ? 'bg-red-50 text-red-500 border-red-100'
                       : 'bg-green-50 text-green-600 border-green-100'
                   }`}
