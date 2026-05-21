@@ -609,7 +609,13 @@ function FamilyBonusDashboard() {
                 <span className="text-[10px] font-black text-on-surface-variant/30 uppercase tracking-[0.2em] mb-2">
                   Voucher Code
                 </span>
-                <span className="text-lg sm:text-xl md:text-2xl font-black font-headline text-primary tracking-wider sm:tracking-widest selection:bg-primary selection:text-white uppercase text-center break-words">
+                <span 
+                  className={`font-black font-headline text-primary selection:bg-primary selection:text-white uppercase text-center whitespace-nowrap ${
+                    red.voucher_code?.length > 12 
+                      ? 'text-base sm:text-lg md:text-xl tracking-normal' 
+                      : 'text-lg sm:text-xl md:text-2xl tracking-wider sm:tracking-widest'
+                  }`}
+                >
                   {red.voucher_code}
                 </span>
               </div>
