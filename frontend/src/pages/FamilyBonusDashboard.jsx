@@ -586,7 +586,7 @@ function FamilyBonusDashboard() {
               className="bg-[#FBFBF5] rounded-[2rem] p-8 shadow-sm border border-outline-variant/10 flex flex-col relative group overflow-hidden"
             >
               {/* Status Badge */}
-              <div className="absolute top-6 right-6">
+              <div className="absolute top-6 right-4">
                 <span
                   className={`text-[9px] font-black tracking-[0.15em] uppercase px-3 py-1 rounded-full border ${
                     red.status === 'used' || red.status === 'fulfilled'

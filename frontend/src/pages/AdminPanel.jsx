@@ -1143,6 +1143,7 @@ function AdminPanel() {
           message="This will permanently remove the record from the log. This action is irreversible."
           confirmText="Delete Permanently"
           variant="danger"
+          requireTypeToConfirm={false}
         />
       )}
 
@@ -1215,7 +1216,7 @@ const RedemptionRow = ({ red, onUpdate, onDelete }) => {
               {loading ? 'Confirming...' : 'Confirm'}
             </button>
           )}
-          {red.status === 'fulfilled' && (
+          {(red.status === 'fulfilled' || red.status === 'used') && (
             <button
               onClick={() => onDelete(red.id)}
               className="bg-red-500 text-white font-bold text-[10px] tracking-widest px-6 h-[38px] rounded-full hover:bg-red-600 transition-all uppercase flex items-center justify-center whitespace-nowrap shadow-md shadow-red-500/10"

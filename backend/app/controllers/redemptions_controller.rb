@@ -149,7 +149,7 @@ class RedemptionsController < ApplicationController
         @redemption = @user.redemptions.create!(
           reward: @reward,
           voucher_code: "INSTORE-#{SecureRandom.hex(4).upcase}",
-          status: "used"
+          status: "fulfilled"
         )
       rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
         if e.is_a?(ActiveRecord::RecordNotUnique) || (e.is_a?(ActiveRecord::RecordInvalid) && e.record.errors[:voucher_code].present?)

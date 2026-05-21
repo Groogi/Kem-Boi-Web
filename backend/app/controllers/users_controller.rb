@@ -53,7 +53,7 @@ class UsersController < ApplicationController
             notes: "Welcome Gift from referral by #{referrer.first_name}"
           )
           # Finalize Voucher
-          redemption.update!(status: "used")
+          redemption.update!(status: "fulfilled")
         end
 
         @user.reload

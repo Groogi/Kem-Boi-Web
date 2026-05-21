@@ -117,11 +117,12 @@ export const ModernConfirm = ({
   confirmText = 'Confirm',
   cancelText = 'Cancel',
   variant = 'primary', // 'primary' or 'danger'
+  requireTypeToConfirm = true,
 }) => {
   const [confirmTextVal, setConfirmTextVal] = useState('')
   if (!isOpen) return null
 
-  const isDeleteValid = variant !== 'danger' || confirmTextVal.toUpperCase() === 'DELETE'
+  const isDeleteValid = variant !== 'danger' || !requireTypeToConfirm || confirmTextVal.toUpperCase() === 'DELETE'
 
   return (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-[#F8F8F0]/40 animate-fade-in">
@@ -144,7 +145,7 @@ export const ModernConfirm = ({
             {message}
           </p>
 
-          {variant === 'danger' && (
+          {variant === 'danger' && requireTypeToConfirm && (
             <div className="w-full mb-8 space-y-2">
               <p className="text-[10px] font-black text-red-500/40 uppercase tracking-[0.2em]">
                 Type 'DELETE' to confirm
