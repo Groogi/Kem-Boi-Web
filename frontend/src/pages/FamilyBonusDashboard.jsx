@@ -598,7 +598,7 @@ function FamilyBonusDashboard() {
                 </span>
               </div>
 
-              <h4 className="text-xl font-bold font-headline text-on-surface mb-1">
+              <h4 className="text-xl font-bold font-headline text-on-surface mb-1 pr-24">
                 {red.reward?.name}
               </h4>
               <p className="text-xs font-bold text-on-surface-variant/40 uppercase tracking-widest mb-8">
