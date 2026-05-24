@@ -19,7 +19,6 @@ function Locations() {
         console.error('Failed to fetch locations', err)
       }
       
-      // Fallback sample data to ensure the map is visible
       setLocations([
         {
           id: 1,
@@ -82,7 +81,6 @@ function Locations() {
                   </a>
                 </div>
                 <div className="lg:w-[55%] aspect-square lg:aspect-[693/670] w-full relative">
-                  {/* We can use the static map or a dynamic placeholder if map_url is just a link */}
                   <img
                     className="w-full h-full object-cover rounded-[32px] shadow-sm brightness-95"
                     src="/map-pic.png"

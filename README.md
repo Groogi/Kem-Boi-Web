@@ -4,7 +4,7 @@
 
 <h1 align="center" style="margin-top"> Kemboi </h1>
 
-### __Description__
+### **Description**
 
 Kemboi is a premium avocado dessert brand based on the Gold Coast, Australia. Reimagining traditional Vietnamese flavors, we combine fresh avocado mousse with artisanal coconut ice cream and customizable toppings. This platform is a modern, technology-driven loyalty ecosystem designed for community building and long-term scalability.
 
@@ -47,7 +47,8 @@ Kemboi is a premium avocado dessert brand based on the Gold Coast, Australia. Re
 *   **Personalized "Pending Bonus" Emails:** When an admin uses the onboarding feature, the system sends a beautifully formatted email using the customer's first name, notifying them that points have been securely vaulted for them, driving instant conversions.
 *   **Security Emails:** Automated password reset delivery.
 
-### __Prerequisites__
+
+### **Prerequisites**
 
 Before starting, ensure you have the following installed:
 - **Ruby**: `3.4.x`
@@ -56,14 +57,57 @@ Before starting, ensure you have the following installed:
 
 ---
 
+### **Frontend Dependencies**
+
+#### NodeJS
+```https://nodejs.org/en```
+
+#### React-router-dom
+```npm install react-router-dom```
+
+#### Tailwind, Postcss, Autoprefixer
+```npm install -D tailwindcss@^3.4.0 postcss autoprefixer```
+
+---
+
+### **Backend Dependencies**
+
+#### Ruby & Rails
+```https://rubyonrails.org/```
+
+#### PostgreSQL
+```https://www.postgresql.org/download/```
+
+#### Ruby Gems (Authentication, CORS, Database)
+The backend uses **BCrypt** for password hashing, **JWT** for secure user sessions, and **Rack-Cors** for CORS configuration. Make sure to download and start PostgreSQL before installing the Ruby gems.
+
+---
+
 ## Getting Started
 
-### 1. Backend Setup
+### PostgreSQL Installation
+
+1. **Download**: Install PostgreSQL from the [official website](https://www.postgresql.org/download/).
+2. **Service**: Ensure the PostgreSQL service is running on the default port (5432).
+3. **Database Config**: Update `backend/config/database.yml` with your local PostgreSQL `username` and `password`.
+
+### Environment Variables
+
+The backend uses a `.env` file for local configuration. Create a copy of the example file:
+
+```bash
+cd backend
+cp .env.example .env
+```
+Update the values in `.env` to match your local PostgreSQL configuration.
+
+---
+
+### 1. Backend & Database Setup
 ```bash
 cd backend
 bundle install
-# Create .env from .env.example and update your DB credentials
-rails db:create db:migrate db:seed
+rails db:drop db:create db:migrate db:seed
 rails s
 ```
 
@@ -74,9 +118,30 @@ npm install
 npm run dev
 ```
 
-### Access Credentials (Demo)
+---
+
+### **Demo Information & Credentials**
+
+The database seed includes pre-configured accounts for testing:
+
 - **Admin**: `admin@kemboi.com` / `password123`
 - **Customer**: `tester@kemboi.com` / `password123`
+
+<p>The customer account is pre-loaded with <b>800 points</b>, which automatically populates <b>4 punches</b> on the loyalty card. The seed also includes three store locations and two active giveaways for UI demonstration.</p>
+
+---
+
+### **Testing**
+#### **Frontend**
+- **Vitest**
+```npm install -D vitest```
+- **Jsdom**
+```npm install -D jsdom```
+
+Test files can be found in the `frontend/src/__tests__` folder.
+
+#### **Backend**
+Run tests with standard rspec.
 
 ---
 

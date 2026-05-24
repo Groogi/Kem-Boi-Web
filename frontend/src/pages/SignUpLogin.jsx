@@ -49,14 +49,12 @@ function SignUpLogin() {
 
   return (
     <div className="min-h-screen font-body text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container flex flex-col relative overflow-hidden z-0">
-      {/* Base light cream background */}
       <div className="absolute inset-0 bg-[#f4f7ed] -z-20"></div>
 
-      {/* The avocado swirl texture from your provided image */}
       <div
         className="absolute inset-0 -z-10 mix-blend-luminosity opacity-[0.4]"
         style={{
-          backgroundImage: "url('/swirl-bg.png')", // Just place the image in the public folder
+          backgroundImage: "url('/swirl-bg.png')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

@@ -226,7 +226,6 @@ function LoginForm() {
 
   return (
     <div className="bg-[#f7f7f2] rounded-[3rem] p-8 md:p-14 w-full max-w-[850px] mx-auto relative z-10 animate-fade-in shadow-2xl shadow-black/5 border border-white/50 flex flex-col items-center">
-      {/* Header - Centered as per screenshot */}
       <div className="flex items-center gap-2 md:gap-8 mb-2">
         <div className="flex flex-col items-center">
           <button
@@ -255,9 +254,7 @@ function LoginForm() {
         onSubmit={activeTab === 'login' ? handleLogin : handleSignup}
         noValidate
       >
-        {/* Split Interior - Match Screenshot */}
         <div className="w-full flex-grow flex flex-col md:flex-row items-stretch justify-center gap-12 mb-12">
-          {/* Left: Social Login */}
           <div className="flex-1 flex flex-col items-center justify-center">
             <p className="text-[13px] font-bold text-[#7d8076] mb-6">
               {activeTab === 'login' ? 'Log in With:' : 'Sign up With:'}
@@ -294,21 +291,18 @@ function LoginForm() {
             </div>
           </div>
 
-          {/* Divider */}
           <div className="hidden md:flex flex-col items-center justify-center opacity-30">
             <div className="w-[1px] h-full bg-[#7d8076] flex-1"></div>
             <span className="my-4 text-[11px] font-black text-[#7d8076] uppercase">OR</span>
             <div className="w-[1px] h-full bg-[#7d8076] flex-1"></div>
           </div>
 
-          {/* Mobile divider */}
           <div className="md:hidden flex items-center justify-center w-full my-4 opacity-20">
             <div className="h-[1px] w-full bg-[#7d8076] flex-1"></div>
             <span className="mx-4 text-[11px] font-black text-[#7d8076] uppercase">OR</span>
             <div className="h-[1px] w-full bg-[#7d8076] flex-1"></div>
           </div>
 
-          {/* Right: Form */}
           <div className="flex-1 flex flex-col justify-center">
             <div className="w-full flex flex-col gap-6">
               {activeTab === 'signup' && (
