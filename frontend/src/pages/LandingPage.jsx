@@ -7,7 +7,6 @@ import Registration from '../components/Landing/Registration'
 import Locations from '../components/Landing/Locations'
 import InstagramGrid from '../components/Landing/InstagramGrid'
 import Footer from '../components/Landing/Footer'
-import EmblaCarousel from '../components/Landing/EmblaCarousel'
 
 function LandingPage() {
   const { hash } = useLocation()
