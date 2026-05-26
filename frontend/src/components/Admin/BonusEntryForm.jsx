@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useToast } from '../../context/ToastContext'
+import { API_BASE } from '../../api/config'
 
 function BonusEntryForm({ users, onQuickAdd, loading, token }) {
   const [bonusUser, setBonusUser] = useState(null)
@@ -7,6 +8,7 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
   const [quickPoints, setQuickPoints] = useState('')
   const [history, setHistory] = useState([])
   const [searchEmail, setSearchEmail] = useState('')
+  const [errors, setErrors] = useState({})
   const { showToast } = useToast()
 
   const searchInputRef = useRef(null)
@@ -22,9 +24,10 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
   }, [users])
 
   const fetchTransactions = useCallback(
-    async (userId) => {
+    async (userId, email = null) => {
       try {
-        const res = await fetch(`/api/transactions?user_id=${userId}`, {
+        const query = email ? `email=${encodeURIComponent(email)}` : `user_id=${userId}`
+        const res = await fetch(`${API_BASE}/transactions?${query}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (res.ok) {
@@ -32,6 +35,18 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
           // Sort by created_at descending (newest first)
           const sorted = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
           setHistory(sorted)
+
+          // If we found a name in any of the pending records, use it for the display
+          if (email && sorted.length > 0) {
+            const namedRecord = sorted.find(r => r.first_name);
+            if (namedRecord) {
+              setBonusUser(prev => ({
+                ...prev,
+                first_name: namedRecord.first_name,
+                last_name: namedRecord.last_name
+              }));
+            }
+          }
         }
       } catch (err) {
         console.error(err)
@@ -41,8 +56,12 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
   )
 
   useEffect(() => {
-    if (bonusUser && !bonusUser.is_new) {
-      fetchTransactions(bonusUser.id)
+    if (bonusUser) {
+      if (bonusUser.is_new) {
+        fetchTransactions(null, bonusUser.email)
+      } else {
+        fetchTransactions(bonusUser.id)
+      }
     } else {
       setHistory([])
     }
@@ -55,7 +74,7 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
     const found = users.find(
       (u) =>
         u.email.toLowerCase() === q.toLowerCase() ||
-        (u.account_id && u.account_id.toLowerCase() === q.toLowerCase())
+        (u.account_id && u.account_id.toLowerCase().includes(q.toLowerCase()))
     )
 
     if (found) {
@@ -80,7 +99,7 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
   return (
     <div className="animate-fade-in space-y-10">
       <div className="flex flex-col gap-6">
-        <h3 className="text-3xl font-bold font-headline text-[#4A6B10]">Manual Bonus Entry</h3>
+        <h3 className="text-3xl font-bold font-headline text-[#4A6B10]">Add Points</h3>
         <div className="relative max-w-xl flex gap-3">
           <div className="relative flex-grow">
             <input
@@ -111,7 +130,7 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
       {!bonusUser ? (
         <div className="bg-[#EEF4E4] rounded-[2.5rem] p-10 max-w-xl border border-white/40 shadow-sm animate-fade-in">
           <h4 className="text-xl font-bold font-headline text-primary text-center mb-8">
-            Quick Points Entry
+            Add Points
           </h4>
           <div className="space-y-6">
             <div>
@@ -119,8 +138,11 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
               <input
                 type="text"
                 value={quickEmail}
-                onChange={(e) => setQuickEmail(e.target.value)}
-                className="w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface"
+                onChange={(e) => {
+                  setQuickEmail(e.target.value)
+                  if (errors.email) setErrors({ ...errors, email: false })
+                }}
+                className={`w-full bg-[#FBFBF5] border-none rounded-full px-5 py-3 shadow-inner font-medium text-on-surface ${errors.email ? 'ring-2 ring-red-500/50' : ''}`}
               />
             </div>
             <div className="flex gap-4 items-end">
@@ -129,16 +151,36 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                 <input
                   type="number"
                   value={quickPoints}
-                  onChange={(e) => setQuickPoints(e.target.value)}
-                  className="w-full bg-surface-container-highest border-none rounded-full px-5 py-3 shadow-inner font-bold text-lg"
+                  onChange={(e) => {
+                    setQuickPoints(e.target.value)
+                    if (errors.points) setErrors({ ...errors, points: false })
+                  }}
+                  className={`w-full bg-surface-container-highest border-none rounded-full px-5 py-3 shadow-inner font-bold text-lg ${errors.points ? 'ring-2 ring-red-500/50' : ''}`}
                 />
               </div>
               <button
-                onClick={() => onQuickAdd(quickEmail, quickPoints)}
+                onClick={() => {
+                  const email = quickEmail.trim()
+                  const points = String(quickPoints).trim()
+                  const newErrors = {}
+
+                  if (!email || !email.includes('@')) newErrors.email = true
+                  if (!points || isNaN(points) || Number(points) <= 0) newErrors.points = true
+
+                  if (Object.keys(newErrors).length > 0) {
+                    setErrors(newErrors)
+                    if (newErrors.email) showToast('Please enter a valid email address.', 'error')
+                    else showToast('Please enter a valid numeric point amount.', 'error')
+                    return
+                  }
+
+                  setErrors({})
+                  onQuickAdd(email, points)
+                }}
                 disabled={loading}
                 className="bg-primary text-white font-bold py-3.5 px-12 rounded-full text-xs shadow-md border-primary/10 transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
               >
-                {loading ? '...' : 'Points'}
+                {loading ? '...' : 'Add Points'}
               </button>
             </div>
           </div>
@@ -187,27 +229,62 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                       type="number"
                       placeholder="000"
                       value={quickPoints}
-                      onChange={(e) => setQuickPoints(e.target.value)}
-                      className="w-full bg-white/80 border-none text-center font-bold text-2xl py-4 rounded-2xl shadow-inner focus:ring-4 focus:ring-[#426500]/10 transition-all outline-none"
+                      onChange={(e) => {
+                        setQuickPoints(e.target.value)
+                        if (errors.quickPoints) setErrors({ ...errors, quickPoints: false })
+                      }}
+                      className={`w-full bg-white/80 border-none text-center font-bold text-2xl py-4 rounded-2xl shadow-inner focus:ring-4 focus:ring-[#426500]/10 transition-all outline-none ${errors.quickPoints ? 'ring-2 ring-red-500/50' : ''}`}
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-widest">
                       PTS
                     </span>
                   </div>
-                  <button
-                    onClick={async () => {
-                      await onQuickAdd(bonusUser.email, quickPoints)
-                      setQuickPoints('')
-                      fetchTransactions(bonusUser.id)
-                    }}
-                    disabled={loading || !quickPoints}
-                    className="w-full bg-primary text-white font-bold py-4 rounded-full shadow-lg shadow-primary/20 hover:bg-[#395800] transition-all active:scale-95 disabled:opacity-20 flex items-center justify-center gap-2 group"
-                  >
-                    <span className="material-symbols-outlined text-[18px] transition-transform group-hover:rotate-12">
-                      add_circle
-                    </span>
-                    <span className="text-xs tracking-widest uppercase">Quick Add Points</span>
-                  </button>
+                  <div className="flex gap-3 mt-2">
+                    <button
+                      onClick={async () => {
+                        const points = String(quickPoints).trim()
+                        if (!points || isNaN(points) || Number(points) <= 0) {
+                          setErrors({ quickPoints: true })
+                          showToast('Please enter a valid numeric point amount.', 'error')
+                          return
+                        }
+
+                        setErrors({})
+                        await onQuickAdd(bonusUser.email, points)
+                        setQuickPoints('')
+                        fetchTransactions(bonusUser.id)
+                      }}
+                      disabled={loading || !quickPoints}
+                      className="flex-1 bg-primary text-white font-bold py-4 rounded-full shadow-lg shadow-primary/20 hover:bg-[#395800] transition-all active:scale-95 disabled:opacity-20 flex items-center justify-center gap-2 group"
+                    >
+                      <span className="material-symbols-outlined text-[18px] transition-transform group-hover:rotate-12">
+                        add_circle
+                      </span>
+                      <span className="text-xs tracking-widest uppercase">Add</span>
+                    </button>
+                    <button
+                      onClick={async () => {
+                        const points = String(quickPoints).trim()
+                        if (!points || isNaN(points) || Number(points) <= 0) {
+                          setErrors({ quickPoints: true })
+                          showToast('Please enter a valid numeric point amount.', 'error')
+                          return
+                        }
+
+                        setErrors({})
+                        await onQuickAdd(bonusUser.email, Number(points) * -1)
+                        setQuickPoints('')
+                        fetchTransactions(bonusUser.id)
+                      }}
+                      disabled={loading || !quickPoints}
+                      className="flex-1 bg-red-500 text-white font-bold py-4 rounded-full shadow-lg shadow-red-500/20 hover:bg-red-600 transition-all active:scale-95 disabled:opacity-20 flex items-center justify-center gap-2 group"
+                    >
+                      <span className="material-symbols-outlined text-[18px] transition-transform group-hover:-rotate-12">
+                        remove_circle
+                      </span>
+                      <span className="text-xs tracking-widest uppercase">Subtract</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -243,29 +320,7 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#426500]/5">
-                  {bonusUser.is_new ? (
-                    <tr>
-                      <td className="px-8 py-6 text-sm font-bold text-primary">+10</td>
-                      <td className="px-8 py-6 text-sm font-medium text-on-surface-variant/70 italic">
-                        11/07/2026
-                      </td>
-                      <td className="px-8 py-6 text-center">
-                        <div className="flex flex-col leading-tight">
-                          <span className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-tighter">
-                            Pending
-                          </span>
-                          <span className="text-[12px] font-bold text-on-surface-variant/60">
-                            Registration
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-8 py-6 text-center">
-                        <span className="bg-[#D1D3C8] text-white px-5 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase">
-                          Email Sent
-                        </span>
-                      </td>
-                    </tr>
-                  ) : history.length > 0 ? (
+                  {history.length > 0 ? (
                     history.map((t, i) => {
                       const isPositive = t.points > 0
                       const date = new Date(t.created_at).toLocaleDateString('en-AU', {
@@ -274,9 +329,14 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                         year: 'numeric',
                       })
 
-                      let runningBalance = bonusUser.points_balance
-                      for (let j = 0; j < i; j++) {
-                        runningBalance -= history[j].points
+                      let runningBalance = bonusUser.is_new ? 0 : (bonusUser.points_balance || 0)
+                      if (!bonusUser.is_new) {
+                        for (let j = 0; j < i; j++) {
+                          runningBalance -= history[j].points
+                        }
+                      } else {
+                        // For new users, we calculate from zero up
+                        runningBalance = history.slice(i).reduce((sum, item) => sum + item.points, 0)
                       }
 
                       return (
@@ -290,13 +350,24 @@ function BonusEntryForm({ users, onQuickAdd, loading, token }) {
                             {date}
                           </td>
                           <td className="px-8 py-5 text-sm font-bold text-center text-[#4A6B10] font-headline">
-                            {runningBalance} pts
+                            {bonusUser.is_new ? (
+                              <div className="flex flex-col leading-tight">
+                                <span className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-tighter">
+                                  Pending
+                                </span>
+                                <span className="text-[12px] font-bold text-on-surface-variant/60">
+                                  {runningBalance} pts
+                                </span>
+                              </div>
+                            ) : (
+                              `${runningBalance} pts`
+                            )}
                           </td>
                           <td className="px-8 py-5 text-center">
                             <span
-                              className={`inline-block px-5 py-1 rounded-full text-[9px] font-bold tracking-widest ${isPositive ? 'bg-[#BFE9A2] text-[#304c00]' : 'bg-red-100 text-red-800'}`}
+                              className={`inline-block px-5 py-1 rounded-full text-[9px] font-bold tracking-widest ${bonusUser.is_new ? 'bg-[#D1D3C8] text-white' : isPositive ? 'bg-[#BFE9A2] text-[#304c00]' : 'bg-red-100 text-red-800'}`}
                             >
-                              {t.transaction_type.toUpperCase()}
+                              {bonusUser.is_new ? 'EMAIL SENT' : t.transaction_type.toUpperCase()}
                             </span>
                           </td>
                         </tr>

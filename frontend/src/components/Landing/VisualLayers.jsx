@@ -16,7 +16,7 @@ function VisualLayers() {
           </p>
         </div>
 
-        <div className="flex items-center justify-center mb-10 w-full">
+        <div className="w-full mb-10 overflow-hidden">
           <EmblaCarousel slides={slides} options={{ loop: true }} />
         </div>
       </section>
@@ -28,17 +28,17 @@ function VisualLayers() {
               Our Story
             </h2>
             <p className="text-[#5B5D56] text-[20px] md:text-[26px] leading-[1.6] font-normal font-body text-center lg:text-left max-w-xl opacity-90">
-              Born in the misty highlands of Dalat, Kem Bơ represents the perfect balance between
+              Born in the misty highlands of Dalat, Kem Boi represents the perfect balance between
               natural buttery richness and cool artisanal freshness. <br />
               <br />
               What started as a roadside delicacy has been elevated into an atelier experience,
               bringing the soul of Vietnamese dessert culture to your doorstep.
             </p>
           </div>
-          <div className="lg:w-1/2 w-full aspect-[4/3] max-w-[650px] overflow-hidden rounded-[40px] md:rounded-[50px] shadow-[30px_30px_90px_rgba(0,0,0,0.05)] border-2 border-white/60 relative animate-float">
+          <div className="lg:w-1/2 w-full aspect-[4/3] max-w-[650px] overflow-hidden rounded-[40px] md:rounded-[50px] shadow-[30px_30px_90px_rgba(0,0,0,0.05)] border-2 border-white/60 relative">
             <img
               src="/placeholder-heritage.png"
-              alt="Kem Bo Heritage"
+              alt="Kem Boi Heritage"
               className="w-full h-full object-cover transition-transform duration-700 ease-out hover:scale-[1.08]"
             />
           </div>

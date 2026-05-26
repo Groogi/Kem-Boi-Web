@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { CustomDatePicker, ModernConfirm } from '../Common/SharedUI'
+import { API_BASE } from '../../api/config'
 
 function RewardsManager({ onRewardsChange }) {
   const { token } = useAuth()
@@ -11,8 +12,11 @@ function RewardsManager({ onRewardsChange }) {
   const [loading, setLoading] = useState(false)
   const [showNewReward, setShowNewReward] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false)
   const [showUnsavedWarning, setShowUnsavedWarning] = useState(false)
   const [rewardToDelete, setRewardToDelete] = useState(null)
+  const [pendingClaimsCount, setPendingClaimsCount] = useState(0)
+  const [errors, setErrors] = useState({})
 
   const [rewardData, setRewardData] = useState({
     name: '',
@@ -24,11 +28,12 @@ function RewardsManager({ onRewardsChange }) {
     limit_per_user: 0,
     total_limit: 0,
     reward_type: 'standard',
+    never_expires: false,
   })
 
   const fetchRewards = useCallback(async () => {
     try {
-      const res = await fetch('/api/rewards', {
+      const res = await fetch(`${API_BASE}/rewards`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
@@ -42,14 +47,21 @@ function RewardsManager({ onRewardsChange }) {
     fetchRewards()
   }, [token])
 
-  const handleSaveReward = async () => {
+
+  const handleSaveReward = () => {
     if (!rewardData.name.trim()) {
+      setErrors({ name: true })
       showToast('Reward name is required', 'error')
       return
     }
+    setErrors({})
+    setShowSaveConfirm(true)
+  }
 
+  const executeSave = async () => {
     setLoading(true)
-    const url = editingReward ? `/api/rewards/${editingReward.id}` : '/api/rewards'
+    setShowSaveConfirm(false)
+    const url = editingReward ? `${API_BASE}/rewards/${editingReward.id}` : `${API_BASE}/rewards`
     const method = editingReward ? 'PUT' : 'POST'
 
     try {
@@ -66,7 +78,7 @@ function RewardsManager({ onRewardsChange }) {
         showToast(editingReward ? 'Reward updated!' : 'Reward created!', 'success')
         fetchRewards()
         if (onRewardsChange) onRewardsChange()
-        cancelEdit()
+        forceCancel() // Close directly after success
       } else {
         const errData = await res.json()
         const errMsg = errData
@@ -84,6 +96,13 @@ function RewardsManager({ onRewardsChange }) {
   }
 
   const handleDeleteReward = (id) => {
+    const r = rewards.find(x => x.id === id)
+    if (r) {
+      const pending = (r.redemptions_count || 0) - (r.fulfilled_count || 0)
+      setPendingClaimsCount(pending)
+    } else {
+      setPendingClaimsCount(0)
+    }
     setRewardToDelete(id)
     setShowConfirm(true)
   }
@@ -92,7 +111,7 @@ function RewardsManager({ onRewardsChange }) {
     if (!rewardToDelete) return
 
     try {
-      const res = await fetch(`/api/rewards/${rewardToDelete}`, {
+      const res = await fetch(`${API_BASE}/rewards/${rewardToDelete}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -100,7 +119,7 @@ function RewardsManager({ onRewardsChange }) {
         showToast('Reward deleted', 'info')
         fetchRewards()
         if (onRewardsChange) onRewardsChange()
-        cancelEdit() // Return to dashboard list
+        forceCancel() 
       }
     } catch (err) {
       console.error(err)
@@ -108,6 +127,7 @@ function RewardsManager({ onRewardsChange }) {
     } finally {
       setShowConfirm(false)
       setRewardToDelete(null)
+      setPendingClaimsCount(0)
     }
   }
 
@@ -122,6 +142,7 @@ function RewardsManager({ onRewardsChange }) {
       limit_per_user: 0,
       total_limit: 0,
       reward_type: 'standard',
+      never_expires: false,
     }
 
     return (
@@ -133,7 +154,8 @@ function RewardsManager({ onRewardsChange }) {
       rewardData.end_date !== (original.end_date || '') ||
       rewardData.limit_per_user !== (original.limit_per_user || 0) ||
       rewardData.total_limit !== (original.total_limit || 0) ||
-      rewardData.reward_type !== (original.reward_type || 'standard')
+      rewardData.reward_type !== (original.reward_type || 'standard') ||
+      rewardData.never_expires !== (original.never_expires || false)
     )
   }
 
@@ -149,6 +171,7 @@ function RewardsManager({ onRewardsChange }) {
     setEditingReward(null)
     setShowNewReward(false)
     setShowUnsavedWarning(false)
+    setShowSaveConfirm(false)
     setRewardData({
       name: '',
       description: '',
@@ -159,7 +182,9 @@ function RewardsManager({ onRewardsChange }) {
       limit_per_user: 0,
       total_limit: 0,
       reward_type: 'standard',
+      never_expires: false,
     })
+    setErrors({})
   }
 
   const startEdit = (reward) => {
@@ -174,6 +199,7 @@ function RewardsManager({ onRewardsChange }) {
       limit_per_user: reward.limit_per_user || 0,
       total_limit: reward.total_limit || 0,
       reward_type: reward.reward_type || 'standard',
+      never_expires: reward.never_expires || false,
     })
     setShowNewReward(true)
   }
@@ -193,9 +219,12 @@ function RewardsManager({ onRewardsChange }) {
               <input
                 type="text"
                 value={rewardData.name}
-                onChange={(e) => setRewardData({ ...rewardData, name: e.target.value })}
+                onChange={(e) => {
+                  setRewardData({ ...rewardData, name: e.target.value })
+                  if (errors.name) setErrors({ ...errors, name: false })
+                }}
                 placeholder="e.g. Free Avocado Smoothie"
-                className="w-full bg-[#FBFBF5] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                className={`w-full bg-[#FBFBF5] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none ${errors.name ? 'ring-2 ring-red-500/50' : ''}`}
               />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 lg:gap-4 xl:gap-8">
@@ -241,7 +270,6 @@ function RewardsManager({ onRewardsChange }) {
                 />
               </div>
 
-              {/* Status Section - Side by side on mobile */}
               <div className="col-span-1 sm:col-span-1">
                 <label className="block text-xs font-bold text-[#4A6B10] mb-2 px-1 sm:text-center whitespace-nowrap">
                   Active:
@@ -274,6 +302,20 @@ function RewardsManager({ onRewardsChange }) {
                   </div>
                 </div>
               </div>
+
+              <div className="col-span-1 sm:col-span-1">
+                <label className="block text-xs font-bold text-[#4A6B10] mb-2 px-1 sm:text-center whitespace-nowrap">
+                  Never Expires:
+                </label>
+                <div 
+                  onClick={() => setRewardData({ ...rewardData, never_expires: !rewardData.never_expires })}
+                  className="w-full h-[58px] bg-[#FBFBF5] rounded-[1.2rem] flex items-center justify-center cursor-pointer shadow-inner hover:shadow-md transition-all group"
+                >
+                  <div className={`w-11 h-6 rounded-full relative transition-all duration-500 shadow-inner ${rewardData.never_expires ? 'bg-[#4A6B10]' : 'bg-[#D1D3C8]'}`}>
+                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-md transition-all duration-500 transform ${rewardData.never_expires ? 'left-6 scale-110' : 'left-0.5 scale-90'}`}></div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-8">
               <div className="w-full">
@@ -284,12 +326,12 @@ function RewardsManager({ onRewardsChange }) {
                   placeholder="Set start date"
                 />
               </div>
-              <div className="w-full">
+              <div className={`w-full transition-opacity duration-300 ${rewardData.never_expires ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
                 <CustomDatePicker
                   label="End Date"
                   value={rewardData.end_date}
                   onChange={(val) => setRewardData({ ...rewardData, end_date: val })}
-                  placeholder="Set end date"
+                  placeholder={rewardData.never_expires ? "Permanent Reward" : "Set end date"}
                 />
               </div>
             </div>
@@ -427,12 +469,32 @@ function RewardsManager({ onRewardsChange }) {
       <ModernConfirm
         isOpen={showConfirm}
         onConfirm={confirmDelete}
-        onCancel={() => setShowConfirm(false)}
+        onCancel={() => {
+          setShowConfirm(false)
+          setPendingClaimsCount(0)
+        }}
         title="Delete Reward?"
-        message="This will permanently remove this reward from the system. It cannot be undone."
+        message={
+          pendingClaimsCount > 0 
+            ? `WARNING: ${pendingClaimsCount} customer(s) have claimed this reward but haven't used it yet. If you delete it, their vouchers will vanish and their points will NOT be refunded automatically. Are you sure?`
+            : "This will permanently remove this reward from the system. It cannot be undone."
+        }
         confirmText="Yes, Delete it"
         cancelText="Keep Reward"
         variant="danger"
+      />
+
+      <ModernConfirm
+        isOpen={showSaveConfirm}
+        onConfirm={executeSave}
+        onCancel={() => setShowSaveConfirm(false)}
+        title={editingReward ? "Update Reward?" : "Save New Reward?"}
+        message={editingReward 
+          ? "Are you sure you want to update this reward with your latest changes?" 
+          : "Are you sure you want to create and publish this new reward?"}
+        confirmText={editingReward ? "Yes, Update" : "Yes, Save"}
+        cancelText="Cancel"
+        variant="primary"
       />
 
       <ModernConfirm

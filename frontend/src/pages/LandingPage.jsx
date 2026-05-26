@@ -29,13 +29,13 @@ function LandingPage() {
   return (
     <>
       <Navbar />
-      <div>
+      <main>
         <Hero />
         <VisualLayers />
         <Registration />
         <Locations />
         <InstagramGrid />
-      </div>
+      </main>
       <Footer />
     </>
   )

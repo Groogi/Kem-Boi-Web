@@ -1,0 +1,16 @@
+You've Got Points at Kem Bơ! 🥑
+
+Hi <%= @name.presence || "there" %>,
+ 
+Good news! Our staff just added <%= @points %> reward points to your account.
+
+To claim these points and start earning rewards, simply sign up using this email address:
+<%= @email %>
+
+Claim your points here:
+<% frontend_url = ENV.fetch('APP_DOMAIN', 'http://localhost:5173') %>
+<% frontend_url = "https://#{frontend_url}" unless frontend_url.start_with?('http') %>
+<%= "#{frontend_url}/login?mode=signup" %>
+
+See you soon at Kem Bơ!
+Traditional Atelier & Smoothie Bar

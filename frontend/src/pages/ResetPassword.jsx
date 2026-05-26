@@ -90,7 +90,7 @@ function ResetPassword() {
                   New Password
                 </label>
                 <input
-                  className="w-full px-8 py-5 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[16px] font-semibold outline-none"
+                  className="w-full px-8 py-5 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-[#F8F8F0] transition-all text-[#444] text-[16px] font-semibold outline-none"
                   type="password"
                   placeholder="••••••••"
                   value={password}
@@ -104,7 +104,7 @@ function ResetPassword() {
                   Confirm Password
                 </label>
                 <input
-                  className="w-full px-8 py-5 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[16px] font-semibold outline-none"
+                  className="w-full px-8 py-5 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-[#F8F8F0] transition-all text-[#444] text-[16px] font-semibold outline-none"
                   type="password"
                   placeholder="••••••••"
                   value={confirmPassword}

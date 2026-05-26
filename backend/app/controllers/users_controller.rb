@@ -11,7 +11,7 @@ class UsersController < ApplicationController
   end
 
   def create
-    props = user_params.to_h
+    props = user_params.to_h.except("referral_code")
 
     @user = User.new(props.merge(role: "customer"))
 
@@ -53,9 +53,10 @@ class UsersController < ApplicationController
             notes: "Welcome Gift from referral by #{referrer.first_name}"
           )
           # Finalize Voucher
-          redemption.update!(status: "used")
+          redemption.update!(status: "fulfilled")
         end
 
+        @user.reload
         token = JsonWebToken.encode(user_id: @user.id)
         time = Time.now + 24.hours.to_i
         render json: {
@@ -97,26 +98,18 @@ class UsersController < ApplicationController
   end
 
   def admin_update
-    if @current_user.admin?
-      @user = User.find(params[:id])
-      if @user.update(user_params)
-        render json: @user.as_json(methods: :points_balance)
-      else
-        render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
-      end
+    @user = User.find(params[:id])
+    if @user.update(user_params)
+      render json: @user.as_json(methods: :points_balance)
     else
-      render json: { error: "Not authorized" }, status: :unauthorized
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
   def destroy
-    if @current_user.admin?
-      @user = User.find(params[:id])
-      @user.destroy
-      render json: { message: "User deleted" }
-    else
-      render json: { error: "Not authorized" }, status: :unauthorized
-    end
+    @user = User.find(params[:id])
+    @user.destroy
+    render json: { message: "User deleted" }
   end
 
   def add_points

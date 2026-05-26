@@ -1,47 +1,83 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { forgotPassword } from '../../api/auth'
+import { useGoogleLogin } from '@react-oauth/google'
 
 function LoginForm() {
-  const { login, register } = useAuth()
+  const { login, register, googleAuth } = useAuth()
   const { showToast } = useToast()
   const navigate = useNavigate()
+  const location = useLocation()
 
-  const [activeTab, setActiveTab] = useState('login') // "login" | "signup"
+  const [activeTab, setActiveTab] = useState(location.state?.mode === 'signup' ? 'signup' : 'login') // "login" | "signup"
   const [isForgotMode, setIsForgotMode] = useState(false)
   const [resetSent, setResetSent] = useState(false)
   const [forgotEmail, setForgotEmail] = useState('')
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const modeParam = params.get('mode')
+    
+    if (modeParam === 'signup' || modeParam === 'login') {
+      setActiveTab(modeParam)
+    } else if (location.state?.mode) {
+      setActiveTab(location.state.mode)
+    }
+  }, [location])
 
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const [signupData, setSignupData] = useState({ firstName: '', lastName: '', email: '', password: '', password_confirmation: '', referralCode: '' })
   const [loginData, setLoginData] = useState({ email: '', password: '' })
+  const [errors, setErrors] = useState({})
+
+  const validateEmail = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      )
+  }
 
   const handleSignup = async (e) => {
     e.preventDefault()
     
-    if (signupData.password.length < 8) {
-      showToast('Password must be at least 8 characters', 'error')
+    const newErrors = {}
+    const nameRegex = /^[a-zA-Z\s-]+$/
+
+    if (!signupData.firstName || !nameRegex.test(signupData.firstName)) newErrors.firstName = true
+    if (!signupData.lastName || !nameRegex.test(signupData.lastName)) newErrors.lastName = true
+    if (!signupData.email || !validateEmail(signupData.email)) newErrors.email = true
+    if (signupData.password.length < 8) newErrors.password = true
+    if (signupData.password !== signupData.password_confirmation) newErrors.password_confirmation = true
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      if (newErrors.password_confirmation && signupData.password === signupData.password_confirmation) {
+          // This case won't happen based on the logic above, but keeping it safe
+      }
+      
+      if (newErrors.firstName || newErrors.lastName) showToast('Names can only contain letters, spaces, or hyphens', 'error')
+      else if (newErrors.email) showToast('Please enter a valid email address', 'error')
+      else if (newErrors.password) showToast('Password must be at least 8 characters', 'error')
+      else if (newErrors.password_confirmation) showToast('Passwords do not match', 'error')
       return
     }
 
-    if (signupData.password !== signupData.password_confirmation) {
-      showToast('Passwords do not match', 'error')
-      return
-    }
+    setErrors({})
 
     setLoading(true)
     try {
       await register({
-        first_name: signupData.firstName,
-        last_name: signupData.lastName,
-        email: signupData.email,
+        first_name: signupData.firstName.trim().toLowerCase(),
+        last_name: signupData.lastName.trim().toLowerCase(),
+        email: signupData.email.trim().toLowerCase(),
         password: signupData.password,
         password_confirmation: signupData.password_confirmation,
-        referral_code: signupData.referralCode,
+        referral_code: signupData.referralCode.trim().toUpperCase(),
       })
       showToast('Welcome to the Kem Boi Family!', 'success')
       navigate('/family')
@@ -54,9 +90,19 @@ function LoginForm() {
 
   const handleLogin = async (e) => {
     e.preventDefault()
+    
+    if (!loginData.email || !validateEmail(loginData.email)) {
+      setErrors({ email: true })
+      showToast('Please enter a valid email address', 'error')
+      return
+    }
+
+    setErrors({})
+    setLoading(true)
+
     setLoading(true)
     try {
-      const user = await login({ email: loginData.email, password: loginData.password })
+      const user = await login({ email: loginData.email.trim().toLowerCase(), password: loginData.password })
       showToast(`Welcome back!`, 'success')
       navigate(user.role === 'admin' ? '/admin' : '/family')
     } catch {
@@ -66,10 +112,30 @@ function LoginForm() {
     }
   }
 
+  const handleGoogleSuccess = async (tokenResponse) => {
+    setLoading(true)
+    try {
+      // useGoogleLogin implicitly grants an access_token for the 'implicit flow'
+      // We send this token to the backend
+      const user = await googleAuth(tokenResponse.access_token)
+      showToast('Successfully signed in with Google!', 'success')
+      navigate(user.role === 'admin' ? '/admin' : '/family')
+    } catch (err) {
+      showToast(err.message || 'Google sign in failed', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleClick = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => showToast('Google sign in failed', 'error'),
+  })
+
   const handleForgotSubmit = async (e) => {
     e.preventDefault()
-    if (!forgotEmail) {
-      showToast('Please enter your email', 'error')
+    if (!forgotEmail || !validateEmail(forgotEmail)) {
+      showToast('Please enter a valid email address', 'error')
       return
     }
 
@@ -105,17 +171,24 @@ function LoginForm() {
         </div>
 
         {!resetSent ? (
-          <form className="max-w-md mx-auto w-full space-y-8" onSubmit={handleForgotSubmit}>
+          <form 
+            className="max-w-md mx-auto w-full space-y-8" 
+            onSubmit={handleForgotSubmit}
+            noValidate
+          >
             <div className="space-y-1">
               <label className="text-[12px] text-[#8ea46a] ml-5 font-black tracking-widest uppercase">
                 Email Address
               </label>
               <input
-                className="w-full px-8 py-5 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[16px] font-semibold outline-none"
+                className={`w-full px-8 py-5 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[16px] font-semibold outline-none ${errors.forgotEmail ? 'ring-2 ring-red-500/50' : ''}`}
                 type="email"
                 placeholder="hello@example.com"
                 value={forgotEmail}
-                onChange={(e) => setForgotEmail(e.target.value)}
+                onChange={(e) => {
+                  setForgotEmail(e.target.value)
+                  if (errors.forgotEmail) setErrors({ ...errors, forgotEmail: false })
+                }}
                 required
               />
             </div>
@@ -179,14 +252,19 @@ function LoginForm() {
       <form
         className="w-full flex flex-col items-center"
         onSubmit={activeTab === 'login' ? handleLogin : handleSignup}
+        noValidate
       >
         <div className="w-full flex-grow flex flex-col md:flex-row items-stretch justify-center gap-12 mb-12">
           <div className="flex-1 flex flex-col items-center justify-center">
-            <p className="text-[13px] font-bold text-[#7d8076] mb-6">Log in With:</p>
+            <p className="text-[13px] font-bold text-[#7d8076] mb-6">
+              {activeTab === 'login' ? 'Log in With:' : 'Sign up With:'}
+            </p>
             <div className="space-y-4 w-full max-w-[280px]">
               <button
                 type="button"
-                className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-[#E3E5D7] rounded-full shadow-lg shadow-black/5 hover:bg-white/80 transition-all"
+                onClick={() => handleGoogleClick()}
+                disabled={loading}
+                className="w-full flex items-center justify-center gap-3 py-4 bg-white border border-[#E3E5D7] rounded-full shadow-lg shadow-black/5 hover:bg-white/80 transition-all disabled:opacity-50"
               >
                 <img
                   src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -234,11 +312,14 @@ function LoginForm() {
                       First Name
                     </label>
                     <input
-                      className="w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none"
+                      className={`w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none ${errors.firstName ? 'ring-2 ring-red-500/50' : ''}`}
                       type="text"
                       placeholder="First name"
                       value={signupData.firstName}
-                      onChange={(e) => setSignupData({ ...signupData, firstName: e.target.value })}
+                      onChange={(e) => {
+                        setSignupData({ ...signupData, firstName: e.target.value })
+                        if (errors.firstName) setErrors({ ...errors, firstName: false })
+                      }}
                       required
                     />
                   </div>
@@ -247,11 +328,14 @@ function LoginForm() {
                       Last Name
                     </label>
                     <input
-                      className="w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none"
+                      className={`w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none ${errors.lastName ? 'ring-2 ring-red-500/50' : ''}`}
                       type="text"
                       placeholder="Last name"
                       value={signupData.lastName}
-                      onChange={(e) => setSignupData({ ...signupData, lastName: e.target.value })}
+                      onChange={(e) => {
+                        setSignupData({ ...signupData, lastName: e.target.value })
+                        if (errors.lastName) setErrors({ ...errors, lastName: false })
+                      }}
                       required
                     />
                   </div>
@@ -263,15 +347,18 @@ function LoginForm() {
                   Email
                 </label>
                 <input
-                  className="w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none"
+                  className={`w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none ${errors.email ? 'ring-2 ring-red-500/50' : ''}`}
                   type="email"
                   placeholder="email@example.com"
                   value={activeTab === 'login' ? loginData.email : signupData.email}
-                  onChange={(e) =>
-                    activeTab === 'login'
-                      ? setLoginData({ ...loginData, email: e.target.value })
-                      : setSignupData({ ...signupData, email: e.target.value })
-                  }
+                  onChange={(e) => {
+                    if (activeTab === 'login') {
+                      setLoginData({ ...loginData, email: e.target.value })
+                    } else {
+                      setSignupData({ ...signupData, email: e.target.value })
+                    }
+                    if (errors.email) setErrors({ ...errors, email: false })
+                  }}
                   required
                 />
               </div>
@@ -293,15 +380,18 @@ function LoginForm() {
                 </div>
                 <div className="relative group/pass">
                   <input
-                    className="w-full px-8 pr-14 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none"
+                    className={`w-full px-8 pr-14 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none ${errors.password ? 'ring-2 ring-red-500/50' : ''}`}
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={activeTab === 'login' ? loginData.password : signupData.password}
-                    onChange={(e) =>
-                      activeTab === 'login'
-                        ? setLoginData({ ...loginData, password: e.target.value })
-                        : setSignupData({ ...signupData, password: e.target.value })
-                    }
+                    onChange={(e) => {
+                      if (activeTab === 'login') {
+                        setLoginData({ ...loginData, password: e.target.value })
+                      } else {
+                        setSignupData({ ...signupData, password: e.target.value })
+                      }
+                      if (errors.password) setErrors({ ...errors, password: false })
+                    }}
                     required
                   />
                   <button
@@ -323,11 +413,14 @@ function LoginForm() {
                     Confirm Password
                   </label>
                   <input
-                    className="w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none"
+                    className={`w-full px-8 py-4 bg-[#dcdcdc]/40 border-none rounded-full focus:bg-white transition-all text-[#444] text-[15px] font-semibold outline-none ${errors.password_confirmation ? 'ring-2 ring-red-500/50' : ''}`}
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={signupData.password_confirmation}
-                    onChange={(e) => setSignupData({ ...signupData, password_confirmation: e.target.value })}
+                    onChange={(e) => {
+                      setSignupData({ ...signupData, password_confirmation: e.target.value })
+                      if (errors.password_confirmation) setErrors({ ...errors, password_confirmation: false })
+                    }}
                     required
                   />
                 </div>

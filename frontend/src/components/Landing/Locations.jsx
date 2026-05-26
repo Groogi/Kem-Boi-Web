@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { API_BASE } from '../../api/config'
 
 function Locations() {
   const [locations, setLocations] = useState([])
@@ -6,7 +7,7 @@ function Locations() {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const res = await fetch('/api/locations')
+        const res = await fetch(`${API_BASE}/locations`)
         if (res.ok) {
           const data = await res.json()
           if (data && data.length > 0) {
@@ -56,9 +57,9 @@ function Locations() {
                   <h2 className="text-[32px] md:text-[48px] font-bold font-headline text-[#426500] mb-6 tracking-tight leading-tight">
                     Find Our Atelier
                   </h2>
-                  <h4 className="font-bold text-[18px] md:text-[19px] text-[#426500] mb-2 font-body uppercase tracking-wider">
+                  <h3 className="font-bold text-[18px] md:text-[19px] text-[#426500] mb-2 font-body uppercase tracking-wider">
                     {loc.name}
-                  </h4>
+                  </h3>
                   <p className="text-[20px] md:text-[28px] text-[#5B5C59] font-bold leading-relaxed mb-8 md:mb-10 tracking-tight">
                     {loc.address_line_1}
                     <br />

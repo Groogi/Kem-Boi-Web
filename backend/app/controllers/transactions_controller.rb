@@ -6,6 +6,20 @@ class TransactionsController < ApplicationController
     if params[:user_id].present? && @current_user.admin?
       @user = User.find(params[:user_id])
       render json: @user.transactions.order(created_at: :desc)
+    elsif params[:email].present? && @current_user.admin?
+      # Return pending bonuses for this email if the user doesn't exist yet
+      pending = PendingBonus.where(email: params[:email].to_s.downcase).order(created_at: :desc)
+      render json: pending.map { |pb| 
+        { 
+          id: pb.id, 
+          points: pb.points_amount, 
+          first_name: pb.first_name,
+          last_name: pb.last_name,
+          created_at: pb.created_at, 
+          transaction_type: "pending", 
+          notes: "Pending registration" 
+        } 
+      }
     else
       render json: @current_user.transactions.order(created_at: :desc)
     end
@@ -21,8 +35,17 @@ class TransactionsController < ApplicationController
         render json: { errors: transaction.errors.full_messages }, status: :unprocessable_entity
       end
     else
-      # User doesn't exist, create a pending bonus
-      pb = PendingBonus.create(email: params[:email], points_amount: params[:points].to_i)
+      # User doesn't exist, create a pending bonus with optional names
+      pb = PendingBonus.create(
+        email: params[:email], 
+        points_amount: params[:points].to_i,
+        first_name: params[:first_name],
+        last_name: params[:last_name]
+      )
+      
+      # Pass the first_name to the mailer for a personalized greeting
+      UserMailer.pending_bonus_notification(params[:email], params[:points].to_i, params[:first_name]).deliver_now
+      
       render json: { message: "User not found. Points saved as pending bonus.", pending: pb }
     end
   end
@@ -32,10 +55,4 @@ class TransactionsController < ApplicationController
     render json: user.transactions.order(created_at: :desc)
   end
 
-  private
-
-  def transaction_params
-    # We permit points (should be negative for redemption) and transaction_type
-    params.require(:transaction).permit(:points, :transaction_type, :notes)
-  end
 end

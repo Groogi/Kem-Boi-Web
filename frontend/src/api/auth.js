@@ -1,4 +1,4 @@
-const API_BASE = '/api'
+import { API_BASE } from './config'
 
 export async function register({
   first_name,
@@ -22,7 +22,16 @@ export async function register({
     }),
   })
 
-  const data = await res.json()
+  let data;
+  try {
+    data = await res.json()
+  } catch (err) {
+    if (!res.ok) {
+      throw new Error('The server is currently waking up from sleep. Please wait 30 seconds and try again!')
+    }
+    throw new Error('An unexpected error occurred.')
+  }
+
   if (!res.ok) throw new Error(data.errors?.join(', ') || 'Registration failed')
   return data
 }
@@ -33,7 +42,15 @@ export async function login({ email, password }) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   })
-  const data = await res.json()
+  let data;
+  try {
+    data = await res.json()
+  } catch (err) {
+    if (!res.ok) {
+      throw new Error('The server is currently waking up from sleep. Please wait 30 seconds and try again!')
+    }
+    throw new Error('An unexpected error occurred.')
+  }
   if (!res.ok) throw new Error(data.error || 'Login failed')
   return data
 }
@@ -58,7 +75,12 @@ export async function forgotPassword(email) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email }),
   })
-  const data = await res.json()
+  let data;
+  try {
+    data = await res.json()
+  } catch (err) {
+    throw new Error('Server error sending email. Please make sure your email is verified in Mailgun Sandbox.')
+  }
   if (!res.ok) throw new Error(data.error || 'Failed to send reset link')
   return data
 }
@@ -71,5 +93,16 @@ export async function resetPassword({ email, token, password }) {
   })
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || 'Failed to reset password')
+  return data
+}
+
+export async function googleLogin(token) {
+  const res = await fetch(`${API_BASE}/auth/google`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Google login failed')
   return data
 }

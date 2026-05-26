@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback } from 'react'
-import { login as apiLogin, register as apiRegister } from '../api/auth'
+import { login as apiLogin, register as apiRegister, googleLogin as apiGoogleLogin } from '../api/auth'
+import { API_BASE } from '../api/config'
 
 const AuthContext = createContext(null)
 
@@ -38,6 +39,12 @@ export function AuthProvider({ children }) {
     return data
   }, [])
 
+  const googleAuth = useCallback(async (token) => {
+    const data = await apiGoogleLogin(token)
+    persist(data)
+    return data
+  }, [])
+
   const logout = useCallback(() => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
@@ -59,7 +66,7 @@ export function AuthProvider({ children }) {
   const refreshProfile = useCallback(async () => {
     if (!token) return
     try {
-      const res = await fetch('/api/profile', {
+      const res = await fetch(`${API_BASE}/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
@@ -79,6 +86,7 @@ export function AuthProvider({ children }) {
         isAuthenticated: !!token,
         login,
         register,
+        googleAuth,
         logout,
         updateUser,
         refreshProfile,

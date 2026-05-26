@@ -21,14 +21,14 @@ export function ToastProvider({ children }) {
             ${
               toast.type === 'error'
                 ? 'bg-red-50/90 border-red-100 text-red-600'
-                : 'bg-[#EEF4E4]/90 border-white text-primary'
+                : 'bg-[#EEF4E4]/90 border-primary/5 text-primary'
             }
           `}
           >
             <div
               className={`
               w-10 h-10 rounded-full flex items-center justify-center shrink-0
-              ${toast.type === 'error' ? 'bg-red-100' : 'bg-white'}
+              ${toast.type === 'error' ? 'bg-red-100' : 'bg-[#FBFBF5]'}
             `}
             >
               <span className="material-symbols-outlined text-[20px]">

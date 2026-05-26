@@ -8,18 +8,24 @@ import WebsiteLinksForm from '../components/Admin/WebsiteLinksForm'
 import LocationEditor from '../components/Admin/LocationEditor'
 import RewardsManager from '../components/Admin/RewardsManager'
 import { ModernAlert, ModernConfirm } from '../components/Common/SharedUI'
+import { API_BASE } from '../api/config'
 
 function AdminPanel() {
   const { user, token, logout } = useAuth()
   const { showToast } = useToast()
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState('dashboard')
+  const [activeTab, setActiveTab] = useState(() => localStorage.getItem('adminActiveTab') || 'dashboard') // dashboard, bonus-entry, giveaways, locations
+
+  useEffect(() => {
+    localStorage.setItem('adminActiveTab', activeTab)
+  }, [activeTab])
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
-  const [viewMode, setViewMode] = useState('list')
+  const [viewMode, setViewMode] = useState('list') // list, add-user, user-details
   const [selectedUser, setSelectedUser] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
 
+  // Locations State
   const [locations, setLocations] = useState([])
   const [locationMode, setLocationMode] = useState('grid')
   const [editingLocation, setEditingLocation] = useState(null)
@@ -33,6 +39,10 @@ function AdminPanel() {
   const [redemptionToDelete, setRedemptionToDelete] = useState(null)
   const [rewardsKey, setRewardsKey] = useState(0)
 
+  // Locations filtering states
+  const [locationSearchQuery, setLocationSearchQuery] = useState('')
+  const [locationStatusFilter, setLocationStatusFilter] = useState('all') // all, active, inactive
+
   const filteredUsers = users.filter((u) => {
     const fullName = `${u.first_name || ''} ${u.last_name || ''}`.toLowerCase()
     const email = (u.email || '').toLowerCase()
@@ -40,17 +50,18 @@ function AdminPanel() {
     const query = searchQuery.toLowerCase()
     return fullName.includes(query) || email.includes(query) || accId.includes(query)
   })
-
+  // New states for interactive features
   const [quickEmail, setQuickEmail] = useState('')
   const [quickPoints, setQuickPoints] = useState('')
   const [selectedUserRedemptions, setSelectedUserRedemptions] = useState([])
   const [manualPointsAmount, setManualPointsAmount] = useState('')
   const [addUserForm, setAddUserForm] = useState({ full_name: '', email: '', points: '' })
   const [editUserForm, setEditUserForm] = useState({ first_name: '', last_name: '', email: '' })
+  const [errors, setErrors] = useState({})
 
   const fetchUsers = useCallback(async () => {
     try {
-      const res = await fetch('/api/users_list', {
+      const res = await fetch(`${API_BASE}/users_list`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
@@ -63,7 +74,7 @@ function AdminPanel() {
 
   const fetchRewards = useCallback(async () => {
     try {
-      const res = await fetch('/api/rewards', {
+      const res = await fetch(`${API_BASE}/rewards`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
@@ -76,7 +87,7 @@ function AdminPanel() {
 
   const fetchRedemptions = useCallback(async () => {
     try {
-      const res = await fetch('/api/redemptions', {
+      const res = await fetch(`${API_BASE}/redemptions`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
@@ -89,7 +100,7 @@ function AdminPanel() {
 
   const fetchLocations = useCallback(async () => {
     try {
-      const res = await fetch('/api/locations', {
+      const res = await fetch(`${API_BASE}/locations`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const data = await res.json()
@@ -101,6 +112,7 @@ function AdminPanel() {
   }, [token])
 
   useEffect(() => {
+    // Only redirect if we definitely have a user object and can confirm they are NOT an admin
     if (token && user && user.role && user.role !== 'admin') {
       navigate('/')
     }
@@ -117,7 +129,7 @@ function AdminPanel() {
 
   const handleUpdateRedemptionStatus = async (redId, newStatus) => {
     try {
-      const res = await fetch(`/api/redemptions/${redId}`, {
+      const res = await fetch(`${API_BASE}/redemptions/${redId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +151,7 @@ function AdminPanel() {
     if (!id) return
 
     try {
-      const res = await fetch(`/api/redemptions/${id}`, {
+      const res = await fetch(`${API_BASE}/redemptions/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -156,7 +168,7 @@ function AdminPanel() {
   const fetchUserRedemptions = useCallback(
     async (userId) => {
       try {
-        const res = await fetch(`/api/redemptions?user_id=${userId}`, {
+        const res = await fetch(`${API_BASE}/redemptions?user_id=${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (res.ok) {
@@ -187,10 +199,10 @@ function AdminPanel() {
     if (!targetEmail || !targetPoints) return
     setLoading(true)
     try {
-      const res = await fetch('/api/transactions/quick_add', {
+      const res = await fetch(`${API_BASE}/transactions/quick_add`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ email: targetEmail, points: targetPoints }),
+        body: JSON.stringify({ email: targetEmail.toString().trim().toLowerCase(), points: targetPoints }),
       })
       if (res.ok) {
         setQuickEmail('')
@@ -206,14 +218,25 @@ function AdminPanel() {
     }
   }
 
-  const handleManualAddPoints = async () => {
-    if (!selectedUser || !manualPointsAmount) return
+  const handleManualAddPoints = async (actionType = 'add') => {
+    if (!selectedUser) return
+    const amount = Number(manualPointsAmount)
+    if (!manualPointsAmount || isNaN(amount) || amount <= 0) {
+      setErrors({ manualPoints: true })
+      showToast('Please enter a valid numeric point amount.', 'error')
+      return
+    }
+    setErrors({})
     setLoading(true)
+    
+    const finalPoints = actionType === 'subtract' ? -amount : amount;
+    const notes = actionType === 'subtract' ? 'Admin Manual Deduction' : 'Admin Manual Addition';
+
     try {
-      const res = await fetch(`/api/users/${selectedUser.id}/add_points`, {
+      const res = await fetch(`${API_BASE}/users/${selectedUser.id}/add_points`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ points: manualPointsAmount, notes: 'Admin Manual Addition' }),
+        body: JSON.stringify({ points: finalPoints, notes }),
       })
       if (res.ok) {
         const data = await res.json()
@@ -240,7 +263,7 @@ function AdminPanel() {
     if (!selectedUser) return
     setLoading(true)
     try {
-      const res = await fetch(`/api/users/${selectedUser.id}`, {
+      const res = await fetch(`${API_BASE}/users/${selectedUser.id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -263,39 +286,40 @@ function AdminPanel() {
   }
 
   const handleCreateUser = async () => {
+    const newErrors = {}
+    if (!addUserForm.full_name?.trim()) newErrors.full_name = true
+    if (!addUserForm.email?.trim() || !addUserForm.email.includes('@')) newErrors.email = true
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      showToast('Please fill in all required fields correctly.', 'error')
+      return
+    }
+
+    setErrors({})
     setLoading(true)
+
+    // Name Splitting Logic
+    const nameParts = addUserForm.full_name.trim().split(/\s+/)
+    const firstName = nameParts[0]
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : ''
+
     try {
-      const res = await fetch('/api/register', {
+      const res = await fetch(`${API_BASE}/transactions/quick_add`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, // Registration is usually public
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
         body: JSON.stringify({
-          email: addUserForm.email,
-          first_name: addUserForm.full_name.trim().split(' ')[0] || addUserForm.full_name.trim(),
-          last_name: addUserForm.full_name.trim().split(' ').slice(1).join(' ') || '',
-          password: 'Password123!', // Default password for invitations
-          role: 'customer',
+          email: addUserForm.email.trim().toLowerCase(),
+          points: addUserForm.points || 0,
+          first_name: firstName,
+          last_name: lastName
         }),
       })
+
       if (res.ok) {
-        const userData = await res.json()
-        // If points were specified, add them now
-        if (addUserForm.points && Number(addUserForm.points) !== 0) {
-          const userId = userData.id || userData.user?.id
-          if (userId) {
-            try {
-              await fetch(`/api/users/${userId}/add_points`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-                body: JSON.stringify({
-                  points: addUserForm.points,
-                  notes: 'Initial Sign-up Bonus',
-                }),
-              })
-            } catch (pointErr) {
-              console.error('Failed to add initial points:', pointErr)
-            }
-          }
-        }
         showToast(`Invitation sent to ${addUserForm.email}!`, 'success')
         setAddUserForm({ full_name: '', email: '', points: '' })
         setViewMode('list')
@@ -303,13 +327,13 @@ function AdminPanel() {
       } else {
         const errorData = await res.json()
         showToast(
-          errorData.error || errorData.errors?.join(', ') || 'Failed to create user',
+          errorData.error || errorData.errors?.join(', ') || 'Failed to send invitation',
           'error'
         )
       }
     } catch (err) {
       console.error(err)
-      showToast('Network error occurred while creating user.', 'error')
+      showToast('Network error occurred while sending invitation.', 'error')
     } finally {
       setLoading(false)
     }
@@ -318,7 +342,7 @@ function AdminPanel() {
   const handleSaveLocation = async (locationData) => {
     setLoading(true)
     try {
-      const url = locationData.id ? `/api/locations/${locationData.id}` : '/api/locations'
+      const url = locationData.id ? `${API_BASE}/locations/${locationData.id}` : `${API_BASE}/locations`
       const method = locationData.id ? 'PUT' : 'POST'
       await fetch(url, {
         method,
@@ -337,7 +361,7 @@ function AdminPanel() {
   const handleDeleteLocation = async (id) => {
     setLoading(true)
     try {
-      await fetch(`/api/locations/${id}`, {
+      await fetch(`${API_BASE}/locations/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -357,9 +381,10 @@ function AdminPanel() {
     return { label: 'BRONZE', class: 'bg-[#B8BAAF] text-white' }
   }
 
+  // Sidebar navigation
   const navItems = [
     { id: 'dashboard', label: 'Customers', icon: 'group' },
-    { id: 'bonus-entry', label: 'Staff Service Hub', icon: 'point_of_sale' },
+    { id: 'bonus-entry', label: 'Add Points', icon: 'point_of_sale' },
     { id: 'rewards', label: 'Rewards', icon: 'workspace_premium' },
     { id: 'redemptions', label: 'Rewards History', icon: 'history_edu' },
     { id: 'locations', label: 'Store Locations', icon: 'add_location' },
@@ -368,6 +393,7 @@ function AdminPanel() {
 
   const renderSidebar = () => (
     <>
+      {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-[60] lg:hidden animate-fade-in"
@@ -408,7 +434,7 @@ function AdminPanel() {
                 setIsSidebarOpen(false)
               }}
               className={`flex items-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 group ${activeTab === item.id
-                  ? 'bg-white border-2 border-[#E5E7E1] text-primary shadow-sm shadow-black/5'
+                  ? 'bg-[#EEF4E4] border-2 border-[#E5E7E1] text-primary shadow-sm shadow-black/5'
                   : 'text-on-surface-variant hover:bg-surface-container-highest/30'
                 }`}
             >
@@ -431,7 +457,7 @@ function AdminPanel() {
             logout()
             navigate('/')
           }}
-          className="mt-auto mb-4 flex items-center justify-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 text-on-surface-variant hover:bg-red-50 hover:text-red-600 border border-outline-variant/10 bg-white"
+          className="mt-auto mb-4 flex items-center justify-center gap-3 px-4 py-3 rounded-full cursor-pointer transition-all duration-200 text-on-surface-variant hover:bg-red-50 hover:text-red-600 border border-outline-variant/10 bg-[#FBFBF5]"
         >
           <span className="text-[15px] font-bold">Logout</span>
         </div>
@@ -444,18 +470,19 @@ function AdminPanel() {
       <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary capitalize tracking-[-0.02em]">
         {(() => {
           if (activeTab === 'dashboard') return 'Customer Directory'
-          if (activeTab === 'bonus-entry') return 'Staff Service Hub'
+          if (activeTab === 'bonus-entry') return 'Add Points'
+          if (activeTab === 'redemptions') return 'Rewards'
           return activeTab.replace('-', ' ')
         })()}
       </h2>
 
       {/* Hide full profile badge on mobile since it's now in the top-right sticky bar */}
-      <div className="hidden md:flex items-center gap-3 bg-white pr-4 pl-1 py-1 rounded-full border border-outline-variant/20 shadow-sm">
+      <div className="hidden md:flex items-center gap-3 bg-[#FBFBF5] pr-4 pl-1 py-1 rounded-full border border-outline-variant/20 shadow-sm">
         <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
           <span className="material-symbols-outlined text-[1.2rem]">person</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-bold text-primary leading-tight">
+          <span className="text-sm font-bold text-primary leading-tight capitalize">
             {user?.first_name ? `${user.first_name} ${user.last_name || ''}` : 'Full Name'}
           </span>
           <span className="text-[11px] text-on-surface-variant/60 font-bold uppercase leading-tight tracking-tighter">
@@ -482,7 +509,7 @@ function AdminPanel() {
       </div>
 
       <div className="bg-[#EEF4E4]/70 rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-14 relative border border-white/40 shadow-sm">
-        <div className="bg-white/60 backdrop-blur-sm rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-white/20 whitespace-nowrap lg:whitespace-normal">
+        <div className="bg-[#F8F8F0]/60 backdrop-blur-sm rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-white/20 whitespace-nowrap lg:whitespace-normal">
           <table className="w-full text-left">
             <thead className="bg-[#F2F3EB]/60 border-b border-[#4A6B10]/5">
               <tr>
@@ -493,7 +520,7 @@ function AdminPanel() {
                   Points Balance
                 </th>
                 <th className="px-8 py-5 text-sm font-bold text-[#304c00] text-center">Status</th>
-                <th className="px-8 py-5 text-sm font-bold text-[#304c00] text-right">Actions</th>
+                <th className="px-8 py-5 text-sm font-bold text-[#304c00] text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -505,14 +532,20 @@ function AdminPanel() {
                       key={idx}
                       onClick={() => {
                         setSelectedUser(u)
+                        setEditUserForm({
+                          first_name: u.first_name || '',
+                          last_name: u.last_name || '',
+                          email: u.email || '',
+                        })
+                        fetchUserRedemptions(u.id)
                         setViewMode('user-details')
                       }}
                       className="hover:bg-surface-container-highest/10 cursor-pointer transition-all"
                     >
-                      <td className="px-8 py-5 text-[11px] font-black text-[#5C5F57]">
-                        #{u.account_id || u.id}
+                      <td className="px-8 py-5 text-sm font-bold text-[#5C5F57] whitespace-nowrap tracking-tighter">
+                        {u.account_id?.toLowerCase()}
                       </td>
-                      <td className="px-8 py-5 text-sm font-bold text-on-surface">
+                      <td className="px-8 py-5 text-sm font-bold text-on-surface capitalize">
                         {u.first_name} {u.last_name}
                       </td>
                       <td className="px-8 py-5 text-sm font-bold text-[#5C5F57] italic">
@@ -528,7 +561,7 @@ function AdminPanel() {
                           {status.label}
                         </span>
                       </td>
-                      <td className="px-8 py-6 text-right">
+                      <td className="px-8 py-6 text-center">
                         <span className="bg-[#426500]/10 text-[#426500] font-bold text-[10px] tracking-widest px-6 py-2.5 rounded-full hover:bg-[#426500] hover:text-white transition-all uppercase border border-[#426500]/10">
                           View
                         </span>
@@ -571,15 +604,18 @@ function AdminPanel() {
 
   const renderAddUserView = () => (
     <div className="bg-[#EEF4E4]/70 rounded-[1.5rem] md:rounded-[2.5rem] p-8 md:p-14 max-w-4xl relative border border-white/40 shadow-sm">
-      <div className="bg-white/60 backdrop-blur-sm rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-12 space-y-8 md:space-y-10 border border-white/20">
+      <div className="bg-[#F8F8F0]/60 backdrop-blur-sm rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-12 space-y-8 md:space-y-10 border border-white/20">
         <div>
           <label className="block text-sm font-bold text-[#4A6B10] mb-3 px-1">Full Name</label>
           <div className="relative group">
             <input
               type="text"
               value={addUserForm.full_name}
-              onChange={(e) => setAddUserForm({ ...addUserForm, full_name: e.target.value })}
-              className="w-full bg-[#EBECE4] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+              onChange={(e) => {
+                setAddUserForm({ ...addUserForm, full_name: e.target.value })
+                if (errors.full_name) setErrors({ ...errors, full_name: false })
+              }}
+              className={`w-full bg-[#EBECE4] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none ${errors.full_name ? 'ring-2 ring-red-500/50' : ''}`}
             />
             <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-center leading-none text-on-surface-variant/40 pointer-events-none select-none">
               <span className="material-symbols-outlined text-[18px]">edit_square</span>
@@ -594,8 +630,11 @@ function AdminPanel() {
             <input
               type="email"
               value={addUserForm.email}
-              onChange={(e) => setAddUserForm({ ...addUserForm, email: e.target.value })}
-              className="w-full bg-[#EBECE4] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+              onChange={(e) => {
+                setAddUserForm({ ...addUserForm, email: e.target.value })
+                if (errors.email) setErrors({ ...errors, email: false })
+              }}
+              className={`w-full bg-[#EBECE4] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none ${errors.email ? 'ring-2 ring-red-500/50' : ''}`}
             />
             <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-center leading-none text-on-surface-variant/40 pointer-events-none select-none">
               <span className="material-symbols-outlined text-[18px]">edit_square</span>
@@ -605,11 +644,12 @@ function AdminPanel() {
         </div>
 
         <div>
-          <label className="block text-sm font-bold text-[#4A6B10] mb-3 px-1">Add Points</label>
+          <label className="block text-sm font-bold text-[#4A6B10] mb-3 px-1">Initial Points Reward (Optional)</label>
           <div className="flex items-center gap-6">
-            <div className="relative group w-48">
+            <div className="relative group w-full">
               <input
                 type="number"
+                placeholder="0"
                 value={addUserForm.points}
                 onChange={(e) => setAddUserForm({ ...addUserForm, points: e.target.value })}
                 className="w-full bg-[#EBECE4] border-none rounded-full px-6 py-4 shadow-inner font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all outline-none"
@@ -619,9 +659,6 @@ function AdminPanel() {
                 <span className="text-[9px] font-bold uppercase mt-0.5 tracking-wider">Edit</span>
               </div>
             </div>
-            <button className="bg-[#5c8b16] text-white font-bold py-3.5 px-8 text-sm tracking-wide rounded-full shadow-md hover:bg-[#4a6b10] transition-all">
-              Add Points
-            </button>
           </div>
         </div>
       </div>
@@ -636,7 +673,7 @@ function AdminPanel() {
         </button>
         <button
           onClick={() => setViewMode('list')}
-          className="w-full sm:w-auto bg-white border-2 border-[#D1D3C8] text-on-surface-variant/80 font-bold py-[12px] px-10 text-xs tracking-widest rounded-full hover:bg-surface-container-highest/20 transition-all uppercase"
+          className="w-full sm:w-auto bg-[#FBFBF5] border-2 border-[#D1D3C8] text-on-surface-variant/80 font-bold py-[12px] px-10 text-xs tracking-widest rounded-full hover:bg-surface-container-highest/20 transition-all uppercase"
         >
           Cancel
         </button>
@@ -646,12 +683,28 @@ function AdminPanel() {
 
   const handleUpdateUser = async () => {
     if (!selectedUser) return
+    const newErrors = {}
+    if (!editUserForm.first_name?.trim()) newErrors.first_name = true
+    if (!editUserForm.last_name?.trim()) newErrors.last_name = true
+    if (!editUserForm.email?.trim() || !editUserForm.email.includes('@')) newErrors.email = true
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      showToast('Please correct the highlighted fields.', 'error')
+      return
+    }
+
+    setErrors({})
     setLoading(true)
     try {
-      const res = await fetch(`/api/users/${selectedUser.id}`, {
+      const res = await fetch(`${API_BASE}/users/${selectedUser.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(editUserForm),
+        body: JSON.stringify({
+          first_name: editUserForm.first_name.trim().toLowerCase(),
+          last_name: editUserForm.last_name.trim().toLowerCase(),
+          email: editUserForm.email.trim().toLowerCase(),
+        }),
       })
       if (res.ok) {
         const data = await res.json()
@@ -682,7 +735,7 @@ function AdminPanel() {
   }
 
   const renderDeleteModal = () => (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/40 animate-fade-in px-6">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#F8F8F0]/40 animate-fade-in px-6">
       <div className="bg-[#FBFBF5] rounded-[3rem] p-10 md:p-14 max-w-lg w-full shadow-2xl border border-white/20 relative animate-scale-in">
         <div className="flex flex-col items-center mb-10">
           <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-6">
@@ -727,7 +780,7 @@ function AdminPanel() {
                 setShowDeleteModal(false)
                 setDeleteConfirmText('')
               }}
-              className="flex-1 bg-white border-2 border-[#D1D3C8] text-on-surface-variant/60 font-bold py-4 rounded-full transition-all hover:bg-surface-container-highest/20 text-sm tracking-widest uppercase"
+              className="flex-1 bg-[#FBFBF5] border-2 border-[#D1D3C8] text-on-surface-variant/60 font-bold py-4 rounded-full transition-all hover:bg-surface-container-highest/20 text-sm tracking-widest uppercase"
             >
               Keep User
             </button>
@@ -737,99 +790,146 @@ function AdminPanel() {
     </div>
   )
 
-  const renderLocationsView = () => (
-    <div className="animate-fade-in space-y-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-2">
-        <div>
-          <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary capitalize">
-            Store Locations
-          </h2>
-          <p className="text-on-surface-variant font-medium opacity-60">
-            Manage your active stalls and stores.
-          </p>
-        </div>
-        <button
-          onClick={() => {
-            setEditingLocation(null)
-            setLocationMode('editor')
-          }}
-          className="w-full sm:w-auto bg-[#426500] text-white font-bold py-3.5 px-8 text-sm tracking-widest rounded-full shadow-md hover:bg-[#4a6b10] transition-all flex items-center justify-center gap-2"
-        >
-          <span className="material-symbols-outlined text-[20px]">add_location</span>
-          ADD STORE
-        </button>
-      </div>
+  const renderLocationsView = () => {
+    const filteredLocations = locations.filter((store) => {
+      const matchesSearch =
+        store.name.toLowerCase().includes(locationSearchQuery.toLowerCase()) ||
+        store.suburb.toLowerCase().includes(locationSearchQuery.toLowerCase())
 
-      <div className="bg-[#fcfdf9] rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 shadow-sm border border-outline-variant/30">
-        <div className="bg-white rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-primary/5 shadow-sm whitespace-nowrap lg:whitespace-normal">
-          <table className="w-full text-left">
-            <thead className="bg-[#F2F3EB]/30 border-b border-primary/5">
-              <tr>
-                <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest">
-                  Store Name
-                </th>
-                <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest">
-                  Suburb
-                </th>
-                <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-center">
-                  Status
-                </th>
-                <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-right">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#426500]/5">
-              {locations.length > 0 ? (
-                locations.map((store, idx) => (
-                  <tr key={idx} className="hover:bg-surface-container-highest/10 transition-colors">
-                    <td className="px-8 py-6 text-sm font-bold text-on-surface">{store.name}</td>
-                    <td className="px-8 py-6 text-sm font-medium text-on-surface-variant/70 italic">
-                      {store.suburb}
-                    </td>
-                    <td className="px-8 py-6 text-center">
-                      <span
-                        className={`text-[11px] font-bold uppercase tracking-widest ${store.active ? 'text-[#4A6B10]' : 'text-on-surface-variant/40'}`}
-                      >
-                        {store.active ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                    <td className="px-8 py-6 text-right">
-                      <button
-                        onClick={() => {
-                          setEditingLocation(store)
-                          setLocationMode('editor')
-                        }}
-                        className="bg-[#426500]/10 text-[#426500] font-bold text-[10px] tracking-widest px-4 py-1.5 rounded-full border border-[#426500]/20 hover:bg-[#426500] hover:text-white transition-all uppercase"
-                      >
-                        Manage
-                      </button>
+      const matchesStatus =
+        locationStatusFilter === 'all' ||
+        (locationStatusFilter === 'active' && store.active) ||
+        (locationStatusFilter === 'inactive' && !store.active)
+
+      return matchesSearch && matchesStatus
+    })
+
+    return (
+      <div className="animate-fade-in space-y-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-2">
+          <div>
+            <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary capitalize">
+              Store Locations
+            </h2>
+            <p className="text-on-surface-variant font-medium opacity-60">
+              Manage your active stalls and stores.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              setEditingLocation(null)
+              setLocationMode('editor')
+            }}
+            className="w-full sm:w-auto bg-[#426500] text-white font-bold py-3.5 px-8 text-sm tracking-widest rounded-full shadow-md hover:bg-[#4a6b10] transition-all flex items-center justify-center gap-2"
+          >
+            <span className="material-symbols-outlined text-[20px]">add_location</span>
+            ADD STORE
+          </button>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-4 items-center mb-2">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              placeholder="Search store name or suburb..."
+              value={locationSearchQuery}
+              onChange={(e) => setLocationSearchQuery(e.target.value)}
+              className="w-full bg-[#fcfdf2] border-none rounded-full px-12 py-3.5 shadow-inner focus:ring-4 focus:ring-[#426500]/10 transition-all font-medium text-on-surface-variant outline-none"
+            />
+            <span className="material-symbols-outlined absolute left-4 top-[14px] text-on-surface-variant/40">
+              search
+            </span>
+          </div>
+          <div className="bg-[#EEF4E4] p-1 rounded-full flex gap-1">
+            {['all', 'active', 'inactive'].map((status) => (
+              <button
+                key={status}
+                onClick={() => setLocationStatusFilter(status)}
+                className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${locationStatusFilter === status
+                    ? 'bg-white text-primary shadow-sm'
+                    : 'text-primary/60 hover:text-primary'
+                  }`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="bg-[#F8F8F0] rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 shadow-sm border border-outline-variant/30">
+          <div className="bg-[#F8F8F0] rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-primary/5 shadow-sm whitespace-nowrap lg:whitespace-normal">
+            <table className="w-full text-left">
+              <thead className="bg-[#F2F3EB]/30 border-b border-primary/5">
+                <tr>
+                  <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest">
+                    Store Name
+                  </th>
+                  <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest">
+                    Suburb
+                  </th>
+                  <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-center">
+                    Status
+                  </th>
+                  <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-center">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#426500]/5">
+                {filteredLocations.length > 0 ? (
+                  filteredLocations.map((store, idx) => (
+                    <tr
+                      key={idx}
+                      className="hover:bg-surface-container-highest/10 transition-colors"
+                    >
+                      <td className="px-8 py-6 text-sm font-bold text-on-surface">{store.name}</td>
+                      <td className="px-8 py-6 text-sm font-medium text-on-surface-variant/70 italic">
+                        {store.suburb}
+                      </td>
+                      <td className="px-8 py-6 text-center">
+                        <span
+                          className={`text-[11px] font-bold uppercase tracking-widest ${store.active ? 'text-[#4A6B10]' : 'text-on-surface-variant/40'}`}
+                        >
+                          {store.active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="px-8 py-6 text-center">
+                        <button
+                          onClick={() => {
+                            setEditingLocation(store)
+                            setLocationMode('editor')
+                          }}
+                          className="bg-[#426500]/10 text-[#426500] font-bold text-[10px] tracking-widest px-4 py-1.5 rounded-full border border-[#426500]/20 hover:bg-[#426500] hover:text-white transition-all uppercase"
+                        >
+                          Manage
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan="4"
+                      className="px-8 py-10 text-center text-sm font-medium text-on-surface-variant/40 italic"
+                    >
+                      No stores found matching your criteria.
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="4"
-                    className="px-8 py-10 text-center text-sm font-medium text-on-surface-variant/40 italic"
-                  >
-                    No stores found. List your first store to get started!
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   const renderRedemptionLogs = () => (
     <div className="animate-fade-in space-y-8">
       <div className="flex justify-between items-center mb-12">
         <div>
           <h2 className="text-5xl font-headline font-bold text-primary capitalize tracking-[-0.03em]">
-            Redemption Log
+            Rewards History
           </h2>
           <p className="text-on-surface-variant font-medium opacity-60 text-lg mt-2">
             Track and verify customer reward claims.
@@ -859,8 +959,8 @@ function AdminPanel() {
         </button>
       </div>
 
-      <div className="bg-[#fcfdf9] rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 shadow-sm border border-outline-variant/30">
-        <div className="bg-white rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-primary/5 shadow-sm whitespace-nowrap lg:whitespace-normal">
+      <div className="bg-[#F8F8F0] rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-10 shadow-sm border border-outline-variant/30">
+        <div className="bg-[#F8F8F0] rounded-[1.2rem] md:rounded-[2rem] overflow-x-auto border border-primary/5 shadow-sm whitespace-nowrap lg:whitespace-normal">
           <table className="w-full text-left">
             <thead className="bg-[#F2F3EB]/30 border-b border-primary/5">
               <tr>
@@ -879,36 +979,34 @@ function AdminPanel() {
                 <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-center text-[11px]">
                   Status
                 </th>
-                <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-right text-[11px]">
+                <th className="px-8 py-5 text-sm font-bold text-[#4A6B10] opacity-80 uppercase tracking-widest text-center text-[11px]">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody>
               {redemptions
-                .filter((red) => red.status === 'pending')
                 .filter((red) => {
-                  const name =
-                    `${red.user?.first_name || ''} ${red.user?.last_name || ''}`.toLowerCase()
+                  const name = `${red.user?.first_name || ''} ${red.user?.last_name || ''}`.toLowerCase()
+                  const email = (red.user?.email || '').toLowerCase()
                   const accId = String(red.user?.account_id || '').toLowerCase()
                   const query = redemptionSearch.toLowerCase()
-                  return name.includes(query) || accId.includes(query)
+                  return name.includes(query) || accId.includes(query) || email.includes(query)
                 }).length > 0 ? (
                 redemptions
-                  .filter((red) => red.status === 'pending')
                   .filter((red) => {
-                    const name =
-                      `${red.user?.first_name || ''} ${red.user?.last_name || ''}`.toLowerCase()
+                    const name = `${red.user?.first_name || ''} ${red.user?.last_name || ''}`.toLowerCase()
+                    const email = (red.user?.email || '').toLowerCase()
                     const accId = String(red.user?.account_id || '').toLowerCase()
                     const query = redemptionSearch.toLowerCase()
-                    return name.includes(query) || accId.includes(query)
+                    return name.includes(query) || accId.includes(query) || email.includes(query)
                   })
                   .map((red, idx) => (
                     <RedemptionRow
                       key={idx}
                       red={red}
                       onUpdate={handleUpdateRedemptionStatus}
-                      onDelete={handleDeleteRedemption}
+                      onDelete={(id) => setRedemptionToDelete({ id })}
                     />
                   ))
               ) : (
@@ -932,6 +1030,7 @@ function AdminPanel() {
     <div className="min-h-screen bg-[#FBFBF5] font-body text-on-surface selection:bg-[#c7fc79] selection:text-[#304c00]">
       {renderSidebar()}
 
+      {/* Mobile Header */}
       <div className="lg:hidden bg-[#F2F3EB] border-b border-outline-variant/10 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <button
@@ -950,7 +1049,7 @@ function AdminPanel() {
             Kem Boi
           </h1>
         </div>
-        <div className="flex items-center gap-3 bg-white pr-4 pl-1 py-1 rounded-full border border-outline-variant/20 shadow-sm shadow-black/5">
+        <div className="flex items-center gap-3 bg-[#FBFBF5] pr-4 pl-1 py-1 rounded-full border border-outline-variant/20 shadow-sm shadow-black/5">
           <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
             <span className="material-symbols-outlined text-[1.2rem]">person</span>
           </div>
@@ -998,6 +1097,8 @@ function AdminPanel() {
                   onDelete={handleDeleteRedemption}
                   selectedUserRedemptions={selectedUserRedemptions}
                   setLoading={setLoading}
+                  errors={errors}
+                  setErrors={setErrors}
                 />
               )}
             </>
@@ -1042,6 +1143,7 @@ function AdminPanel() {
           message="This will permanently remove the record from the log. This action is irreversible."
           confirmText="Delete Permanently"
           variant="danger"
+          requireTypeToConfirm={false}
         />
       )}
 
@@ -1056,7 +1158,7 @@ const RedemptionRow = ({ red, onUpdate, onDelete }) => {
   const [loading, setLoading] = useState(false)
 
   return (
-    <tr className="hover:bg-white/60 transition-all group">
+    <tr className="hover:bg-[#F8F8F0]/60 transition-all group">
       <td className="px-8 py-8">
         <span className="text-[11px] font-bold text-on-surface-variant font-mono">
           {new Date(red.created_at).toLocaleDateString('en-AU')}
@@ -1094,15 +1196,14 @@ const RedemptionRow = ({ red, onUpdate, onDelete }) => {
           {red.status}
         </span>
       </td>
-      <td className="px-8 py-8 text-right">
-        <div className="flex justify-end gap-3">
+      <td className="px-8 py-8 text-center">
+        <div className="flex justify-center gap-3">
           {red.status === 'pending' && (
             <button
               onClick={async () => {
                 setLoading(true)
                 try {
-                  await onUpdate(red.id, 'used')
-                  await onDelete(red.id)
+                  await onUpdate(red.id, 'fulfilled')
                 } catch (err) {
                   console.error(err)
                 } finally {
@@ -1112,7 +1213,15 @@ const RedemptionRow = ({ red, onUpdate, onDelete }) => {
               disabled={loading}
               className="bg-[#426500] text-white font-bold text-[10px] tracking-widest px-6 h-[38px] rounded-full hover:bg-[#4a6b10] transition-all uppercase disabled:opacity-50 flex items-center justify-center whitespace-nowrap shadow-md shadow-[#426500]/10"
             >
-              {loading ? 'Confirming...' : 'Confirm & Clear'}
+              {loading ? 'Confirming...' : 'Confirm'}
+            </button>
+          )}
+          {(red.status === 'fulfilled' || red.status === 'used') && (
+            <button
+              onClick={() => onDelete(red.id)}
+              className="bg-red-500 text-white font-bold text-[10px] tracking-widest px-6 h-[38px] rounded-full hover:bg-red-600 transition-all uppercase flex items-center justify-center whitespace-nowrap shadow-md shadow-red-500/10"
+            >
+              Delete
             </button>
           )}
         </div>
@@ -1145,6 +1254,8 @@ const UserDetailsView = ({
   onUpdate,
   onDelete,
   selectedUserRedemptions,
+  errors,
+  setErrors,
 }) => {
   const [detailTab, setDetailTab] = useState('details') // details, points
   const [confirmFulfill, setConfirmFulfill] = useState({
@@ -1182,10 +1293,11 @@ const UserDetailsView = ({
                   <input
                     type="text"
                     value={editUserForm.first_name}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setEditUserForm({ ...editUserForm, first_name: e.target.value })
-                    }
-                    className="w-full bg-[#EBECE4] border-none rounded-full px-7 py-3.5 shadow-inner text-on-surface font-medium focus:ring-2 focus:ring-[#426500]/20 outline-none"
+                      if (errors.first_name) setErrors({ ...errors, first_name: false })
+                    }}
+                    className={`w-full bg-[#EBECE4] border-none rounded-full px-7 py-3.5 shadow-inner text-on-surface font-medium focus:ring-2 focus:ring-[#426500]/20 outline-none ${errors.first_name ? 'ring-2 ring-red-500/50' : ''}`}
                   />
                 </div>
               </div>
@@ -1197,10 +1309,11 @@ const UserDetailsView = ({
                   <input
                     type="text"
                     value={editUserForm.last_name}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setEditUserForm({ ...editUserForm, last_name: e.target.value })
-                    }
-                    className="w-full bg-[#EBECE4] border-none rounded-full px-7 py-3.5 shadow-inner text-on-surface font-medium focus:ring-2 focus:ring-[#426500]/20 outline-none"
+                      if (errors.last_name) setErrors({ ...errors, last_name: false })
+                    }}
+                    className={`w-full bg-[#EBECE4] border-none rounded-full px-7 py-3.5 shadow-inner text-on-surface font-medium focus:ring-2 focus:ring-[#426500]/20 outline-none ${errors.last_name ? 'ring-2 ring-red-500/50' : ''}`}
                   />
                 </div>
               </div>
@@ -1213,8 +1326,11 @@ const UserDetailsView = ({
                 <input
                   type="email"
                   value={editUserForm.email}
-                  onChange={(e) => setEditUserForm({ ...editUserForm, email: e.target.value })}
-                  className="w-full bg-[#EBECE4] border-none rounded-full px-7 py-3.5 shadow-inner text-on-surface font-medium focus:ring-2 focus:ring-[#426500]/20 outline-none"
+                  onChange={(e) => {
+                    setEditUserForm({ ...editUserForm, email: e.target.value })
+                    if (errors.email) setErrors({ ...errors, email: false })
+                  }}
+                  className={`w-full bg-[#EBECE4] border-none rounded-full px-7 py-3.5 shadow-inner text-on-surface font-medium focus:ring-2 focus:ring-[#426500]/20 outline-none ${errors.email ? 'ring-2 ring-red-500/50' : ''}`}
                 />
               </div>
             </div>
@@ -1241,8 +1357,8 @@ const UserDetailsView = ({
               </span>
             </div>
 
-            <div className="bg-[#F2F3EB]/60 rounded-full p-1.5 shadow-inner flex items-center border border-white max-w-md mb-8">
-              <div className="bg-white rounded-full px-10 py-1.5 flex flex-col items-center flex-grow shadow-sm">
+            <div className="bg-[#F2F3EB]/60 rounded-full p-1.5 shadow-inner flex items-center border border-[#D1D3C8]/40 max-w-md mb-8">
+              <div className="bg-[#F8F8F0] rounded-full px-10 py-1.5 flex flex-col items-center flex-grow shadow-sm">
                 <p className="text-[9px] font-bold text-[#4A6B10]/50 uppercase tracking-[0.2em] leading-none mb-1">
                   Points Balance:
                 </p>
@@ -1257,21 +1373,33 @@ const UserDetailsView = ({
                 <input
                   type="number"
                   value={manualPointsAmount}
-                  onChange={(e) => setManualPointsAmount(e.target.value)}
-                  className="w-full bg-[#EBECE4] border-none rounded-full px-8 py-3.5 shadow-inner font-bold text-lg text-on-surface focus:ring-0"
+                  onChange={(e) => {
+                    setManualPointsAmount(e.target.value)
+                    if (errors.manualPoints) setErrors({ ...errors, manualPoints: false })
+                  }}
+                  className={`w-full bg-[#EBECE4] border-none rounded-full px-8 py-3.5 shadow-inner font-bold text-lg text-on-surface focus:ring-0 ${errors.manualPoints ? 'ring-2 ring-red-500/50' : ''}`}
                 />
                 <div className="absolute right-6 top-1/2 -translate-y-1/2 flex flex-col items-center leading-none text-on-surface-variant/40 pointer-events-none select-none">
                   <span className="material-symbols-outlined text-[18px]">edit_square</span>
                   <span className="text-[8px] font-bold uppercase tracking-tighter">Edit</span>
                 </div>
               </div>
-              <button
-                onClick={handleManualAddPoints}
-                disabled={loading}
-                className="bg-[#426500] text-white font-bold px-12 py-3.5 rounded-full text-sm shadow-md shadow-[#426500]/20 disabled:opacity-50 hover:bg-[#395800] transition-all active:scale-95"
-              >
-                {loading ? '...' : 'Add Points'}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleManualAddPoints('add')}
+                  disabled={loading}
+                  className="bg-[#426500] text-white font-bold px-8 py-3.5 rounded-full text-sm shadow-md shadow-[#426500]/20 disabled:opacity-50 hover:bg-[#395800] transition-all active:scale-95 whitespace-nowrap"
+                >
+                  {loading ? '...' : 'Add Points'}
+                </button>
+                <button
+                  onClick={() => handleManualAddPoints('subtract')}
+                  disabled={loading}
+                  className="bg-red-500 text-white font-bold px-8 py-3.5 rounded-full text-sm shadow-md shadow-red-500/20 disabled:opacity-50 hover:bg-red-600 transition-all active:scale-95 whitespace-nowrap"
+                >
+                  Subtract
+                </button>
+              </div>
             </div>
 
             <div className="mt-12 space-y-10">
@@ -1296,7 +1424,7 @@ const UserDetailsView = ({
                       .map((red) => (
                         <div
                           key={red.id}
-                          className="bg-surface-container-highest/10 rounded-3xl p-5 shadow-sm border border-white flex justify-between items-center hover:bg-white transition-all"
+                          className="bg-surface-container-highest/10 rounded-3xl p-5 shadow-sm border border-primary/10 flex justify-between items-center hover:bg-[#F8F8F0] transition-all"
                         >
                           <div className="flex flex-col">
                             <span className="text-[9px] font-black text-primary/40 uppercase tracking-widest mb-1">
@@ -1314,7 +1442,7 @@ const UserDetailsView = ({
                                 redemptionId: red.id,
                               })
                             }
-                            className="bg-white border-2 border-[#426500] text-[#426500] font-bold py-2 px-6 rounded-full text-[10px] tracking-widest hover:bg-[#426500] hover:text-white transition-all shadow-sm whitespace-nowrap"
+                            className="bg-[#FBFBF5] border-2 border-[#426500] text-[#426500] font-bold py-2 px-6 rounded-full text-[10px] tracking-widest hover:bg-[#426500] hover:text-white transition-all shadow-sm whitespace-nowrap"
                           >
                             USE NOW
                           </button>
@@ -1379,7 +1507,7 @@ const UserDetailsView = ({
                       .map((r) => (
                         <div
                           key={r.id}
-                          className="bg-surface-container-highest/10 rounded-3xl p-5 shadow-sm border border-white flex justify-between items-center hover:bg-white transition-all"
+                          className="bg-surface-container-highest/10 rounded-3xl p-5 shadow-sm border border-primary/10 flex justify-between items-center hover:bg-[#F8F8F0] transition-all"
                         >
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2 mb-1">
@@ -1398,7 +1526,7 @@ const UserDetailsView = ({
                           </div>
                           <button
                             onClick={() => setConfirmFulfill({ isOpen: true, reward: r })}
-                            className="bg-white border-2 border-[#426500] text-[#426500] font-bold py-2 px-6 rounded-full text-[10px] tracking-widest hover:bg-[#426500] hover:text-white transition-all shadow-sm whitespace-nowrap"
+                            className="bg-[#FBFBF5] border-2 border-[#426500] text-[#426500] font-bold py-2 px-6 rounded-full text-[10px] tracking-widest hover:bg-[#426500] hover:text-white transition-all shadow-sm whitespace-nowrap"
                           >
                             CLAIM & USE
                           </button>
@@ -1420,7 +1548,7 @@ const UserDetailsView = ({
           </button>
           <button
             onClick={() => setViewMode('list')}
-            className="w-full sm:w-auto bg-white border-2 border-[#D1D3C8] text-on-surface-variant font-bold py-3.5 px-14 text-[10px] tracking-[0.2em] rounded-full hover:bg-surface-container-highest/20 transition-all uppercase"
+            className="w-full sm:w-auto bg-[#FBFBF5] border-2 border-[#D1D3C8] text-on-surface-variant font-bold py-3.5 px-14 text-[10px] tracking-[0.2em] rounded-full hover:bg-surface-container-highest/20 transition-all uppercase"
           >
             Return to list
           </button>
@@ -1434,18 +1562,17 @@ const UserDetailsView = ({
               ? `Confirm usage of voucher "${confirmFulfill.reward?.name}" for this member?`
               : `Are you sure you want to deduct ${confirmFulfill.reward?.point_cost} points from this user and fulfill the "${confirmFulfill.reward?.name}" reward?`
           }
-          confirmText={confirmFulfill.redemptionId ? 'Mark as Used' : 'Confirm & Deduct'}
+          confirmText={confirmFulfill.redemptionId ? 'Mark as Fulfilled' : 'Confirm & Deduct'}
           onConfirm={async () => {
             const { reward, redemptionId } = confirmFulfill
             setConfirmFulfill({ isOpen: false, reward: null, redemptionId: null })
             setLoading(true)
             try {
               if (redemptionId) {
-                // Mark as used then immediately delete to "clear" from history as requested
-                await onUpdate(redemptionId, 'used')
-                await onDelete(redemptionId)
+                // Mark as fulfilled
+                await onUpdate(redemptionId, 'fulfilled')
 
-                showToast('Voucher fulfilled and cleared!', 'success')
+                showToast('Voucher fulfilled!', 'success')
 
                 // Trigger all refreshes
                 await Promise.all([
@@ -1455,7 +1582,7 @@ const UserDetailsView = ({
                 ])
               } else {
                 // Create new redemption (Direct Fulfill)
-                const res = await fetch(`/api/redemptions/direct_fulfill`, {
+                const res = await fetch(`${API_BASE}/redemptions/direct_fulfill`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                   body: JSON.stringify({ user_id: selectedUser.id, reward_id: reward.id }),

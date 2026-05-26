@@ -52,3 +52,6 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
   gem "letter_opener"
 end
+
+gem "google-id-token", "~> 1.4"
+gem "resend"

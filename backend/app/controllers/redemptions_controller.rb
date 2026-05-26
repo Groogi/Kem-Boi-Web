@@ -8,6 +8,8 @@ class RedemptionsController < ApplicationController
     ActiveRecord::Base.transaction do
       # Lock the reward row to prevent stock race conditions
       @reward.lock!
+      # Lock current user to prevent point balance race conditions
+      @current_user.lock!
 
       # Check points balance (using the cached balance)
       if @current_user.points_balance < @reward.point_cost
@@ -66,7 +68,6 @@ class RedemptionsController < ApplicationController
   end
 
   def index
-    authorize_admin
     @redemptions = Redemption.all.includes(:user, :reward).order(created_at: :desc)
 
     if params[:user_id].present?
@@ -99,7 +100,6 @@ class RedemptionsController < ApplicationController
   end
 
   def destroy
-    authorize_admin
     @redemption = Redemption.find(params[:id])
     @redemption.destroy
     head :no_content
@@ -149,7 +149,7 @@ class RedemptionsController < ApplicationController
         @redemption = @user.redemptions.create!(
           reward: @reward,
           voucher_code: "INSTORE-#{SecureRandom.hex(4).upcase}",
-          status: "used"
+          status: "fulfilled"
         )
       rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
         if e.is_a?(ActiveRecord::RecordNotUnique) || (e.is_a?(ActiveRecord::RecordInvalid) && e.record.errors[:voucher_code].present?)

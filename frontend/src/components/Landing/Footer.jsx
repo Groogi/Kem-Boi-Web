@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { API_BASE } from '../../api/config'
 import { Link } from 'react-router-dom'
 
 function Footer() {
@@ -11,7 +12,7 @@ function Footer() {
   useEffect(() => {
     const fetchLinks = async () => {
       try {
-        const res = await fetch('/api/social_links')
+        const res = await fetch(`${API_BASE}/social_links`)
         if (res.ok) {
           const data = await res.json()
           setSocialLinks(data)
@@ -32,15 +33,17 @@ function Footer() {
   return (
     <footer className="w-full bg-[#f7f7f2] py-14 border-t border-black/[0.03]">
       <div className="max-w-[1440px] mx-auto px-6 md:px-12">
-        <div className="flex flex-col md:flex-row justify-between items-center text-[13px] text-[#5B5C59] font-medium font-body gap-10">
-          <div className="flex flex-col items-center md:items-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 items-center text-[13px] text-[#5B5C59] font-medium font-body gap-10">
+          {/* Left: Brand & Copyright */}
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <div className="font-bold text-[#426500] text-[20px] font-headline mb-1">Kem Boi</div>
             <div className="opacity-50 text-[11px]">© 2026 Kem Boi Digital Editorial</div>
           </div>
 
-          <div className="flex gap-12 font-medium">
+          {/* Center: Navigation */}
+          <div className="flex justify-center gap-12 font-medium">
             <a href="/#locations" className="hover:text-[#426500] transition-colors">
-              Location
+              Locations
             </a>
             <Link to="/privacy" className="hover:text-[#426500] transition-colors">
               Privacy
@@ -50,11 +53,13 @@ function Footer() {
             </Link>
           </div>
 
-          <div className="flex gap-5 items-center">
+          {/* Right: Socials */}
+          <div className="flex gap-5 items-center justify-center md:justify-end">
             <a
               href={ensureHttps(socialLinks.facebook)}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Follow Kem Boi on Facebook"
               className="hover:text-[#426500] transition-colors text-[#2D2F2C]"
             >
               <svg
@@ -71,6 +76,7 @@ function Footer() {
               href={ensureHttps(socialLinks.instagram)}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Follow Kem Boi on Instagram"
               className="hover:text-[#426500] transition-colors text-[#2D2F2C]"
             >
               <svg

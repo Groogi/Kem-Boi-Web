@@ -1,4 +1,5 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "from@example.com"
+  # Replace 'YOUR-MAILGUN-DOMAIN.com' with your actual Mailgun Sandbox or verified domain!
+  default from: ENV.fetch("MAILER_FROM", "noreply@example.com")
   layout "mailer"
 end

@@ -8,10 +8,12 @@ function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
+      // Check for background change on scroll
       setIsScrolled(window.scrollY > 20)
 
+      // ScrollSpy logic
       const sections = ['products', 'story', 'locations']
-      const scrollPosition = window.scrollY + 200
+      const scrollPosition = window.scrollY + 200 // Better offset for active detection
 
       let currentSection = ''
       for (const section of sections) {
@@ -46,8 +48,8 @@ function Navbar() {
   }, [isOpen])
 
   const getLinkClass = (sectionId) => {
-    const targetSection =
-      sectionId === 'menu' || sectionId === 'our-products' ? 'products' : sectionId
+    // Only 'our-products' lights up for the 'products' section to avoid conflict
+    const targetSection = sectionId === 'our-products' ? 'products' : sectionId
     const isActive = activeSection === targetSection
 
     const baseClass = 'transition-all duration-300 pb-1 whitespace-nowrap'
@@ -61,8 +63,9 @@ function Navbar() {
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-[#f7f7f2]/95 backdrop-blur-md py-1 shadow-sm' : 'bg-transparent py-4'}`}
     >
+      {/* Desktop Header */}
       <div className="flex justify-between items-center px-6 md:px-12 max-w-[1440px] mx-auto">
-        <div className="flex-shrink-0">
+        <div className="flex-1 flex justify-start">
           <Link to="/" onClick={() => window.scrollTo(0, 0)}>
             <img
               src="/logo.png"
@@ -72,7 +75,8 @@ function Navbar() {
           </Link>
         </div>
 
-        <div className="hidden lg:flex items-center gap-10 font-bold text-[16px] font-headline">
+        {/* Desktop Links - Centered */}
+        <div className="hidden lg:flex flex-1 justify-center items-center gap-10 font-bold text-[16px] font-headline">
           <a className={getLinkClass('menu')} href="#products">
             Menu
           </a>
@@ -83,11 +87,11 @@ function Navbar() {
             Our Story
           </a>
           <a className={getLinkClass('locations')} href="#locations">
-            Location
+            Locations
           </a>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex-1 flex items-center justify-end gap-4">
           <Link
             to="/login"
             className={`hidden md:flex bg-[#4d7902] text-white rounded-full font-bold shadow-lg shadow-[#4d7902]/20 hover:bg-[#3d6101] transition-all hover:-translate-y-0.5 active:scale-95 font-headline ${isScrolled ? 'px-8 py-2 text-[15px]' : 'px-8 py-3 text-[18px]'}`}
@@ -96,14 +100,19 @@ function Navbar() {
           </Link>
 
           {/* Burger Menu for Mobile */}
-          <button onClick={() => setIsOpen(!isOpen)} className="lg:hidden text-[#426500] p-2">
-            <span className="material-symbols-outlined text-[40px]">
+          <button 
+            onClick={() => setIsOpen(!isOpen)} 
+            className="lg:hidden text-[#426500] p-2"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+          >
+            <span className="material-symbols-outlined text-[40px]" aria-hidden="true">
               {isOpen ? 'close' : 'menu'}
             </span>
           </button>
         </div>
       </div>
 
+      {/* Mobile Menu Drawer */}
       <div
         className={`fixed top-0 left-0 w-full h-screen bg-[#f7f7f2] z-[100] transition-all duration-500 lg:hidden ${
           isOpen
@@ -122,7 +131,7 @@ function Navbar() {
           <a
             onClick={() => setIsOpen(false)}
             href="#products"
-            className={activeSection === 'products' ? 'border-b-2 border-[#426500]' : ''}
+            className="opacity-80"
           >
             Our Products
           </a>
@@ -138,7 +147,7 @@ function Navbar() {
             href="#locations"
             className={activeSection === 'locations' ? 'border-b-2 border-[#426500]' : ''}
           >
-            Location
+            Locations
           </a>
           <Link
             onClick={() => setIsOpen(false)}
